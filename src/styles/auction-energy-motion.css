@@ -1,0 +1,1095 @@
+/*
+ * Auction energy motion system.
+ * Motion is concentrated around live state, price, time and bid actions so
+ * the interface feels urgent without making reading areas unstable.
+ */
+
+.auction-status.live .badge,
+.auction-status.ending .badge {
+  position: relative;
+  isolation: isolate;
+  animation: auction-energy-live-badge 1.05s ease-in-out infinite;
+}
+
+.auction-status.ending .badge {
+  animation-duration: 0.68s;
+}
+
+.auction-status.live .badge::after,
+.auction-status.ending .badge::after {
+  position: absolute;
+  z-index: -1;
+  inset: -4px;
+  border: 1px solid rgb(244 81 11 / 0.5);
+  border-radius: inherit;
+  content: "";
+  pointer-events: none;
+  animation: auction-energy-signal 1.05s ease-out infinite;
+}
+
+.auction-status.ending .badge::after {
+  border-color: rgb(220 49 8 / 0.65);
+  animation-duration: 0.68s;
+}
+
+.auction-status.live .auction-countdown,
+.auction-status.ending .auction-countdown {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  animation: auction-energy-clock-beat 0.92s ease-in-out infinite;
+}
+
+.auction-countdown {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.auction-countdown > svg {
+  width: 14px;
+  height: 14px;
+  flex: 0 0 auto;
+  stroke-width: 2.4;
+}
+
+.auction-status.ending .auction-countdown {
+  color: #d73d08;
+  animation-duration: 0.56s;
+}
+
+.auction-card-live {
+  position: relative;
+  isolation: isolate;
+}
+
+.auction-card-live::before {
+  position: absolute;
+  z-index: 3;
+  top: 0;
+  left: -42%;
+  width: 42%;
+  height: 3px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, #ffb079 34%, #ff4b0b 70%, transparent);
+  box-shadow: 0 2px 12px rgb(244 81 11 / 0.5);
+  content: "";
+  pointer-events: none;
+  animation: auction-energy-card-runner 1.55s linear infinite;
+}
+
+.auction-card-live .auction-price {
+  animation: auction-energy-hot-price 1.05s ease-in-out infinite;
+}
+
+.auction-card-live .auction-time {
+  position: relative;
+  overflow: hidden;
+  border-block: 1px solid #f36a21;
+  background:
+    radial-gradient(circle at 88% 50%, rgb(255 96 18 / 0.27), transparent 34%),
+    linear-gradient(105deg, #180b07 0%, #321208 52%, #4f1b09 100%);
+  box-shadow:
+    inset 4px 0 0 #ff5a14,
+    inset 0 1px 0 rgb(255 213 158 / 0.18),
+    0 7px 16px rgb(83 29 5 / 0.2);
+}
+
+.auction-card-live .auction-time::after {
+  position: absolute;
+  inset: 0 auto 0 -35%;
+  width: 30%;
+  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.52), transparent);
+  content: "";
+  pointer-events: none;
+  transform: skewX(-18deg);
+  animation: auction-energy-time-strip 1.25s ease-in-out infinite;
+}
+
+.auction-card-live .auction-time .auction-countdown {
+  position: relative;
+  z-index: 1;
+  color: #fff !important;
+  font-size: 14px;
+  font-weight: 900;
+  letter-spacing: 0.055em;
+  text-shadow: 0 2px 8px rgb(91 17 0 / 0.28);
+  animation: auction-energy-card-clock 0.72s ease-in-out infinite;
+}
+
+.auction-card-live .auction-time .auction-countdown > svg {
+  filter: drop-shadow(0 2px 3px rgb(89 18 0 / 0.26));
+  animation: auction-energy-clock-hand 0.72s steps(2, end) infinite;
+}
+
+.auction-card-state-published .auction-time,
+.auction-card-state-registration_open .auction-time {
+  position: relative;
+  overflow: hidden;
+  border-block: 1px solid #ffc79e;
+  background: linear-gradient(105deg, #fff0e3, #ffe2cf 52%, #fff2e7);
+  box-shadow: inset 4px 0 0 #ff641b;
+}
+
+.auction-card-state-published .auction-time .auction-countdown,
+.auction-card-state-registration_open .auction-time .auction-countdown {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #db490c !important;
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0.035em;
+  animation: auction-energy-upcoming-clock 1.35s ease-in-out infinite;
+}
+
+.auction-card-state-published .auction-time .auction-countdown > svg,
+.auction-card-state-registration_open .auction-time .auction-countdown > svg {
+  color: #ed5714;
+  animation: auction-energy-clock-hand 1.35s steps(2, end) infinite;
+}
+
+.auction-card-live .card-link svg {
+  animation: auction-energy-arrow-rush 0.78s ease-in-out infinite;
+}
+
+.auction-card-live:hover {
+  transform: translateY(-6px) scale(1.008);
+  box-shadow: 0 20px 38px rgb(194 66 9 / 0.2);
+}
+
+.bid-now,
+.public-live-header-actions .button.primary,
+.public-live-auction-strip > .button.primary,
+.live-room .composer > .button.primary,
+.auction-detail-page .detail-actions > .button.primary {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  box-shadow: 0 10px 24px rgb(219 62 5 / 0.26);
+  animation: auction-energy-cta-beat 1.25s ease-in-out infinite;
+}
+
+.bid-now::after,
+.public-live-header-actions .button.primary::after,
+.public-live-auction-strip > .button.primary::after,
+.live-room .composer > .button.primary::after,
+.auction-detail-page .detail-actions > .button.primary::after {
+  position: absolute;
+  z-index: -1;
+  inset: -35% auto -35% -42%;
+  width: 34%;
+  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.62), transparent);
+  content: "";
+  pointer-events: none;
+  transform: skewX(-18deg);
+  animation: auction-energy-cta-sweep 1.65s cubic-bezier(0.45, 0, 0.2, 1) infinite;
+}
+
+.bid-now svg,
+.public-live-header-actions .button.primary svg,
+.public-live-auction-strip > .button.primary svg,
+.live-room .composer > .button.primary svg,
+.auction-detail-page .detail-actions > .button.primary svg {
+  animation: auction-energy-gavel-kick 0.68s ease-in-out infinite alternate;
+}
+
+.bid-now:active,
+.public-live-header-actions .button.primary:active,
+.public-live-auction-strip > .button.primary:active,
+.live-room .composer > .button.primary:active,
+.auction-detail-page .detail-actions > .button.primary:active {
+  transform: translateY(1px) scale(0.98);
+}
+
+.live-room .price-card {
+  position: relative;
+  overflow: hidden;
+  border-color: #e6631e;
+  box-shadow: 0 14px 34px rgb(85 30 7 / 0.24);
+}
+
+.live-room .price-card::after {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(110deg, transparent 24%, rgb(255 123 43 / 0.14) 46%, transparent 68%);
+  content: "";
+  pointer-events: none;
+  transform: translateX(-110%);
+  animation: auction-energy-price-sweep 1.8s ease-in-out infinite;
+}
+
+.live-room .price-card > strong,
+.public-live-current-price > strong {
+  position: relative;
+  z-index: 1;
+  transform-origin: left center;
+  animation: auction-energy-price-arrival 0.48s cubic-bezier(0.2, 1.55, 0.45, 1) both;
+}
+
+.live-room .count-card {
+  position: relative;
+  overflow: hidden;
+  border-color: #efb27f;
+  background: linear-gradient(120deg, #fffdf9, #fff2e7);
+  box-shadow: 0 10px 26px rgb(182 66 11 / 0.12);
+}
+
+.live-room .count-card::before {
+  position: absolute;
+  top: 0;
+  left: -35%;
+  width: 35%;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #ff5916, transparent);
+  content: "";
+  animation: auction-energy-time-runner 1.2s linear infinite;
+}
+
+.live-room .count-card > svg {
+  color: #e95010;
+  animation: auction-energy-clock-hand 0.9s steps(2, end) infinite;
+}
+
+.live-room .count-card > h2 {
+  margin-block: 8px;
+  color: #d94a0b;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.08em;
+  text-shadow: 0 6px 18px rgb(223 74 10 / 0.14);
+  animation: auction-energy-clock-beat 0.92s ease-in-out infinite;
+}
+
+.live-room .count-card.urgent {
+  border-color: #e64512;
+  background: linear-gradient(120deg, #fff4eb, #ffe4d2);
+  box-shadow: 0 10px 28px rgb(218 58 8 / 0.2);
+  animation: auction-energy-urgent-card 0.72s ease-in-out infinite;
+}
+
+.live-room .count-card.urgent > h2,
+.live-room .count-card.urgent > svg {
+  animation-duration: 0.48s;
+}
+
+.live-room .event-feed li:first-child,
+.live-room .bid-success {
+  animation: auction-energy-event-in 0.42s cubic-bezier(0.18, 0.9, 0.3, 1.2) both;
+}
+
+.bid-overlay {
+  animation: auction-energy-overlay-in 0.18s ease-out both;
+}
+
+.bid-modal {
+  transform-origin: center bottom;
+  animation: auction-energy-modal-in 0.28s cubic-bezier(0.18, 0.9, 0.3, 1.16) both;
+}
+
+.auto-bid-drawer {
+  animation: auction-energy-drawer-in 0.3s cubic-bezier(0.22, 0.82, 0.32, 1) both;
+}
+
+.auction-detail-page .detail-countdown.live {
+  border-color: #d96b28;
+  background:
+    radial-gradient(circle at 91% 48%, rgb(255 95 16 / 0.3), transparent 32%),
+    repeating-conic-gradient(
+      from -90deg at 91% 50%,
+      rgb(255 176 87 / 0.42) 0deg 1deg,
+      transparent 1deg 12deg
+    ),
+    linear-gradient(108deg, #170b07 0%, #321208 72%, #4b1909 100%);
+  box-shadow:
+    inset 4px 0 0 #ff5c14,
+    inset 0 0 0 1px rgb(255 193 116 / 0.16),
+    0 10px 22px rgb(75 29 7 / 0.2),
+    0 0 20px rgb(244 81 11 / 0.12);
+  animation: auction-energy-detail-pulse 1.05s ease-in-out infinite;
+}
+
+.auction-detail-page .detail-countdown.live::before {
+  display: none;
+}
+
+.auction-detail-page .detail-countdown.live > svg,
+.auction-detail-page .detail-countdown.live > div > span,
+.auction-detail-page .detail-countdown.live strong,
+.auction-detail-page .detail-countdown.live .auction-countdown {
+  color: #fff4e7;
+  text-shadow:
+    0 0 7px rgb(255 246 224 / 0.62),
+    0 0 15px rgb(255 83 10 / 0.7);
+}
+
+.auction-detail-page .detail-countdown.live small {
+  color: #efc6a9;
+}
+
+.home-chatbox .home-chat-ai-mark {
+  animation: auction-energy-ai-float 2s ease-in-out infinite;
+}
+
+@keyframes auction-energy-live-badge {
+  0%,
+  100% {
+    filter: saturate(1);
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    filter: saturate(1.22);
+    transform: translateY(-1px) scale(1.025);
+  }
+}
+
+@keyframes auction-energy-signal {
+  0% {
+    opacity: 0.7;
+    transform: scale(0.94);
+  }
+  80%,
+  100% {
+    opacity: 0;
+    transform: scale(1.18);
+  }
+}
+
+@keyframes auction-energy-clock-beat {
+  0%,
+  100% {
+    filter: brightness(1);
+    transform: translateY(0) scale(1);
+  }
+  45% {
+    filter: brightness(1.08);
+    transform: translateY(-1px) scale(1.025);
+  }
+}
+
+@keyframes auction-energy-card-runner {
+  to {
+    left: 100%;
+  }
+}
+
+@keyframes auction-energy-hot-price {
+  50% {
+    color: #ee4a08;
+    text-shadow: 0 0 14px rgb(244 81 11 / 0.24);
+  }
+}
+
+@keyframes auction-energy-arrow-rush {
+  50% {
+    transform: translateX(4px);
+  }
+}
+
+@keyframes auction-energy-time-strip {
+  55%,
+  100% {
+    left: 112%;
+  }
+}
+
+@keyframes auction-energy-card-clock {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+  45% {
+    transform: translateY(-1px) scale(1.035);
+  }
+}
+
+@keyframes auction-energy-upcoming-clock {
+  50% {
+    color: #ef4a08;
+    text-shadow: 0 0 12px rgb(244 81 11 / 0.18);
+    transform: translateX(2px);
+  }
+}
+
+@keyframes auction-energy-cta-beat {
+  50% {
+    box-shadow:
+      0 0 0 5px rgb(244 81 11 / 0.1),
+      0 14px 30px rgb(219 62 5 / 0.34);
+  }
+}
+
+@keyframes auction-energy-cta-sweep {
+  58%,
+  100% {
+    left: 118%;
+  }
+}
+
+@keyframes auction-energy-gavel-kick {
+  to {
+    transform: translateY(-1px) rotate(-9deg) scale(1.1);
+  }
+}
+
+@keyframes auction-energy-price-sweep {
+  58%,
+  100% {
+    transform: translateX(110%);
+  }
+}
+
+@keyframes auction-energy-price-arrival {
+  0% {
+    opacity: 0.4;
+    transform: translateY(7px) scale(0.92);
+    text-shadow: 0 0 22px rgb(255 106 26 / 0.7);
+  }
+  65% {
+    opacity: 1;
+    transform: translateY(-1px) scale(1.035);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    text-shadow: 0 0 0 rgb(255 106 26 / 0);
+  }
+}
+
+@keyframes auction-energy-time-runner {
+  to {
+    left: 100%;
+  }
+}
+
+@keyframes auction-energy-clock-hand {
+  50% {
+    transform: rotate(10deg) scale(1.06);
+  }
+}
+
+@keyframes auction-energy-urgent-card {
+  50% {
+    box-shadow:
+      0 0 0 4px rgb(230 69 18 / 0.08),
+      0 13px 32px rgb(218 58 8 / 0.24);
+  }
+}
+
+@keyframes auction-energy-event-in {
+  from {
+    opacity: 0;
+    transform: translateX(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes auction-energy-overlay-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes auction-energy-modal-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes auction-energy-drawer-in {
+  from {
+    opacity: 0.6;
+    transform: translateX(42px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes auction-energy-detail-pulse {
+  50% {
+    border-color: #ef7a31;
+    box-shadow:
+      0 0 0 4px rgb(244 81 11 / 0.06),
+      0 12px 24px rgb(244 81 11 / 0.18);
+  }
+}
+
+@keyframes auction-energy-ai-float {
+  50% {
+    transform: translateY(-2px) rotate(-2deg);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.3),
+      0 11px 22px rgb(116 34 2 / 0.24);
+  }
+}
+
+/* Homepage spotlight: a focused ignition sequence for the live state,
+ * countdown and primary bid action. The double-beat leaves a short rest so
+ * the urgency stays noticeable without making the copy hard to read. */
+.auction-spotlight .spotlight-heading {
+  isolation: isolate;
+  transform-origin: center;
+  animation: auction-energy-fire-bar 1.08s ease-in-out infinite;
+}
+
+.auction-spotlight .spotlight-heading::before {
+  position: absolute;
+  z-index: 0;
+  inset: 26% -4% -48%;
+  border-radius: 50%;
+  background:
+    radial-gradient(ellipse at 8% 100%, rgb(255 238 119 / 0.88) 0 5%, rgb(255 126 18 / 0.58) 16%, transparent 34%),
+    radial-gradient(ellipse at 28% 100%, rgb(255 221 79 / 0.82) 0 6%, rgb(255 93 12 / 0.52) 18%, transparent 38%),
+    radial-gradient(ellipse at 52% 100%, rgb(255 241 140 / 0.9) 0 5%, rgb(255 111 11 / 0.56) 17%, transparent 36%),
+    radial-gradient(ellipse at 76% 100%, rgb(255 215 64 / 0.84) 0 6%, rgb(255 76 5 / 0.5) 18%, transparent 38%),
+    radial-gradient(ellipse at 94% 100%, rgb(255 238 119 / 0.86) 0 5%, rgb(255 118 13 / 0.54) 17%, transparent 35%);
+  content: "";
+  filter: blur(1.5px);
+  mix-blend-mode: screen;
+  opacity: 0.62;
+  pointer-events: none;
+  transform-origin: bottom;
+  animation: auction-energy-fire-tongues 0.56s ease-in-out infinite alternate;
+}
+
+.auction-spotlight .spotlight-heading::after {
+  z-index: 0;
+  animation: auction-energy-fire-sweep 1.38s cubic-bezier(0.45, 0, 0.2, 1) infinite;
+}
+
+.auction-spotlight .spotlight-heading .badge {
+  text-shadow: 0 2px 9px rgb(103 17 0 / 0.34);
+}
+
+.auction-spotlight .spotlight-heading .badge > svg {
+  filter: drop-shadow(0 2px 5px rgb(255 229 92 / 0.6));
+  transform-origin: 50% 85%;
+  animation: auction-energy-flame-dance 0.48s ease-in-out infinite alternate;
+}
+
+.auction-spotlight .spotlight-summary .auction-countdown {
+  isolation: isolate;
+  overflow: visible;
+  border: 1px solid #ed6b28;
+  background:
+    radial-gradient(circle at 92% 50%, rgb(255 105 22 / 0.28), transparent 38%),
+    linear-gradient(105deg, #180b07, #3e1609);
+  box-shadow:
+    inset 3px 0 0 #ff641a,
+    0 8px 18px rgb(78 25 4 / 0.24),
+    0 0 18px rgb(255 81 12 / 0.16);
+  color: #fff7e9;
+  transform-origin: center;
+  will-change: transform, filter;
+  animation: auction-energy-double-heartbeat 1.08s cubic-bezier(0.22, 0.61, 0.36, 1) infinite;
+}
+
+.auction-spotlight .spotlight-summary .auction-countdown::before,
+.auction-spotlight .spotlight-summary .auction-countdown::after {
+  position: absolute;
+  z-index: -1;
+  border-radius: inherit;
+  content: "";
+  pointer-events: none;
+}
+
+.auction-spotlight .spotlight-summary .auction-countdown::before {
+  inset: -4px;
+  border: 2px solid rgb(255 97 19 / 0.48);
+  animation: auction-energy-heartbeat-ring 1.08s ease-out infinite;
+}
+
+.auction-spotlight .spotlight-summary .auction-countdown::after {
+  inset: -8px;
+  background: radial-gradient(ellipse, rgb(255 105 24 / 0.24), transparent 68%);
+  filter: blur(4px);
+  animation: auction-energy-heartbeat-heat 1.08s ease-out infinite;
+}
+
+.auction-spotlight .spotlight-summary .auction-countdown > svg {
+  filter: drop-shadow(0 2px 4px rgb(100 20 0 / 0.28));
+  transform-origin: center;
+  animation: auction-energy-heartbeat-clock 1.08s ease-in-out infinite;
+}
+
+.auction-spotlight .bid-now {
+  transform-origin: center;
+  will-change: transform, box-shadow, filter;
+  animation: auction-energy-cta-ignite 1.16s cubic-bezier(0.22, 0.61, 0.36, 1) infinite;
+}
+
+.auction-spotlight .bid-now::before {
+  position: absolute;
+  z-index: -1;
+  right: -8%;
+  bottom: -54%;
+  left: -8%;
+  height: 108%;
+  border-radius: 50% 50% 0 0;
+  background:
+    radial-gradient(ellipse at 13% 100%, rgb(255 244 137 / 0.94) 0 7%, rgb(255 106 9 / 0.72) 18%, transparent 38%),
+    radial-gradient(ellipse at 38% 100%, rgb(255 224 74 / 0.92) 0 8%, rgb(255 86 4 / 0.66) 20%, transparent 42%),
+    radial-gradient(ellipse at 64% 100%, rgb(255 246 150 / 0.9) 0 7%, rgb(255 116 8 / 0.7) 18%, transparent 39%),
+    radial-gradient(ellipse at 88% 100%, rgb(255 219 64 / 0.9) 0 7%, rgb(255 76 3 / 0.64) 20%, transparent 41%);
+  content: "";
+  filter: blur(1px);
+  mix-blend-mode: screen;
+  opacity: 0.52;
+  pointer-events: none;
+  transform-origin: bottom;
+  animation: auction-energy-cta-flames 0.58s ease-in-out infinite alternate;
+}
+
+.auction-spotlight .bid-now::after {
+  animation-duration: 1.24s;
+}
+
+.auction-spotlight .bid-now > svg,
+.auction-spotlight .bid-now .sgdg-button__icon > svg {
+  filter: drop-shadow(0 3px 5px rgb(91 15 0 / 0.28));
+  animation: auction-energy-lightning-strike 0.58s ease-in-out infinite;
+}
+
+.auction-spotlight .bid-now:hover {
+  animation-duration: 0.86s;
+}
+
+.home-live-countdown {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-color: #f06b2b;
+  background:
+    radial-gradient(circle at 92% 50%, rgb(255 107 25 / 0.34), transparent 37%),
+    repeating-conic-gradient(
+      from -90deg at 92% 50%,
+      rgb(255 184 99 / 0.32) 0deg 1deg,
+      transparent 1deg 13deg
+    ),
+    linear-gradient(105deg, #170a06 0%, #311108 53%, #4a1909 100%);
+  color: #fff;
+  box-shadow:
+    inset 4px 0 0 #ff5d16,
+    inset 0 1px 0 rgb(255 218 166 / 0.2),
+    0 10px 24px rgb(73 24 5 / 0.27),
+    0 0 20px rgb(255 80 10 / 0.14);
+  transform-origin: center;
+  animation: auction-energy-live-clock-card 1.14s ease-in-out infinite;
+}
+
+.home-live-countdown::before,
+.home-live-countdown::after {
+  position: absolute;
+  content: "";
+  pointer-events: none;
+}
+
+.home-live-countdown::before {
+  z-index: -1;
+  right: -5%;
+  bottom: -66%;
+  left: -5%;
+  height: 118%;
+  border-radius: 50% 50% 0 0;
+  background:
+    radial-gradient(ellipse at 12% 100%, rgb(255 246 151 / 0.86) 0 6%, rgb(255 105 8 / 0.6) 18%, transparent 38%),
+    radial-gradient(ellipse at 36% 100%, rgb(255 223 74 / 0.82) 0 7%, rgb(255 77 3 / 0.58) 20%, transparent 42%),
+    radial-gradient(ellipse at 62% 100%, rgb(255 247 159 / 0.84) 0 6%, rgb(255 117 8 / 0.62) 18%, transparent 39%),
+    radial-gradient(ellipse at 88% 100%, rgb(255 218 66 / 0.82) 0 7%, rgb(255 70 2 / 0.56) 20%, transparent 41%);
+  filter: blur(1px);
+  mix-blend-mode: screen;
+  opacity: 0.48;
+  transform-origin: bottom;
+  animation: auction-energy-live-clock-flames 0.62s ease-in-out infinite alternate;
+}
+
+.home-live-countdown::after {
+  z-index: 0;
+  inset: -45% auto -45% -34%;
+  width: 24%;
+  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.66), transparent);
+  transform: skewX(-18deg);
+  animation: auction-energy-live-clock-sweep 1.42s cubic-bezier(0.45, 0, 0.2, 1) infinite;
+}
+
+.home-live-countdown > div,
+.home-live-countdown > .auction-status {
+  position: relative;
+  z-index: 1;
+}
+
+.home-live-countdown > div:first-child,
+.home-live-countdown svg,
+.home-live-countdown .auction-countdown {
+  color: #fff !important;
+}
+
+.home-live-countdown > div:first-child {
+  text-shadow: 0 2px 6px rgb(91 15 0 / 0.28);
+}
+
+.home-live-countdown > div:first-child > svg {
+  filter: drop-shadow(0 2px 4px rgb(91 15 0 / 0.3));
+  transform-origin: center;
+  animation: auction-energy-live-clock-alert 0.76s steps(2, end) infinite;
+}
+
+.home-live-countdown .auction-status.live .auction-countdown,
+.home-live-countdown .auction-status.ending .auction-countdown {
+  text-shadow: 0 3px 9px rgb(91 15 0 / 0.34);
+  transform-origin: center;
+  will-change: transform, filter;
+  animation: auction-energy-double-heartbeat 1.02s cubic-bezier(0.22, 0.61, 0.36, 1) infinite;
+}
+
+.home-live-countdown .auction-status.live .auction-countdown > svg,
+.home-live-countdown .auction-status.ending .auction-countdown > svg {
+  filter: drop-shadow(0 2px 4px rgb(91 15 0 / 0.32));
+  transform-origin: center;
+  animation: auction-energy-heartbeat-clock 1.02s ease-in-out infinite;
+}
+
+@keyframes auction-energy-fire-bar {
+  0%,
+  100% {
+    background-position: 0% 50%;
+    box-shadow: 0 7px 16px rgb(255 79 0 / 0.22);
+    filter: saturate(1);
+    transform: translateY(0) scale(1);
+  }
+
+  42% {
+    background-position: 74% 50%;
+    box-shadow:
+      0 0 0 3px rgb(255 103 22 / 0.08),
+      0 10px 24px rgb(237 64 4 / 0.36);
+    filter: saturate(1.18) brightness(1.04);
+    transform: translateY(-1px) scale(1.004);
+  }
+}
+
+@keyframes auction-energy-fire-tongues {
+  0% {
+    opacity: 0.42;
+    transform: translateY(10%) scaleX(1.02) scaleY(0.76) skewX(-3deg);
+  }
+
+  100% {
+    opacity: 0.72;
+    transform: translateY(-7%) scaleX(0.98) scaleY(1.08) skewX(3deg);
+  }
+}
+
+@keyframes auction-energy-fire-sweep {
+  0%,
+  34% {
+    opacity: 0;
+    transform: translateX(-120%);
+  }
+
+  48% {
+    opacity: 0.82;
+  }
+
+  72%,
+  100% {
+    opacity: 0;
+    transform: translateX(120%);
+  }
+}
+
+@keyframes auction-energy-flame-dance {
+  0% {
+    transform: translateY(1px) rotate(-7deg) scale(0.94, 1.02);
+  }
+
+  100% {
+    transform: translateY(-2px) rotate(6deg) scale(1.12, 1.2);
+  }
+}
+
+@keyframes auction-energy-double-heartbeat {
+  0%,
+  31%,
+  100% {
+    filter: brightness(1) saturate(1);
+    transform: translateY(0) scale(1);
+  }
+
+  7% {
+    filter: brightness(1.14) saturate(1.16) drop-shadow(0 7px 9px rgb(226 58 3 / 0.3));
+    transform: translateY(-1px) scale(1.095);
+  }
+
+  14% {
+    filter: brightness(1.03) saturate(1.06);
+    transform: translateY(0) scale(0.99);
+  }
+
+  21% {
+    filter: brightness(1.1) saturate(1.12) drop-shadow(0 5px 7px rgb(226 58 3 / 0.24));
+    transform: translateY(-1px) scale(1.06);
+  }
+
+  28% {
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes auction-energy-heartbeat-ring {
+  0%,
+  31%,
+  100% {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+
+  8% {
+    opacity: 0.78;
+    transform: scale(1.1);
+  }
+
+  15% {
+    opacity: 0;
+    transform: scale(1.17);
+  }
+
+  21% {
+    opacity: 0.56;
+    transform: scale(1.08);
+  }
+
+  30% {
+    opacity: 0;
+    transform: scale(1.2);
+  }
+}
+
+@keyframes auction-energy-heartbeat-heat {
+  0%,
+  31%,
+  100% {
+    opacity: 0.1;
+    transform: scale(0.96);
+  }
+
+  8%,
+  21% {
+    opacity: 0.86;
+    transform: scale(1.15);
+  }
+}
+
+@keyframes auction-energy-heartbeat-clock {
+  0%,
+  31%,
+  100% {
+    transform: rotate(0deg) scale(1);
+  }
+
+  7% {
+    transform: rotate(-12deg) scale(1.18);
+  }
+
+  21% {
+    transform: rotate(9deg) scale(1.1);
+  }
+}
+
+@keyframes auction-energy-cta-ignite {
+  0%,
+  34%,
+  100% {
+    filter: brightness(1) saturate(1);
+    transform: translateY(0) scale(1);
+    box-shadow: 0 10px 24px rgb(219 62 5 / 0.26);
+  }
+
+  9% {
+    filter: brightness(1.1) saturate(1.16);
+    transform: translateY(-2px) scale(1.025);
+    box-shadow:
+      0 0 0 5px rgb(255 99 18 / 0.12),
+      0 16px 32px rgb(219 62 5 / 0.4);
+  }
+
+  19% {
+    transform: translateY(0) scale(0.998);
+  }
+
+  27% {
+    filter: brightness(1.06) saturate(1.1);
+    transform: translateY(-1px) scale(1.012);
+    box-shadow:
+      0 0 0 3px rgb(255 99 18 / 0.09),
+      0 13px 28px rgb(219 62 5 / 0.34);
+  }
+}
+
+@keyframes auction-energy-cta-flames {
+  from {
+    opacity: 0.36;
+    transform: translateY(14%) scaleX(1.03) scaleY(0.72) skewX(-2deg);
+  }
+
+  to {
+    opacity: 0.68;
+    transform: translateY(-4%) scaleX(0.98) scaleY(1.12) skewX(2deg);
+  }
+}
+
+@keyframes auction-energy-lightning-strike {
+  0%,
+  34%,
+  100% {
+    transform: translateY(0) rotate(0deg) scale(1);
+  }
+
+  8% {
+    transform: translateY(-2px) rotate(-12deg) scale(1.22);
+  }
+
+  20% {
+    transform: translateY(0) rotate(7deg) scale(1.08);
+  }
+}
+
+@keyframes auction-energy-live-clock-card {
+  0%,
+  34%,
+  100% {
+    filter: brightness(1) saturate(1);
+    transform: translateY(0) scale(1);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.3),
+      0 10px 24px rgb(218 58 7 / 0.24);
+  }
+
+  9% {
+    filter: brightness(1.08) saturate(1.16);
+    transform: translateY(-1px) scale(1.012);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.4),
+      0 0 0 4px rgb(255 95 15 / 0.1),
+      0 14px 30px rgb(218 58 7 / 0.34);
+  }
+
+  22% {
+    filter: brightness(1.04) saturate(1.08);
+    transform: translateY(0) scale(1.005);
+  }
+}
+
+@keyframes auction-energy-live-clock-flames {
+  from {
+    opacity: 0.34;
+    transform: translateY(12%) scaleX(1.03) scaleY(0.7) skewX(-2deg);
+  }
+
+  to {
+    opacity: 0.62;
+    transform: translateY(-6%) scaleX(0.98) scaleY(1.14) skewX(2deg);
+  }
+}
+
+@keyframes auction-energy-live-clock-sweep {
+  0%,
+  36% {
+    left: -34%;
+    opacity: 0;
+  }
+
+  49% {
+    opacity: 0.8;
+  }
+
+  72%,
+  100% {
+    left: 116%;
+    opacity: 0;
+  }
+}
+
+@keyframes auction-energy-live-clock-alert {
+  0%,
+  100% {
+    transform: rotate(0deg) scale(1);
+  }
+
+  50% {
+    transform: rotate(12deg) scale(1.12);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auction-spotlight .spotlight-heading,
+  .auction-spotlight .spotlight-heading::before,
+  .auction-spotlight .spotlight-heading::after,
+  .auction-spotlight .spotlight-heading .badge > svg,
+  .auction-spotlight .spotlight-summary .auction-countdown::before,
+  .auction-spotlight .spotlight-summary .auction-countdown::after,
+  .auction-spotlight .spotlight-summary .auction-countdown > svg,
+  .auction-spotlight .bid-now::before,
+  .home-live-countdown,
+  .home-live-countdown::before,
+  .home-live-countdown::after,
+  .home-live-countdown > div:first-child > svg,
+  .home-live-countdown .auction-countdown,
+  .home-live-countdown .auction-countdown > svg,
+  .auction-status.live .badge,
+  .auction-status.ending .badge,
+  .auction-status.live .badge::after,
+  .auction-status.ending .badge::after,
+  .auction-status.live .auction-countdown,
+  .auction-status.ending .auction-countdown,
+  .auction-card-live::before,
+  .auction-card-live .auction-price,
+  .auction-card-live .auction-time::after,
+  .auction-card-live .auction-time .auction-countdown,
+  .auction-card-live .auction-time .auction-countdown > svg,
+  .auction-card-state-published .auction-time .auction-countdown,
+  .auction-card-state-registration_open .auction-time .auction-countdown,
+  .auction-card-state-published .auction-time .auction-countdown > svg,
+  .auction-card-state-registration_open .auction-time .auction-countdown > svg,
+  .auction-card-live .card-link svg,
+  .bid-now,
+  .public-live-header-actions .button.primary,
+  .public-live-auction-strip > .button.primary,
+  .live-room .composer > .button.primary,
+  .auction-detail-page .detail-actions > .button.primary,
+  .bid-now::after,
+  .public-live-header-actions .button.primary::after,
+  .public-live-auction-strip > .button.primary::after,
+  .live-room .composer > .button.primary::after,
+  .auction-detail-page .detail-actions > .button.primary::after,
+  .bid-now svg,
+  .public-live-header-actions .button.primary svg,
+  .public-live-auction-strip > .button.primary svg,
+  .live-room .composer > .button.primary svg,
+  .auction-detail-page .detail-actions > .button.primary svg,
+  .live-room .price-card::after,
+  .live-room .price-card > strong,
+  .public-live-current-price > strong,
+  .live-room .count-card::before,
+  .live-room .count-card > svg,
+  .live-room .count-card h2,
+  .live-room .count-card.urgent,
+  .live-room .event-feed li:first-child,
+  .live-room .bid-success,
+  .bid-overlay,
+  .bid-modal,
+  .auto-bid-drawer,
+  .auction-detail-page .detail-countdown.live,
+  .home-chatbox .home-chat-ai-mark {
+    animation: none !important;
+  }
+}

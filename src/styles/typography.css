@@ -1,0 +1,87 @@
+.sgdg-text-display,
+.sgdg-text-page-title,
+.sgdg-text-section-title,
+.sgdg-text-card-title {
+  color: var(--sgdg-text-primary);
+  font-family: var(--sgdg-font-family-display);
+}
+
+.sgdg-text-display {
+  font-size: var(--sgdg-font-size-display);
+  font-weight: var(--sgdg-font-weight-bold);
+  letter-spacing: var(--sgdg-letter-spacing-tight);
+  line-height: var(--sgdg-line-height-tight);
+}
+
+.sgdg-text-page-title {
+  font-size: var(--sgdg-font-size-4xl);
+  font-weight: var(--sgdg-font-weight-bold);
+  letter-spacing: var(--sgdg-letter-spacing-tight);
+  line-height: var(--sgdg-line-height-snug);
+}
+
+.sgdg-text-section-title {
+  font-size: var(--sgdg-font-size-3xl);
+  font-weight: var(--sgdg-font-weight-bold);
+  line-height: var(--sgdg-line-height-snug);
+}
+
+.sgdg-text-card-title {
+  font-size: var(--sgdg-font-size-2xl);
+  font-weight: var(--sgdg-font-weight-bold);
+  line-height: var(--sgdg-line-height-snug);
+}
+
+.sgdg-text-body,
+.sgdg-text-body-small {
+  color: var(--sgdg-text-secondary);
+  font-family: var(--sgdg-font-family-body);
+  font-weight: var(--sgdg-font-weight-regular);
+  line-height: var(--sgdg-line-height-normal);
+}
+
+.sgdg-text-body {
+  font-size: var(--sgdg-font-size-lg);
+}
+
+.sgdg-text-body-small {
+  font-size: var(--sgdg-font-size-md);
+}
+
+.sgdg-text-label {
+  font-size: var(--sgdg-font-size-sm);
+  font-weight: var(--sgdg-font-weight-bold);
+  line-height: var(--sgdg-line-height-snug);
+}
+
+.sgdg-text-caption {
+  color: var(--sgdg-text-muted);
+  font-size: var(--sgdg-font-size-xs);
+  line-height: var(--sgdg-line-height-normal);
+}
+
+.sgdg-text-price,
+.sgdg-text-countdown,
+.sgdg-text-metric {
+  font-family: var(--sgdg-font-family-numeric);
+  font-variant-numeric: tabular-nums;
+}
+
+.sgdg-text-price {
+  font-size: var(--sgdg-font-size-3xl);
+  font-weight: var(--sgdg-font-weight-bold);
+  line-height: var(--sgdg-line-height-none);
+}
+
+.sgdg-text-countdown {
+  font-size: var(--sgdg-font-size-4xl);
+  font-weight: var(--sgdg-font-weight-bold);
+  letter-spacing: var(--sgdg-letter-spacing-normal);
+  line-height: var(--sgdg-line-height-none);
+}
+
+.sgdg-text-metric {
+  font-size: var(--sgdg-font-size-xl);
+  font-weight: var(--sgdg-font-weight-bold);
+  line-height: var(--sgdg-line-height-tight);
+}

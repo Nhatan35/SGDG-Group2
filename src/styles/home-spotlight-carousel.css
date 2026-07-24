@@ -1,0 +1,195 @@
+.spotlight-carousel {
+  min-width: 0;
+}
+
+.spotlight-slide {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+  transform-origin: center;
+}
+
+.spotlight-slide-next {
+  animation: spotlight-carousel-in-next 0.58s cubic-bezier(0.22, 0.72, 0.24, 1);
+}
+
+.spotlight-slide-prev {
+  animation: spotlight-carousel-in-prev 0.58s cubic-bezier(0.22, 0.72, 0.24, 1);
+}
+
+.spotlight-carousel .spotlight-heading {
+  padding-right: 142px;
+}
+
+.spotlight-carousel-controls {
+  position: absolute;
+  z-index: 8;
+  top: 24px;
+  right: 27px;
+  display: flex;
+  height: 30px;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 5px;
+  border: 1px solid rgb(255 255 255 / 0.24);
+  border-radius: 999px;
+  background: rgb(111 22 0 / 0.16);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.16);
+  backdrop-filter: blur(6px);
+}
+
+.spotlight-carousel-controls > button {
+  display: grid;
+  width: 23px;
+  height: 23px;
+  padding: 0;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 0.16);
+  color: #fff;
+  cursor: pointer;
+  transition:
+    background 160ms ease,
+    transform 160ms ease;
+}
+
+.spotlight-carousel-controls > button:hover {
+  background: rgb(255 255 255 / 0.32);
+  transform: scale(1.08);
+}
+
+.spotlight-carousel-controls > button:focus-visible,
+.spotlight-carousel-dots button:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+.spotlight-carousel-controls svg {
+  width: 15px;
+  height: 15px;
+  stroke-width: 2.8;
+}
+
+.spotlight-carousel-dots {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.spotlight-carousel-dots button {
+  width: 6px;
+  height: 6px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.46);
+  cursor: pointer;
+  transition:
+    width 200ms ease,
+    background 200ms ease,
+    transform 200ms ease;
+}
+
+.spotlight-carousel-dots button:hover {
+  background: rgb(255 255 255 / 0.78);
+  transform: scale(1.22);
+}
+
+.spotlight-carousel-dots button.active {
+  width: 17px;
+  background: #fff;
+  box-shadow: 0 0 8px rgb(255 255 255 / 0.55);
+}
+
+.spotlight-carousel-progress {
+  position: absolute;
+  z-index: 7;
+  top: 60px;
+  right: 31px;
+  left: 31px;
+  height: 2px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.2);
+  pointer-events: none;
+}
+
+.spotlight-carousel-progress span {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #fff4c9, #fff, #ffd38b);
+  box-shadow: 0 0 8px rgb(255 255 255 / 0.72);
+  transform: scaleX(0);
+  transform-origin: left;
+  animation: spotlight-carousel-progress 5.2s linear forwards;
+}
+
+.spotlight-carousel.carousel-paused .spotlight-carousel-progress span {
+  animation: none;
+  transform: scaleX(0);
+}
+
+@keyframes spotlight-carousel-in-next {
+  from {
+    opacity: 0.18;
+    filter: saturate(0.86) blur(2px);
+    transform: translateX(28px) scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+    filter: saturate(1) blur(0);
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes spotlight-carousel-in-prev {
+  from {
+    opacity: 0.18;
+    filter: saturate(0.86) blur(2px);
+    transform: translateX(-28px) scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+    filter: saturate(1) blur(0);
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes spotlight-carousel-progress {
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@media (max-width: 520px) {
+  .spotlight-carousel .spotlight-heading {
+    padding-right: 134px;
+  }
+
+  .spotlight-carousel-controls {
+    right: 24px;
+  }
+
+  .spotlight-carousel-progress {
+    right: 28px;
+    left: 28px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spotlight-slide-next,
+  .spotlight-slide-prev,
+  .spotlight-carousel-progress span {
+    animation: none !important;
+  }
+
+  .spotlight-carousel-controls > button,
+  .spotlight-carousel-dots button {
+    transition: none;
+  }
+}

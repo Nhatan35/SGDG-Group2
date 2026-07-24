@@ -1,0 +1,221 @@
+:root {
+  /* Primitive palette: values intentionally preserve the current SGDG brand. */
+  --sgdg-orange-50: #fffaf6;
+  --sgdg-orange-100: #fff0e7;
+  --sgdg-orange-200: #ffd7bf;
+  --sgdg-orange-500: #ff7a1a;
+  --sgdg-orange-600: #f4510b;
+  --sgdg-orange-700: #c3420b;
+  --sgdg-orange-800: #a94711;
+  --sgdg-orange-900: #6a260b;
+
+  --sgdg-amber-100: #f4e8da;
+  --sgdg-amber-500: #d28a29;
+  --sgdg-amber-800: #875b18;
+
+  --sgdg-red-100: #fbe7e4;
+  --sgdg-red-600: #ba422c;
+
+  --sgdg-green-50: #f4f1eb;
+  --sgdg-green-100: #eef9ec;
+  --sgdg-green-600: #258b47;
+  --sgdg-green-700: #7a6e5c;
+
+  --sgdg-neutral-0: #fffefd;
+  --sgdg-neutral-50: #f3f2ef;
+  --sgdg-neutral-100: #e9f0f2;
+  --sgdg-neutral-400: #aaa296;
+  --sgdg-neutral-500: #70645e;
+  --sgdg-neutral-600: #6f6a61;
+  --sgdg-neutral-900: #211714;
+
+  --sgdg-cream-50: #fffdf9;
+  --sgdg-cream-100: #fff9f4;
+  --sgdg-cream-200: #fff8f1;
+  --sgdg-cream-300: #f4e8da;
+
+  --sgdg-brown-100: #ead8c7;
+  --sgdg-brown-200: #ddd4c8;
+  --sgdg-brown-700: #5a2b17;
+  --sgdg-brown-900: #30150a;
+
+  /* Brand semantics. */
+  --sgdg-color-brand-primary: var(--sgdg-orange-600);
+  --sgdg-color-brand-primary-hover: var(--sgdg-orange-700);
+  --sgdg-color-brand-primary-active: var(--sgdg-orange-800);
+  --sgdg-color-brand-primary-soft: var(--sgdg-orange-100);
+  --sgdg-color-brand-on-primary: var(--sgdg-neutral-0);
+
+  /* Live energy semantics. */
+  --sgdg-color-live: var(--sgdg-orange-600);
+  --sgdg-color-live-strong: var(--sgdg-orange-700);
+  --sgdg-color-live-soft: var(--sgdg-orange-100);
+  --sgdg-color-live-glow: rgb(244 81 11 / 28%);
+  --sgdg-color-ember: var(--sgdg-orange-500);
+  --sgdg-color-ending-soon: #df5d12;
+  --sgdg-color-critical-ending: var(--sgdg-red-600);
+
+  /* Text semantics. */
+  --sgdg-text-primary: var(--sgdg-neutral-900);
+  --sgdg-text-secondary: var(--sgdg-neutral-500);
+  --sgdg-text-muted: #80675a;
+  --sgdg-text-inverse: var(--sgdg-neutral-0);
+  --sgdg-text-link: var(--sgdg-orange-700);
+  --sgdg-text-live: var(--sgdg-orange-700);
+  --sgdg-text-warning: var(--sgdg-amber-800);
+  --sgdg-text-danger: var(--sgdg-red-600);
+  --sgdg-text-success: var(--sgdg-green-700);
+
+  /* Surface semantics. */
+  --sgdg-surface-page: var(--sgdg-cream-100);
+  --sgdg-surface-card: var(--sgdg-neutral-0);
+  --sgdg-surface-elevated: #fff;
+  --sgdg-surface-muted: var(--sgdg-green-50);
+  --sgdg-surface-warm: var(--sgdg-cream-200);
+  --sgdg-surface-live: var(--sgdg-orange-100);
+  --sgdg-surface-live-dark: var(--sgdg-brown-900);
+  --sgdg-surface-overlay: rgb(33 13 6 / 66%);
+
+  /* Border semantics. */
+  --sgdg-border-default: var(--sgdg-brown-100);
+  --sgdg-border-subtle: #f0dfd2;
+  --sgdg-border-strong: #ecd1bd;
+  --sgdg-border-focus: var(--sgdg-orange-600);
+  --sgdg-border-live: var(--sgdg-orange-600);
+  --sgdg-border-warning: var(--sgdg-amber-500);
+  --sgdg-border-danger: var(--sgdg-red-600);
+
+  /* Feedback semantics. */
+  --sgdg-color-success: var(--sgdg-green-700);
+  --sgdg-color-success-soft: var(--sgdg-green-50);
+  --sgdg-color-warning: var(--sgdg-amber-500);
+  --sgdg-color-warning-soft: var(--sgdg-amber-100);
+  --sgdg-color-danger: var(--sgdg-red-600);
+  --sgdg-color-danger-soft: var(--sgdg-red-100);
+  --sgdg-color-info: #7d6e65;
+  --sgdg-color-info-soft: var(--sgdg-neutral-100);
+
+  /* Focus foundation. */
+  --sgdg-focus-ring-color: var(--sgdg-orange-600);
+  --sgdg-focus-ring-width: 3px;
+  --sgdg-focus-ring-offset: 3px;
+
+  /* Gradients, shadows and attention glows. */
+  --sgdg-gradient-primary-cta: linear-gradient(
+    180deg,
+    var(--sgdg-orange-500),
+    var(--sgdg-orange-600)
+  );
+  --sgdg-gradient-live: linear-gradient(
+    135deg,
+    var(--sgdg-orange-600),
+    var(--sgdg-orange-800)
+  );
+  --sgdg-gradient-ending: linear-gradient(135deg, #ff751c, #df5d12);
+  --sgdg-gradient-hero-warm: linear-gradient(
+    135deg,
+    var(--sgdg-cream-50),
+    var(--sgdg-orange-100)
+  );
+
+  --sgdg-shadow-sm: 0 4px 16px rgb(95 52 28 / 8%);
+  --sgdg-shadow-md: 0 16px 42px rgb(95 41 16 / 14%);
+  --sgdg-shadow-lg: 0 22px 58px rgb(74 31 12 / 18%);
+  --sgdg-shadow-modal: 0 26px 70px rgb(33 13 6 / 50%);
+  --sgdg-shadow-live-panel: 0 15px 35px rgb(57 20 5 / 16%);
+
+  --sgdg-glow-live: 0 0 20px rgb(244 81 11 / 24%);
+  --sgdg-glow-ending: 0 0 0 3px rgb(255 79 0 / 14%);
+  --sgdg-glow-critical: 0 0 28px rgb(186 66 44 / 32%);
+  --sgdg-glow-current-leader:
+    inset 0 0 18px rgb(239 91 18 / 8%),
+    0 0 16px rgb(239 91 18 / 8%);
+
+  /* Spacing scale. */
+  --sgdg-space-1: 4px;
+  --sgdg-space-2: 8px;
+  --sgdg-space-3: 12px;
+  --sgdg-space-4: 16px;
+  --sgdg-space-5: 20px;
+  --sgdg-space-6: 24px;
+  --sgdg-space-8: 32px;
+  --sgdg-space-10: 40px;
+  --sgdg-space-12: 48px;
+  --sgdg-space-16: 64px;
+
+  /* Radius scale. */
+  --sgdg-radius-xs: 8px;
+  --sgdg-radius-sm: 10px;
+  --sgdg-radius-md: 14px;
+  --sgdg-radius-lg: 18px;
+  --sgdg-radius-xl: 24px;
+  --sgdg-radius-pill: 999px;
+
+  /* Layout foundation. */
+  --sgdg-container-max-width: 1440px;
+  --sgdg-content-gutter: 24px;
+  --sgdg-content-gutter-mobile: 12px;
+  --sgdg-header-height: 70px;
+  --sgdg-header-height-mobile: 64px;
+  --sgdg-sidebar-width: 280px;
+  --sgdg-sticky-offset: 145px;
+
+  /* Typography foundation. */
+  --sgdg-font-family-display: "Be Vietnam Pro", Inter, system-ui, sans-serif;
+  --sgdg-font-family-body: "Be Vietnam Pro", Inter, system-ui, sans-serif;
+  --sgdg-font-family-numeric: "Be Vietnam Pro", Inter, system-ui, sans-serif;
+
+  --sgdg-font-size-xs: 0.6875rem;
+  --sgdg-font-size-sm: 0.75rem;
+  --sgdg-font-size-md: 0.875rem;
+  --sgdg-font-size-lg: 1rem;
+  --sgdg-font-size-xl: 1.125rem;
+  --sgdg-font-size-2xl: 1.25rem;
+  --sgdg-font-size-3xl: 1.75rem;
+  --sgdg-font-size-4xl: 2.125rem;
+  --sgdg-font-size-display: clamp(2.5rem, 5vw, 4.25rem);
+
+  --sgdg-font-weight-regular: 400;
+  --sgdg-font-weight-medium: 500;
+  --sgdg-font-weight-semibold: 600;
+  --sgdg-font-weight-bold: 700;
+  --sgdg-font-weight-extrabold: 800;
+  --sgdg-font-weight-black: 900;
+
+  --sgdg-line-height-none: 1;
+  --sgdg-line-height-tight: 1.1;
+  --sgdg-line-height-snug: 1.25;
+  --sgdg-line-height-normal: 1.5;
+  --sgdg-line-height-relaxed: 1.65;
+
+  --sgdg-letter-spacing-tight: -0.035em;
+  --sgdg-letter-spacing-normal: 0;
+  --sgdg-letter-spacing-wide: 0.08em;
+
+  /*
+   * Backward-compatible aliases.
+   * Keep until consumers are migrated deliberately in later phases.
+   */
+  --sgdg-sage-700: var(--sgdg-neutral-600);
+  --sgdg-sage-500: var(--sgdg-neutral-400);
+  --sgdg-sage-300: var(--sgdg-brown-200);
+  --sgdg-sage-100: var(--sgdg-green-50);
+  --sgdg-cream: var(--sgdg-surface-page);
+  --sgdg-sand: var(--sgdg-cream-300);
+  --sgdg-white: var(--sgdg-neutral-0);
+  --sgdg-charcoal: var(--sgdg-text-primary);
+  --sgdg-border: var(--sgdg-border-default);
+  --sgdg-success: var(--sgdg-color-success);
+  --sgdg-warning: var(--sgdg-color-warning);
+  --sgdg-danger: var(--sgdg-color-danger);
+  --sgdg-info: var(--sgdg-color-info);
+  --sgdg-focus: var(--sgdg-focus-ring-color);
+  --font-sans: var(--sgdg-font-family-body);
+  --radius-sm: var(--sgdg-radius-sm);
+  --radius-md: var(--sgdg-radius-md);
+  --radius-lg: var(--sgdg-radius-lg);
+  --shadow-sm: var(--sgdg-shadow-sm);
+  --shadow-md: var(--sgdg-shadow-md);
+  --shadow-lg: var(--sgdg-shadow-lg);
+  --container: var(--sgdg-container-max-width);
+}

@@ -1,0 +1,488 @@
+.admin-management-shell {
+  --management-ink: #35261f;
+  --management-muted: #826f65;
+  --management-line: #eaded4;
+  --management-orange: #e85c18;
+  overflow: hidden;
+  border: 1px solid var(--management-line);
+  border-radius: 16px;
+  background: #fffefd;
+  box-shadow: 0 15px 40px rgba(89, 48, 27, 0.07);
+  color: var(--management-ink);
+}
+
+.management-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid #eee2d9;
+  padding: 15px 17px;
+  background: #fffdf9;
+}
+
+.management-search {
+  display: grid;
+  min-width: 270px;
+  flex: 1;
+  grid-template-columns: 18px minmax(0, 1fr);
+  align-items: center;
+  gap: 7px;
+  border: 1px solid #e4d6cb;
+  border-radius: 9px;
+  padding: 0 11px;
+  background: #fff;
+}
+
+.management-search svg {
+  width: 15px;
+  color: #9d887c;
+}
+
+.management-search input,
+.management-filter-select {
+  min-height: 39px;
+  outline: 0;
+  color: #4e3c34;
+  font: inherit;
+  font-size: 10px;
+}
+
+.management-search input {
+  min-width: 0;
+  border: 0;
+  background: transparent;
+}
+
+.management-search:focus-within,
+.management-filter-select:focus,
+.management-date-filter:focus-within {
+  border-color: #ee9d74;
+  box-shadow: 0 0 0 3px rgba(232, 92, 24, 0.09);
+}
+
+.management-filter-select {
+  min-width: 142px;
+  border: 1px solid #e4d6cb;
+  border-radius: 9px;
+  padding: 0 28px 0 10px;
+  background: #fff;
+}
+
+.management-date-filter {
+  display: inline-flex;
+  min-height: 39px;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid #e4d6cb;
+  border-radius: 9px;
+  padding: 0 10px;
+  background: #fff;
+  color: #67534a;
+  font-size: 9px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.management-date-filter svg {
+  width: 14px;
+  color: #c75a24;
+}
+
+.management-create-button {
+  display: inline-flex;
+  min-height: 39px;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 1px solid var(--management-orange);
+  border-radius: 9px;
+  padding: 0 13px;
+  background: linear-gradient(135deg, #ed671f, #df4d0d);
+  box-shadow: 0 7px 15px rgba(226, 78, 12, 0.17);
+  color: #fff;
+  font: inherit;
+  font-size: 9px;
+  font-weight: 850;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.management-create-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 9px 18px rgba(226, 78, 12, 0.22);
+}
+
+.management-create-button svg {
+  width: 14px;
+}
+
+.management-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  border-bottom: 1px solid #eee2d9;
+  padding: 13px 17px;
+  background: #fff;
+}
+
+.management-summary-grid article {
+  display: flex;
+  min-height: 56px;
+  align-items: center;
+  gap: 10px;
+  border-right: 1px solid #eee3da;
+  padding: 3px 15px;
+}
+
+.management-summary-grid article:first-child {
+  padding-left: 0;
+}
+
+.management-summary-grid article:last-child {
+  border-right: 0;
+}
+
+.management-summary-grid article > div {
+  display: grid;
+  gap: 3px;
+}
+
+.management-summary-grid small {
+  color: #89766c;
+  font-size: 8px;
+  font-weight: 700;
+}
+
+.management-summary-grid strong {
+  font-family: var(--font-display);
+  font-size: 18px;
+}
+
+.management-summary-icon {
+  display: grid;
+  width: 35px;
+  height: 35px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 10px;
+}
+
+.management-summary-icon svg {
+  width: 16px;
+}
+
+.management-summary-icon.sage { background: #edf2e8; color: #64784d; }
+.management-summary-icon.orange { background: #fff0e6; color: #e65b16; }
+.management-summary-icon.gold { background: #fff6df; color: #ce8a1c; }
+.management-summary-icon.rose { background: #fff0eb; color: #d86445; }
+.management-summary-icon.sand { background: #f4eee9; color: #9a7968; }
+
+.management-table-wrap {
+  overflow-x: auto;
+  background: #fff;
+}
+
+.management-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.auction-management-table {
+  min-width: 1120px;
+}
+
+.account-management-table {
+  min-width: 980px;
+}
+
+.management-table th,
+.management-table td {
+  border-bottom: 1px solid #f0e7df;
+  padding: 12px 11px;
+  text-align: left;
+  vertical-align: middle;
+  font-size: 9px;
+}
+
+.management-table th {
+  background: #faf7f3;
+  color: #89766b;
+  font-size: 8px;
+  font-weight: 850;
+  letter-spacing: 0.015em;
+  white-space: nowrap;
+}
+
+.management-table tbody tr {
+  transition: background 160ms ease;
+}
+
+.management-table tbody tr:hover {
+  background: #fffaf5;
+}
+
+.management-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.management-code {
+  color: #695248;
+  font-size: 8px;
+  white-space: nowrap;
+}
+
+.management-asset-cell,
+.management-user-cell {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.management-asset-cell {
+  min-width: 210px;
+}
+
+.management-asset-cell img {
+  width: 38px;
+  height: 38px;
+  flex: 0 0 auto;
+  border: 1px solid #eadfd7;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.management-asset-cell strong,
+.management-user-cell strong {
+  color: #402e27;
+  font-size: 9px;
+}
+
+.management-category,
+.management-role {
+  color: #705e55;
+  white-space: nowrap;
+}
+
+.management-session-date,
+.management-kyc-cell,
+.management-user-cell > div {
+  display: grid;
+  gap: 3px;
+}
+
+.management-session-date strong,
+.management-kyc-cell strong {
+  color: #5f4b42;
+  font-size: 8px;
+  white-space: nowrap;
+}
+
+.management-session-date small,
+.management-kyc-cell small,
+.management-user-cell small {
+  color: #9a877d;
+  font-size: 7px;
+  white-space: nowrap;
+}
+
+.management-money {
+  color: #3f2c24;
+  font-size: 9px;
+  white-space: nowrap;
+}
+
+.management-status {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 5px 8px;
+  font-size: 7px;
+  font-weight: 850;
+  white-space: nowrap;
+}
+
+.management-status.active,
+.management-status.auction-live {
+  background: #edf4e9;
+  color: #55713e;
+}
+
+.management-status.pending,
+.management-status.auction-registration_open,
+.management-status.auction-published {
+  background: #fff5e4;
+  color: #b9771e;
+}
+
+.management-status.locked,
+.management-status.auction-cancelled {
+  background: #fcebe7;
+  color: #bd5541;
+}
+
+.management-status.auction-closed,
+.management-status.auction-completed {
+  background: #f0ece8;
+  color: #746158;
+}
+
+.management-row-actions {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.management-row-actions button {
+  display: grid;
+  width: 27px;
+  height: 27px;
+  place-items: center;
+  border: 1px solid #e8dcd2;
+  border-radius: 7px;
+  background: #fff;
+  color: #786359;
+  cursor: pointer;
+}
+
+.management-row-actions button:hover {
+  border-color: #ee9c72;
+  background: #fff4ec;
+  color: #d55417;
+}
+
+.management-row-actions button.warning {
+  border-color: #f0c9ba;
+  color: #c45c43;
+}
+
+.management-row-actions svg {
+  width: 12px;
+}
+
+.management-user-cell {
+  min-width: 145px;
+}
+
+.management-avatar {
+  display: grid;
+  width: 31px;
+  height: 31px;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px #e7d9cf;
+  color: #fff;
+  font-size: 9px;
+  font-weight: 900;
+}
+
+.management-avatar.avatar-1 { background: linear-gradient(135deg, #5b4134, #a97050); }
+.management-avatar.avatar-2 { background: linear-gradient(135deg, #926551, #d99a76); }
+.management-avatar.avatar-3 { background: linear-gradient(135deg, #607853, #94a97f); }
+.management-avatar.avatar-4 { background: linear-gradient(135deg, #786052, #aa8772); }
+.management-avatar.avatar-5 { background: linear-gradient(135deg, #be6955, #df9b87); }
+
+.management-empty {
+  padding: 35px 20px;
+  color: #8e796e;
+  text-align: center;
+  font-size: 10px;
+}
+
+.management-footer {
+  display: flex;
+  min-height: 49px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  border-top: 1px solid #eee2d9;
+  padding: 8px 17px;
+  background: #fffdf9;
+  color: #8a766b;
+  font-size: 8px;
+}
+
+.management-footer nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.management-footer button {
+  display: grid;
+  min-width: 25px;
+  height: 25px;
+  place-items: center;
+  border: 1px solid #eaded5;
+  border-radius: 6px;
+  background: #fff;
+  color: #78655c;
+  font: inherit;
+  cursor: pointer;
+}
+
+.management-footer button.active {
+  border-color: #e85c18;
+  background: #e85c18;
+  color: #fff;
+}
+
+.management-footer button:disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+
+@media (max-width: 1300px) {
+  .auction-management-toolbar {
+    flex-wrap: wrap;
+  }
+
+  .auction-management-toolbar .management-search {
+    min-width: calc(100% - 165px);
+  }
+
+  .management-summary-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .management-summary-grid article:nth-child(3) {
+    border-right: 0;
+  }
+
+  .management-summary-grid article:nth-child(n + 4) {
+    border-top: 1px solid #eee3da;
+    padding-top: 10px;
+  }
+}
+
+@media (max-width: 760px) {
+  .management-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .management-search,
+  .auction-management-toolbar .management-search,
+  .management-filter-select,
+  .management-create-button,
+  .management-date-filter {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .management-summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .management-summary-grid article,
+  .management-summary-grid article:nth-child(3) {
+    border-right: 0;
+    border-bottom: 1px solid #eee3da;
+    padding: 10px 5px;
+  }
+
+  .management-footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

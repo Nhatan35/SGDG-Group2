@@ -1,0 +1,57 @@
+/*
+ * Temporary compatibility selectors for canonical Phase 2 consumers.
+ * These preserve domain spacing while shared primitives own overlay,
+ * focus, disabled and interaction behavior.
+ */
+.sgdg-dialog__panel.bid-modal,
+.sgdg-dialog__panel.detail-rules-dialog {
+  padding: 0;
+  overflow: hidden;
+}
+
+.auction-card.sgdg-card {
+  padding: 0;
+}
+
+.menu-toggle.sgdg-button {
+  display: none;
+}
+
+.bid-modal > .sgdg-dialog__header {
+  padding: var(--sgdg-space-6) var(--sgdg-space-8) var(--sgdg-space-4);
+}
+
+.bid-modal > .sgdg-dialog__body {
+  padding: 0 var(--sgdg-space-8) var(--sgdg-space-8);
+}
+
+.deposit-modal > .sgdg-dialog__body > p:first-child {
+  color: var(--sgdg-text-live);
+  font-size: var(--sgdg-font-size-sm);
+  font-weight: var(--sgdg-font-weight-black);
+  letter-spacing: var(--sgdg-letter-spacing-wide);
+}
+
+.detail-rules-dialog > .sgdg-dialog__body {
+  padding: var(--sgdg-space-6) var(--sgdg-space-8) var(--sgdg-space-8);
+}
+
+.detail-rules-dialog > .sgdg-dialog__header {
+  padding: var(--sgdg-space-6) var(--sgdg-space-8) var(--sgdg-space-4);
+}
+
+@media (max-width: 620px) {
+  .bid-modal > .sgdg-dialog__header,
+  .bid-modal > .sgdg-dialog__body,
+  .detail-rules-dialog > .sgdg-dialog__header,
+  .detail-rules-dialog > .sgdg-dialog__body {
+    padding-right: var(--sgdg-space-5);
+    padding-left: var(--sgdg-space-5);
+  }
+}
+
+@media (max-width: 820px) {
+  .menu-toggle.sgdg-button {
+    display: inline-flex;
+  }
+}

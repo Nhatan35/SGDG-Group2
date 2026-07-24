@@ -1,0 +1,5 @@
+.home-redesign-hero{background-image:linear-gradient(90deg,rgb(14 7 3 / .22) 0%,rgb(21 9 2 / .08) 44%,rgb(38 11 0 / .02) 100%),url('/assets/auction-hero-background-v1.png');background-position:center;background-size:cover}
+.home-redesign-hero::before,.home-redesign-hero::after,.home-redesign-grid::before{display:none}
+.home-intro .eyebrow{color:#ffd1ac;text-shadow:0 1px 14px rgb(0 0 0 / .35)}.home-intro h1{color:#fff;text-shadow:0 3px 18px rgb(0 0 0 / .42)}.home-intro h1 span{color:#ff7a36}.home-intro>p{color:#fff2e9;text-shadow:0 1px 9px rgb(0 0 0 / .38)}
+.hero-assurances{background:rgb(31 15 6 / .66);border:1px solid rgb(255 195 141 / .22);backdrop-filter:blur(8px);color:#fff1e7}.hero-assurances svg{color:#ffb16f}.hero-assurances span{color:inherit}
+.home-filter-bar{box-shadow:0 14px 30px rgb(0 0 0 / .24)}

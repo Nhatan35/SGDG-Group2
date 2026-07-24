@@ -1,0 +1,8 @@
+.spotlight-meta{display:grid;grid-template-columns:1fr;gap:8px;padding-top:13px}
+.spotlight-meta span{position:relative;display:inline-flex;align-items:center;width:100%;min-height:31px;padding:7px 10px 7px 29px;border:1px solid transparent;border-radius:10px;font-size:10px;font-weight:700;box-shadow:0 4px 10px rgb(36 49 34 / .04);transition:transform .2s ease,box-shadow .2s ease}
+.spotlight-meta span::before{position:absolute;left:9px;font-size:11px;line-height:1}
+.spotlight-meta span:hover{transform:translateY(-2px);box-shadow:0 7px 13px rgb(36 49 34 / .1)}
+.spotlight-meta span:nth-child(1){background:linear-gradient(135deg,#f6f8f0,#e9f1dd);color:#5f765b;border-color:#e2ecd6}.spotlight-meta span:nth-child(1)::before{content:'▦';color:#718967}
+.spotlight-meta span:nth-child(2){background:linear-gradient(135deg,#fff8f1,#ffeedf);color:#9a5a25;border-color:#f8d5ba}.spotlight-meta span:nth-child(2)::before{content:'↗';color:var(--sgdg-orange-600);font-weight:900}
+.spotlight-meta .auction-poster{padding-left:29px;background:linear-gradient(135deg,#fff8f4,#ffece1);color:var(--sgdg-orange-700);border-color:#ffc9ac;box-shadow:0 4px 12px rgb(255 79 0 / .08);animation:poster-glow 2.4s ease-in-out infinite}.spotlight-meta .auction-poster::before{content:'✓';display:grid;place-items:center;width:14px;height:14px;left:8px;border-radius:50%;background:var(--sgdg-orange-600);color:#fff;font-size:9px;font-weight:900}.spotlight-meta .auction-poster:hover{box-shadow:0 8px 17px rgb(255 79 0 / .18)}
+@keyframes poster-glow{50%{box-shadow:0 4px 12px rgb(255 79 0 / .08),0 0 0 3px rgb(255 79 0 / .08)}}

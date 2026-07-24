@@ -1,0 +1,3 @@
+import { Activity, Eye, Gavel, Users } from 'lucide-react'
+import type { Auction } from '../../services/mock/auctionService'
+export function ParticipantMetrics({auction}:{auction:Auction}){return <div className="participant-metrics"><div><Users/><strong>{auction.participantCount}</strong><span>Người tham gia</span></div><div><Eye/><strong>{auction.watcherCount}</strong><span>Đang theo dõi</span></div><div><Gavel/><strong>{auction.acceptedBidCount}</strong><span>Bid được chấp nhận</span></div><div><Activity/><strong>{auction.heatScore}%</strong><span>{auction.heatScore>80?'Rất sôi động':'Được quan tâm'}</span></div></div>}

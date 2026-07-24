@@ -1,0 +1,7 @@
+.home-redesign-hero{isolation:isolate;background:radial-gradient(ellipse at 15% 100%,rgb(255 119 35 / .33),transparent 34%),radial-gradient(circle at 82% 46%,rgb(255 72 0 / .26),transparent 30%),radial-gradient(circle at 98% 8%,rgb(255 157 85 / .38),transparent 31%),linear-gradient(118deg,#fff7f1 0%,#fffaf4 42%,#ffe7d9 100%)}
+.home-redesign-hero::before{content:"";position:absolute;z-index:0;width:610px;height:610px;right:-180px;top:-270px;border:52px solid rgb(255 82 11 / .2);border-radius:50%;box-shadow:0 0 0 34px rgb(255 122 50 / .14),0 0 0 75px rgb(255 170 103 / .1),0 0 90px 35px rgb(255 99 21 / .12);transform:rotate(-18deg);animation:hero-orbit 14s linear infinite}
+.home-redesign-hero::after{width:850px;height:440px;left:21%;bottom:-150px;background:radial-gradient(ellipse at center,rgb(255 87 8 / .42),rgb(255 141 60 / .22) 43%,transparent 71%);filter:blur(4px);animation:hero-glow 4.5s ease-in-out infinite}
+.home-redesign-grid::before{content:"";position:absolute;z-index:-1;width:310px;height:210px;left:34%;top:10px;opacity:.82;background-image:radial-gradient(rgb(255 74 0 / .65) 1.5px,transparent 1.6px);background-size:16px 16px;mask-image:linear-gradient(105deg,transparent,#000 25%,#000 75%,transparent);transform:rotate(-10deg)}
+@keyframes hero-orbit{to{transform:rotate(342deg)}}
+@keyframes hero-glow{50%{opacity:.7;transform:translateX(24px) scale(1.07)}}
+@media(prefers-reduced-motion:reduce){.home-redesign-hero::before,.home-redesign-hero::after{animation:none}}

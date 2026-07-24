@@ -1,0 +1,106 @@
+body {
+  background: var(--sgdg-surface-page);
+  color: var(--sgdg-text-primary);
+  font-family: var(--sgdg-font-family-body);
+  line-height: var(--sgdg-line-height-normal);
+}
+
+.container {
+  width: min(
+    var(--sgdg-container-max-width),
+    calc(100% - var(--sgdg-content-gutter) * 2)
+  );
+}
+
+:focus-visible {
+  outline: var(--sgdg-focus-ring-width) solid var(--sgdg-focus-ring-color);
+  outline-offset: var(--sgdg-focus-ring-offset);
+}
+
+.button {
+  border-radius: var(--sgdg-radius-sm);
+  font-weight: var(--sgdg-font-weight-bold);
+}
+
+.button.primary {
+  background: var(--sgdg-color-brand-primary);
+  color: var(--sgdg-color-brand-on-primary);
+}
+
+.button.primary:hover {
+  background: var(--sgdg-color-brand-primary-hover);
+}
+
+.button.secondary {
+  border-color: var(--sgdg-border-default);
+  background: var(--sgdg-surface-card);
+}
+
+.button.danger {
+  background: var(--sgdg-color-danger);
+  color: var(--sgdg-text-inverse);
+}
+
+.card {
+  border-color: var(--sgdg-border-default);
+  border-radius: var(--sgdg-radius-md);
+  background: var(--sgdg-surface-card);
+  box-shadow: var(--sgdg-shadow-sm);
+}
+
+.badge {
+  border-radius: var(--sgdg-radius-pill);
+  font-size: var(--sgdg-font-size-sm);
+  font-weight: var(--sgdg-font-weight-extrabold);
+}
+
+.badge.brand,
+.badge.live,
+.badge.ending,
+.badge.live-attention {
+  background: var(--sgdg-color-live-soft);
+  color: var(--sgdg-text-live);
+}
+
+.badge.success {
+  background: var(--sgdg-color-success-soft);
+  color: var(--sgdg-text-success);
+}
+
+.badge.warning {
+  background: var(--sgdg-color-warning-soft);
+  color: var(--sgdg-text-warning);
+}
+
+.badge.danger {
+  background: var(--sgdg-color-danger-soft);
+  color: var(--sgdg-text-danger);
+}
+
+.badge.info {
+  background: var(--sgdg-color-info-soft);
+  color: var(--sgdg-color-info);
+}
+
+.badge.neutral {
+  background: var(--sgdg-neutral-50);
+  color: var(--sgdg-text-secondary);
+}
+
+.auction-price,
+.detail-price strong,
+.price-card > strong,
+.auction-countdown,
+.count-card h2 {
+  font-family: var(--sgdg-font-family-numeric);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 760px) {
+  .container {
+    width: min(
+      var(--sgdg-container-max-width),
+      calc(100% - var(--sgdg-content-gutter-mobile) * 2)
+    );
+  }
+}

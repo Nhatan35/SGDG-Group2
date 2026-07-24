@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="SGDG - Nền tảng đấu giá trực tuyến minh bạch và an toàn" />
+  <title>SGDG | Đấu giá thông minh - Giá trị xứng tầm</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-row">
+      <a href="#" class="brand" aria-label="Trang chủ SGDG">
+        <img src="assets/logo.png" alt="SIGONDAUGIA" />
+      </a>
+
+      <nav class="main-nav" id="mainNav">
+        <a class="active" href="#home">Trang chủ</a>
+        <a href="#live">Đấu giá trực tiếp</a>
+        <a href="#upcoming">Đấu giá sắp tới</a>
+        <a href="#categories">Danh mục</a>
+        <a href="#news">Tin tức</a>
+        <a href="#guide">Hướng dẫn</a>
+      </nav>
+
+      <div class="header-actions">
+        <span class="trust-mini">🛡 Đảm bảo uy tín</span>
+        <button class="icon-btn" aria-label="Yêu thích">♡</button>
+        <button class="icon-btn notification" aria-label="Thông báo">🔔<span>3</span></button>
+        <button class="btn btn-outline" data-toast="Đăng nhập sẽ được nối ở bước sau">Đăng nhập</button>
+        <button class="btn btn-primary" data-toast="Đăng ký sẽ được nối ở bước sau">Đăng ký</button>
+        <button class="menu-btn" id="menuBtn" aria-label="Mở menu">☰</button>
+      </div>
+    </div>
+
+    <div class="search-row container">
+      <form class="top-search" id="topSearch">
+        <input id="topSearchInput" type="search" placeholder="Tìm kiếm sản phẩm, thương hiệu, danh mục..." />
+        <select aria-label="Danh mục">
+          <option>Tất cả danh mục</option>
+          <option>Đồng hồ</option>
+          <option>Trang sức</option>
+          <option>Xe cộ</option>
+          <option>Nghệ thuật</option>
+        </select>
+        <button class="search-btn" type="submit" aria-label="Tìm kiếm">⌕</button>
+      </form>
+    </div>
+  </header>
+
+  <main id="home">
+    <section class="hero-section">
+      <div class="hero-blob blob-a"></div>
+      <div class="hero-blob blob-b"></div>
+      <div class="container hero-grid">
+        <div class="hero-copy">
+          <span class="eyebrow">NỀN TẢNG ĐẤU GIÁ TRỰC TUYẾN</span>
+          <h1>Đấu giá thông minh<br><span>Giá trị xứng tầm</span></h1>
+          <p>Nền tảng đấu giá trực tuyến minh bạch, nhanh chóng và an toàn cho mọi giá trị bạn tìm kiếm.</p>
+
+          <form class="hero-filter" id="heroFilter">
+            <label>
+              <span>Danh mục</span>
+              <select id="categorySelect">
+                <option value="">Tất cả danh mục</option>
+                <option>Đồng hồ</option>
+                <option>Trang sức</option>
+                <option>Xe cộ</option>
+                <option>Nghệ thuật</option>
+              </select>
+            </label>
+            <label>
+              <span>Vị trí</span>
+              <select id="locationSelect">
+                <option>Toàn quốc</option>
+                <option>TP. Hồ Chí Minh</option>
+                <option>Hà Nội</option>
+                <option>Đà Nẵng</option>
+              </select>
+            </label>
+            <label>
+              <span>Khoảng giá</span>
+              <select id="priceSelect">
+                <option>Chọn khoảng giá</option>
+                <option>Dưới 100 triệu</option>
+                <option>100 - 500 triệu</option>
+                <option>Trên 500 triệu</option>
+              </select>
+            </label>
+            <button class="btn btn-primary hero-search" type="submit">Tìm kiếm ngay</button>
+          </form>
+
+          <div class="trust-row">
+            <span>🛡 100% minh bạch</span>
+            <span>🔒 Bảo mật tuyệt đối</span>
+            <span>💳 Thanh toán an toàn</span>
+            <span>🎧 Hỗ trợ 24/7</span>
+          </div>
+        </div>
+
+        <article class="featured-auction" id="live">
+          <div class="featured-head">
+            <div><span class="badge live">LIVE</span><strong> ĐẤU GIÁ TRỰC TIẾP</strong></div>
+            <a href="#featured">Xem tất cả →</a>
+          </div>
+          <div class="featured-body">
+            <div class="featured-image-wrap">
+              <img src="assets/featured-rolex.jpg" alt="Rolex Submariner Date" />
+              <button class="heart" aria-label="Yêu thích">☆</button>
+            </div>
+            <div class="featured-info">
+              <h2>Rolex Submariner Date 126610LV “Starbucks”</h2>
+              <p class="auction-code">Mã đấu giá: SGD-20240526-001</p>
+              <div class="countdown-label">Kết thúc sau</div>
+              <div class="countdown" id="countdown">
+                <div><strong id="hours">00</strong><span>Giờ</span></div>
+                <div><strong id="minutes">12</strong><span>Phút</span></div>
+                <div><strong id="seconds">45</strong><span>Giây</span></div>
+              </div>
+              <div class="price-label">Giá hiện tại <span>42 lượt trả giá</span></div>
+              <div class="current-price">450.000.000 đ</div>
+              <svg class="mini-chart" viewBox="0 0 320 95" role="img" aria-label="Biểu đồ giá tăng">
+                <defs>
+                  <linearGradient id="chartFill" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#f4510b" stop-opacity=".22"/>
+                    <stop offset="100%" stop-color="#f4510b" stop-opacity="0"/>
+                  </linearGradient>
+                </defs>
+                <path d="M0 78 L30 72 L55 60 L80 54 L105 43 L130 43 L152 55 L174 48 L198 54 L220 38 L245 27 L270 32 L295 16 L320 7 L320 95 L0 95 Z" fill="url(#chartFill)"/>
+                <polyline points="0,78 30,72 55,60 80,54 105,43 130,43 152,55 174,48 198,54 220,38 245,27 270,32 295,16 320,7" fill="none" stroke="#f4510b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <button class="btn btn-primary bid-now" id="featuredBid">🔨 Đặt giá ngay</button>
+            </div>
+          </div>
+          <div class="featured-chips">
+            <span>▦ Tình trạng: Như mới 99%</span>
+            <span>🚚 Giao hàng toàn quốc</span>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="category-strip" id="categories">
+      <div class="container categories">
+        <button data-category="Đồng hồ"><span>⌚</span>Đồng hồ</button>
+        <button data-category="Trang sức"><span>💎</span>Trang sức</button>
+        <button data-category="Điện thoại"><span>📱</span>Điện thoại</button>
+        <button data-category="Xe cộ"><span>🚗</span>Xe cộ</button>
+        <button data-category="Nghệ thuật"><span>🎨</span>Nghệ thuật</button>
+        <button data-category="Đồ cổ"><span>🏺</span>Đồ cổ</button>
+        <button data-category="Thời trang"><span>👜</span>Thời trang</button>
+        <button data-category="Đồ sưu tầm"><span>🖼</span>Đồ sưu tầm</button>
+        <button data-category=""><span>▦</span>Xem tất cả</button>
+      </div>
+    </section>
+
+    <section class="featured-section container" id="featured">
+      <div class="section-main">
+        <div class="section-title">
+          <h2>🔥 ĐẤU GIÁ NỔI BẬT</h2>
+          <a href="#upcoming">Xem tất cả →</a>
+        </div>
+        <div class="auction-grid" id="auctionGrid"></div>
+      </div>
+
+      <aside class="trust-panel">
+        <h3>🛡 NỀN TẢNG ĐÁNG TIN CẬY</h3>
+        <div class="stats-grid">
+          <div><strong>150.000+</strong><span>Thành viên tin tưởng</span></div>
+          <div><strong>25.000+</strong><span>Phiên đấu giá thành công</span></div>
+          <div><strong>3.500+ tỷ đ</strong><span>Giá trị giao dịch</span></div>
+          <div><strong>24/7</strong><span>Hỗ trợ tận tâm</span></div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="how-section" id="guide">
+      <div class="container">
+        <h2>CÁCH THỨC HOẠT ĐỘNG</h2>
+        <div class="steps">
+          <article><span>1</span><div><h3>Đăng ký tài khoản</h3><p>Tạo tài khoản nhanh chóng, miễn phí chỉ trong 1 phút.</p></div></article>
+          <b>→</b>
+          <article><span>2</span><div><h3>Tìm kiếm & lựa chọn</h3><p>Khám phá hàng ngàn sản phẩm đấu giá hấp dẫn.</p></div></article>
+          <b>→</b>
+          <article><span>3</span><div><h3>Tham gia đấu giá</h3><p>Đặt giá thông minh và theo dõi phiên trực tiếp.</p></div></article>
+          <b>→</b>
+          <article><span>4</span><div><h3>Thanh toán & nhận hàng</h3><p>Thanh toán an toàn, giao hàng toàn quốc.</p></div></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="soft-banner" id="upcoming">
+      <div class="container">
+        <div>
+          <span class="eyebrow">SẮP DIỄN RA</span>
+          <h2>Đăng ký quan tâm để không bỏ lỡ phiên đấu giá phù hợp.</h2>
+        </div>
+        <button class="btn btn-primary" data-toast="Đã đăng ký nhận thông báo phiên sắp tới">Nhận thông báo</button>
+      </div>
+    </section>
+
+    <section class="news-placeholder container" id="news">
+      <div>
+        <span class="eyebrow">TIN TỨC & KIẾN THỨC</span>
+        <h2>Hiểu đúng quy trình, đấu giá tự tin hơn</h2>
+        <p>Phần tin tức sẽ được bổ sung khi chúng ta làm full website.</p>
+      </div>
+      <div class="news-cards">
+        <article><span>01</span><h3>5 bước tham gia một phiên đấu giá trực tuyến</h3></article>
+        <article><span>02</span><h3>Cách xác minh tài sản và hồ sơ pháp lý</h3></article>
+        <article><span>03</span><h3>Những lưu ý khi thanh toán trúng đấu giá</h3></article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div class="footer-brand">
+        <img src="assets/logo.png" alt="SIGONDAUGIA" />
+        <p>Nền tảng đấu giá trực tuyến minh bạch, uy tín hàng đầu Việt Nam.</p>
+        <div class="socials">◉ ◉ ◉ ◉</div>
+      </div>
+      <div><h4>KHÁM PHÁ</h4><a href="#live">Đấu giá trực tiếp</a><a href="#upcoming">Đấu giá sắp tới</a><a href="#categories">Danh mục sản phẩm</a><a href="#news">Tin tức & sự kiện</a></div>
+      <div><h4>HỖ TRỢ</h4><a href="#guide">Hướng dẫn tham gia</a><a href="#">Câu hỏi thường gặp</a><a href="#">Chính sách bảo mật</a><a href="#">Điều khoản sử dụng</a></div>
+      <div><h4>VỀ CHÚNG TÔI</h4><a href="#">Giới thiệu</a><a href="#">Liên hệ</a><a href="#">Tuyển dụng</a><a href="#">Đối tác</a></div>
+      <div><h4>LIÊN HỆ</h4><p>📍 Tầng 7, 123 Lê Lợi, Q.1, TP.HCM</p><p>☎ 1900 8888 66</p><p>✉ support@sigondaugia.vn</p><p>🌐 www.sigondaugia.vn</p></div>
+    </div>
+    <div class="footer-bottom">© 2026 SIGONDAUGIA. Demo frontend phục vụ review UI.</div>
+  </footer>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <dialog class="bid-modal" id="bidModal">
+    <form method="dialog">
+      <button class="modal-close" value="cancel" aria-label="Đóng">×</button>
+      <span class="badge live">LIVE</span>
+      <h2>Đặt giá cho Rolex Submariner</h2>
+      <p>Giá hiện tại</p>
+      <strong>450.000.000 đ</strong>
+      <label>Mức giá của bạn
+        <input type="number" value="455000000" min="455000000" step="5000000" />
+      </label>
+      <small>Bước giá tối thiểu: 5.000.000 đ</small>
+      <button class="btn btn-primary" value="confirm">Xác nhận đặt giá</button>
+    </form>
+  </dialog>
+
+  <script src="app.js"></script>
+</body>
+</html>

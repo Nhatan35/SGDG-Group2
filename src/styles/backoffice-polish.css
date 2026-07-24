@@ -1,0 +1,150 @@
+/* Back-office brand zone */
+.admin-brand-zone {
+  position: relative;
+  flex: 0 0 auto;
+  margin: -18px -14px 8px;
+  padding: 22px 20px 18px;
+  overflow: hidden;
+  border-bottom: 1px solid rgb(255 255 255 / 12%);
+  background:
+    radial-gradient(circle at 88% 10%, rgb(255 113 36 / 20%), transparent 35%),
+    linear-gradient(145deg, #29160f, #1c1210 72%);
+}
+.admin-brand-zone::after {
+  content: "";
+  position: absolute;
+  right: -35px;
+  bottom: -54px;
+  width: 115px;
+  height: 115px;
+  border: 1px solid rgb(255 112 38 / 18%);
+  border-radius: 50%;
+  box-shadow: 0 0 0 18px rgb(255 112 38 / 5%);
+}
+.admin-brand-zone img {
+  position: relative;
+  z-index: 1;
+  width: 168px;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 7px 14px rgb(0 0 0 / 22%));
+}
+.admin-brand-zone > div {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 12px;
+}
+.admin-brand-zone span {
+  color: #d9c8bc;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: .12em;
+}
+.admin-brand-zone strong {
+  padding: 5px 8px;
+  border: 1px solid rgb(255 124 52 / 42%);
+  border-radius: 999px;
+  background: rgb(255 79 14 / 14%);
+  color: #ff9d65;
+  font-size: 9px;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+/* Shared Operations page identity */
+.admin-content > .ops-heading,
+.admin-content > main > .ops-heading,
+.create-session-page > .ops-heading {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  justify-content: initial;
+  align-items: initial;
+  gap: 0;
+  margin: -2px 0 22px;
+  padding: 22px 24px 21px 29px;
+  overflow: hidden;
+  border: 1px solid #ead7c8;
+  border-radius: 16px;
+  background:
+    radial-gradient(circle at 92% 12%, rgb(255 108 28 / 10%), transparent 28%),
+    linear-gradient(115deg, #fffdf9, #faf5ef);
+  box-shadow: 0 10px 26px rgb(75 39 19 / 6%);
+}
+.admin-content > .ops-heading::before,
+.admin-content > main > .ops-heading::before,
+.create-session-page > .ops-heading::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 20px;
+  bottom: 20px;
+  width: 4px;
+  border-radius: 0 4px 4px 0;
+  background: var(--sgdg-orange-600);
+}
+.admin-content .ops-heading > span {
+  display: block;
+  margin: 0 0 5px;
+  color: var(--sgdg-orange-700);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+.admin-content .ops-heading > h1 {
+  margin: 0;
+  color: #2f1f17;
+  font-size: clamp(27px, 2.3vw, 36px);
+  line-height: 1.18;
+  letter-spacing: -.025em;
+}
+.admin-content .ops-heading > p {
+  max-width: 920px;
+  margin: 9px 0 0;
+  color: #76594a;
+  font-size: 13px;
+  line-height: 1.55;
+}
+.handover-ops-header > p {
+  overflow-wrap: anywhere;
+}
+
+/* Give list pages a deliberate content rhythm below their identity block. */
+.admin-content > .ops-heading + .button,
+.admin-content > .ops-heading + a.button {
+  margin: 0 0 14px;
+}
+.admin-content .ops-table-wrap {
+  box-shadow: 0 8px 22px rgb(75 39 19 / 5%);
+}
+
+@media (max-width: 1000px) {
+  .admin-brand-zone {
+    display: grid;
+    place-items: center;
+    margin-inline: -14px;
+    padding: 18px 10px;
+  }
+  .admin-brand-zone img { width: 52px; }
+  .admin-brand-zone > div { display: none; }
+}
+@media (max-width: 700px) {
+  .admin-brand-zone {
+    min-width: 76px;
+    margin: -18px 0 -18px -14px;
+    border-right: 1px solid rgb(255 255 255 / 12%);
+    border-bottom: 0;
+  }
+  .admin-content > .ops-heading,
+  .admin-content > main > .ops-heading,
+  .create-session-page > .ops-heading {
+    padding: 19px 18px 19px 23px;
+    border-radius: 13px;
+  }
+  .admin-content .ops-heading > h1 { font-size: 27px; }
+}

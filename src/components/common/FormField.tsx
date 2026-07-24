@@ -1,0 +1,3 @@
+import type { InputHTMLAttributes } from 'react'
+type Props=InputHTMLAttributes<HTMLInputElement>&{label:string;hint?:string;error?:string}
+export function FormField({label,hint,error,id,...props}:Props){const inputId=id??props.name;return <div className="form-field"><label htmlFor={inputId}>{label}</label><input id={inputId} aria-invalid={Boolean(error)} aria-describedby={error?`${inputId}-error`:hint?`${inputId}-hint`:undefined} {...props}/>{error?<span className="field-error" id={`${inputId}-error`}>{error}</span>:hint?<span className="field-hint" id={`${inputId}-hint`}>{hint}</span>:null}</div>}

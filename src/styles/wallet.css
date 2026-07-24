@@ -1,0 +1,238 @@
+.wallet-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 420px);
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.wallet-balance-card {
+  position: relative;
+  overflow: hidden;
+  min-height: 220px;
+  padding: 24px;
+  border: 1px solid #f0c9ad;
+  border-radius: 16px;
+  background:
+    radial-gradient(
+      circle at 82% 24%,
+      rgb(255 255 255 / 0.24),
+      transparent 30%
+    ),
+    linear-gradient(135deg, #30150a, #7a310f 58%, #f4510b);
+  color: #fff;
+  box-shadow: 0 16px 34px rgb(84 30 5 / 0.18);
+}
+
+.wallet-balance-card::after {
+  content: "";
+  position: absolute;
+  right: -54px;
+  bottom: -72px;
+  width: 210px;
+  height: 210px;
+  border: 24px solid rgb(255 255 255 / 0.14);
+  border-radius: 999px;
+}
+
+.wallet-balance-card span,
+.wallet-withdraw-panel h2,
+.wallet-bank-panel h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.wallet-balance-card span {
+  color: #ffd7bf;
+  font-weight: 900;
+}
+
+.wallet-balance-card svg {
+  width: 22px;
+}
+
+.wallet-balance-card strong {
+  position: relative;
+  z-index: 1;
+  display: block;
+  margin: 22px 0 8px;
+  color: #fff;
+  font-size: 42px;
+  line-height: 1;
+}
+
+.wallet-balance-card small {
+  position: relative;
+  z-index: 1;
+  display: block;
+  max-width: 520px;
+  color: #ffe3d2;
+}
+
+.wallet-withdraw-panel h2,
+.wallet-bank-panel h2 {
+  margin-top: 0;
+}
+
+.wallet-withdraw-panel form,
+.bank-add-form {
+  display: grid;
+  gap: 13px;
+}
+
+.wallet-withdraw-panel label,
+.bank-add-form label {
+  display: grid;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.wallet-withdraw-panel select,
+.wallet-withdraw-panel input,
+.bank-add-form input {
+  min-height: 44px;
+  border: 1px solid var(--sgdg-border);
+  border-radius: 9px;
+  padding: 9px 11px;
+  background: #fff;
+}
+
+.wallet-withdraw-panel .button,
+.bank-add-form .button {
+  width: 100%;
+}
+
+.wallet-message {
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #fff4e8;
+  color: #9d4616;
+  font-weight: 800;
+}
+
+.bank-add-form {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 14px 0;
+  padding: 14px;
+  border: 1px dashed #efc2a3;
+  border-radius: 13px;
+  background: #fff8f2;
+}
+
+.bank-add-form .button {
+  align-self: end;
+}
+
+.bank-account-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.bank-account-list article {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 12px;
+  align-items: center;
+  padding: 14px;
+  border: 1px solid #ecd8c8;
+  border-radius: 13px;
+  background: #fffdf9;
+}
+
+.bank-account-list article > svg {
+  color: #df5d12;
+}
+
+.bank-account-list strong,
+.bank-account-list span,
+.bank-account-list small {
+  display: block;
+}
+
+.bank-account-list small {
+  color: var(--sgdg-text-secondary);
+}
+
+.wallet-confirm-overlay {
+  position: fixed;
+  z-index: 320;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgb(33 13 6 / 0.56);
+  padding: 18px;
+}
+
+.wallet-confirm-modal {
+  width: min(520px, 100%);
+  padding: 24px;
+  border: 1px solid #e7bc9a;
+  border-radius: 18px;
+  background: #fffdf9;
+  box-shadow: 0 26px 70px rgb(33 13 6 / 0.5);
+}
+
+.wallet-confirm-modal h2 {
+  margin-top: 0;
+}
+
+.wallet-confirm-modal dl {
+  display: grid;
+  gap: 10px;
+  margin: 18px 0;
+}
+
+.wallet-confirm-modal dl > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding-top: 10px;
+  border-top: 1px solid #f0dfd2;
+}
+
+.wallet-confirm-modal dt {
+  color: #765443;
+}
+
+.wallet-confirm-modal dd {
+  margin: 0;
+  font-weight: 900;
+  text-align: right;
+}
+
+.wallet-confirm-modal .modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+@media (max-width: 850px) {
+  .wallet-grid,
+  .bank-add-form {
+    grid-template-columns: 1fr;
+  }
+
+  .wallet-balance-card strong {
+    font-size: 32px;
+  }
+}
+
+@media (max-width: 560px) {
+  .wallet-confirm-modal .modal-actions {
+    flex-direction: column;
+  }
+
+  .wallet-confirm-modal .button {
+    width: 100%;
+  }
+
+  .bank-account-list article {
+    grid-template-columns: auto 1fr;
+  }
+
+  .bank-account-list .badge {
+    grid-column: 2;
+  }
+}

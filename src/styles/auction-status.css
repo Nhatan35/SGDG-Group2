@@ -1,0 +1,81 @@
+.live-feature > img,
+.auction-image img {
+  image-rendering: auto;
+}
+
+.auction-image .auction-status {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+}
+
+.auction-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+}
+
+.auction-status.compact {
+  width: auto;
+}
+
+.auction-status .badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.auction-status .badge svg {
+  width: 14px;
+  height: 14px;
+  fill: currentColor;
+  animation: auction-flame 1.15s ease-in-out infinite;
+}
+
+.auction-countdown {
+  font-size: var(--sgdg-font-size-sm);
+  font-weight: var(--sgdg-font-weight-bold);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.auction-status.ending .auction-countdown,
+.auction-status.extended .auction-countdown {
+  color: var(--sgdg-color-ending-soon);
+}
+
+.auction-status.ending .badge {
+  box-shadow: var(--sgdg-glow-ending);
+}
+
+.auction-status.extended .badge {
+  box-shadow: var(--sgdg-glow-live);
+}
+
+.auction-status.paused .auction-countdown,
+.auction-status.reconnecting .auction-countdown {
+  color: var(--sgdg-text-warning);
+}
+
+/* Temporary compatibility: upcoming formerly used the success badge palette. */
+.auction-status.upcoming .badge.neutral {
+  background: var(--sgdg-color-success-soft);
+  color: var(--sgdg-text-success);
+}
+
+.auction-time .auction-status {
+  position: static;
+}
+
+.auction-time .badge {
+  display: none;
+}
+
+@keyframes auction-flame {
+  50% {
+    transform: scale(1.15) translateY(-1px);
+  }
+}

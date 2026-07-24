@@ -1,0 +1,201 @@
+.deposit-inline-status {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin: 14px 0 12px;
+  padding: 12px;
+  border: 1px solid #f0c9ad;
+  border-radius: 12px;
+  background: #fff2e6;
+  color: #7a4328;
+}
+
+.deposit-inline-status svg {
+  width: 19px;
+  height: 19px;
+  flex: 0 0 auto;
+  color: #df5d12;
+}
+
+.deposit-inline-status strong,
+.deposit-inline-status span {
+  display: block;
+}
+
+.deposit-inline-status strong {
+  color: #a94711;
+  font-size: 13px;
+}
+
+.deposit-inline-status span {
+  margin-top: 2px;
+  font-size: 12px;
+}
+
+.deposit-inline-status.paid {
+  border-color: #cfe2bd;
+  background: #f1f8ec;
+  color: #496d45;
+}
+
+.deposit-inline-status.paid svg,
+.deposit-inline-status.paid strong {
+  color: #347545;
+}
+
+.deposit-modal > p {
+  color: #a94711;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
+
+.deposit-summary {
+  display: grid;
+  gap: 12px;
+  margin: 18px 0;
+  padding: 15px;
+  border: 1px solid #efd6c5;
+  border-radius: 14px;
+  background: #fff8f1;
+}
+
+.deposit-summary > span {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  color: #4d3021;
+  font-weight: 900;
+}
+
+.deposit-summary > span svg {
+  width: 18px;
+  height: 18px;
+  color: #df5d12;
+}
+
+.deposit-summary dl {
+  display: grid;
+  gap: 9px;
+  margin: 0;
+}
+
+.deposit-summary dl > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  padding-top: 9px;
+  border-top: 1px solid #f0dfd2;
+}
+
+.deposit-summary dt {
+  color: #7b5b49;
+}
+
+.deposit-summary dd {
+  margin: 0;
+  color: #a94711;
+  font-weight: 900;
+  text-align: right;
+}
+
+.deposit-note,
+.deposit-alert,
+.deposit-success,
+.payment-gateway-card {
+  display: flex;
+  gap: 11px;
+  align-items: flex-start;
+  padding: 13px;
+  border-radius: 13px;
+}
+
+.deposit-note {
+  background: #fff4e9;
+  color: #684a38;
+  font-size: 14px;
+}
+
+.deposit-note svg {
+  flex: 0 0 auto;
+  color: #df5d12;
+}
+
+.deposit-alert {
+  border: 1px solid #f0c0aa;
+  background: #fff0eb;
+  color: #8c351b;
+}
+
+.deposit-alert svg {
+  flex: 0 0 auto;
+  color: #c8471a;
+}
+
+.deposit-alert strong,
+.deposit-alert span,
+.deposit-success strong,
+.deposit-success span,
+.payment-gateway-card span,
+.payment-gateway-card strong,
+.payment-gateway-card small {
+  display: block;
+}
+
+.deposit-alert span,
+.deposit-success span,
+.payment-gateway-card small {
+  margin-top: 3px;
+  font-size: 13px;
+}
+
+.payment-gateway-card {
+  align-items: center;
+  border: 1px solid #f0c9ad;
+  background: linear-gradient(135deg, #33160b, #74300f);
+  color: #fff6ef;
+}
+
+.payment-gateway-card svg {
+  width: 38px;
+  height: 38px;
+  flex: 0 0 auto;
+  color: #ff9d55;
+}
+
+.payment-gateway-card strong {
+  color: #ffb47a;
+  font-size: 28px;
+  line-height: 1.15;
+}
+
+.deposit-success {
+  border: 1px solid #cfe4bd;
+  background: #f0f8eb;
+  color: #365f39;
+}
+
+.deposit-success svg {
+  flex: 0 0 auto;
+  color: #347545;
+}
+
+@media (max-width: 620px) {
+  .deposit-summary dl > div {
+    display: grid;
+    gap: 3px;
+  }
+
+  .deposit-summary dd {
+    text-align: left;
+  }
+
+  .deposit-modal .modal-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .deposit-modal .button {
+    width: 100%;
+  }
+}

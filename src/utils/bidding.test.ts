@@ -1,0 +1,3 @@
+import {describe,expect,it} from 'vitest'
+import {maskAlias,validateBid} from './bidding'
+describe('validateBid',()=>{const base={currentPrice:100,minimumIncrement:10,eligible:true,status:'LIVE' as const};it('accepts a valid increment',()=>expect(validateBid({...base,amount:120})).toBeNull());it('rejects amount below minimum',()=>expect(validateBid({...base,amount:100})).toContain('tối thiểu'));it('rejects an invalid increment',()=>expect(validateBid({...base,amount:115})).toContain('bước giá'));it('rejects ineligible bidder',()=>expect(validateBid({...base,amount:120,eligible:false})).toContain('chưa đủ'))});describe('maskAlias',()=>{it('masks public identity',()=>expect(maskAlias('MinhQ')).toBe('Mi***Q'))})

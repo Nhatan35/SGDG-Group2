@@ -1,0 +1,20 @@
+.audit-context-actions { display: flex; align-items: center; gap: 14px; }
+.audit-context-actions a { display: inline-flex; align-items: center; gap: 6px; }
+.audit-overview-metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 20px 0; }
+.audit-overview-metrics article { padding: 18px; border: 1px solid #ead5c3; border-radius: 14px; background: #fffdf9; }
+.audit-overview-metrics strong, .audit-overview-metrics span { display: block; }
+.audit-overview-metrics strong { font-size: 24px; color: #c44e12; }
+.audit-overview-metrics span { font-size: 12px; color: #80675a; }
+.audit-search { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; padding: 10px 12px; border: 1px solid #ead5c3; border-radius: 14px; background: #fffdf9; }
+.audit-search input { min-width: 0; flex: 1; border: 0; background: transparent; outline: 0; }
+.audit-object-list { overflow: hidden; border: 1px solid #ead5c3; border-radius: 14px; background: #fffdf9; }
+.audit-object-list h2 { margin: 0; padding: 18px; font-size: 18px; }
+.audit-object-list > a { display: grid; grid-template-columns: 28px minmax(0, 1fr) auto 170px; align-items: center; gap: 12px; padding: 14px 18px; border-top: 1px solid #eee1d6; }
+.audit-object-list > a:hover { background: #fff7ef; color: #b75017; }
+.audit-object-list svg { color: #c44e12; }
+.audit-object-list strong, .audit-object-list small { display: block; }
+.audit-object-list small, .audit-object-list time, .audit-object-list > a > span { color: #80675a; font-size: 11px; }
+.audit-object-list time { text-align: right; }
+.audit-warning { padding: 12px 16px; border: 1px solid #e6b76f; border-radius: 12px; background: #fff6df; color: #805514; }
+@media (max-width: 900px) { .audit-overview-metrics { grid-template-columns: 1fr 1fr; } .audit-object-list > a { grid-template-columns: 28px minmax(0, 1fr) auto; } .audit-object-list time { display: none; } }
+@media (max-width: 560px) { .audit-overview-metrics { grid-template-columns: 1fr; } .audit-search .button { display: none; } .audit-object-list > a > span { display: none; } }

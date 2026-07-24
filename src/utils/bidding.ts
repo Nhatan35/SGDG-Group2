@@ -1,0 +1,3 @@
+export interface BidValidationInput{amount:number;currentPrice:number;minimumIncrement:number;eligible:boolean;status:'LIVE'|'PAUSED'|'CLOSED'}
+export function validateBid(input:BidValidationInput):string|null{if(!input.eligible)return'Bạn chưa đủ điều kiện tham gia.';if(input.status!=='LIVE')return input.status==='PAUSED'?'Phiên đang tạm dừng.':'Phiên chưa mở hoặc đã kết thúc.';const minimum=input.currentPrice+input.minimumIncrement;if(input.amount<minimum)return`Mức giá tối thiểu là ${minimum}.`;if((input.amount-minimum)%input.minimumIncrement!==0)return'Mức giá không đúng bước giá.';return null}
+export function maskAlias(value:string){if(value.length<3)return'***';return`${value.slice(0,2)}***${value.slice(-1)}`}
