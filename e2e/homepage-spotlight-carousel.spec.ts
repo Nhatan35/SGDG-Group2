@@ -6,11 +6,11 @@ test("spotlight carousel rotates automatically and pauses for interaction", asyn
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.goto("/");
 
-  const carousel = page.locator(".spotlight-carousel");
-  const title = carousel.locator(".spotlight-summary h2");
+  const carousel = page.locator(".hero-auction-card");
+  const title = carousel.locator(".hero-auction-card__details h2");
   const initialTitle = await title.textContent();
 
-  await expect(carousel.locator(".spotlight-carousel-dots button")).toHaveCount(
+  await expect(carousel.locator(".hero-auction-card__dots button")).toHaveCount(
     5,
   );
   await expect
@@ -24,7 +24,7 @@ test("spotlight carousel rotates automatically and pauses for interaction", asyn
 
   await carousel.getByRole("button", { name: "Xem sản phẩm tiếp theo" }).click();
   await expect(title).not.toHaveText(pausedTitle!);
-  await expect(carousel.locator(".spotlight-carousel-dots .active")).toHaveCount(
+  await expect(carousel.locator(".hero-auction-card__dots .active")).toHaveCount(
     1,
   );
 });
@@ -39,9 +39,9 @@ for (const viewport of [
     await page.setViewportSize(viewport);
     await page.goto("/");
 
-    const carousel = page.locator(".spotlight-carousel");
-    const controls = carousel.locator(".spotlight-carousel-controls");
-    const progress = carousel.locator(".spotlight-carousel-progress span");
+    const carousel = page.locator(".hero-auction-card");
+    const controls = carousel.locator(".hero-auction-card__controls");
+    const progress = carousel.locator(".hero-auction-card__progress span");
 
     const [carouselBox, controlsBox] = await Promise.all([
       carousel.boundingBox(),
@@ -55,13 +55,13 @@ for (const viewport of [
     );
     await expect(progress).toHaveCSS(
       "animation-name",
-      "spotlight-carousel-progress",
+      "hero-card-progress",
     );
 
     await carousel.getByRole("button", { name: "Xem sản phẩm trước" }).click();
-    await expect(carousel.locator(".spotlight-slide")).toHaveCSS(
+    await expect(carousel.locator(".hero-auction-card__slide")).toHaveCSS(
       "animation-name",
-      "spotlight-carousel-in-prev",
+      "hero-card-enter-prev",
     );
   });
 }
@@ -72,13 +72,13 @@ test("spotlight autoplay and transitions respect reduced motion", async ({
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
 
-  const carousel = page.locator(".spotlight-carousel");
-  const title = carousel.locator(".spotlight-summary h2");
+  const carousel = page.locator(".hero-auction-card");
+  const title = carousel.locator(".hero-auction-card__details h2");
   const initialTitle = await title.textContent();
 
   await page.waitForTimeout(5500);
   await expect(title).toHaveText(initialTitle!);
-  await expect(carousel.locator(".spotlight-carousel-progress span")).toHaveCSS(
+  await expect(carousel.locator(".hero-auction-card__progress span")).toHaveCSS(
     "animation-name",
     "none",
   );

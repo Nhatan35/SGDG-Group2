@@ -163,7 +163,7 @@ test("Public CMS projections and route directory are visually sound", async ({
   ]);
   await page.goto("/auctions/upcoming");
   const primaryNavigation = page.getByRole("navigation", { name: "Điều hướng chính" });
-  await expect(primaryNavigation.getByRole("link", { name: "Sắp diễn ra", exact: true })).toHaveClass(/active/);
+  await expect(primaryNavigation.getByRole("link", { name: "Sắp diễn ra", exact: true })).toHaveCount(0);
   await expect(primaryNavigation.getByRole("link", { name: "Phiên đấu giá", exact: true })).not.toHaveClass(/active/);
 });
 

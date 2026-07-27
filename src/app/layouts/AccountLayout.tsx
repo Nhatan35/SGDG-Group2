@@ -1,5 +1,6 @@
 ﻿import {
   Bell,
+  ClipboardList,
   FileCheck2,
   Heart,
   History,
@@ -24,6 +25,7 @@ const links = [
   ["/account/watchlist", "Danh sách theo dõi", Heart],
   ["/account/bids", "Lịch sử giao dịch", History],
   ["/account/notifications", "Trung tâm thông báo", Bell],
+  ["/account/opening-requests", "Yêu cầu mở phiên", ClipboardList],
   ["/account/support", "Trung tâm hỗ trợ", Headphones],
 ] as const;
 

@@ -8,6 +8,10 @@ import {
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { catalogAuctions } from "../../services/mock/auctionService";
+import {
+  canEnterAuction,
+  useEligibilityWorkflowStore,
+} from "../../store/eligibilityWorkflowStore";
 import { formatMoney } from "../../utils/format";
 import "../../styles/pre-live-waiting-room.css";
 
@@ -160,6 +164,9 @@ export function PreLiveWaitingRoomPage() {
   const [localOpen, setLocalOpen] = useState(false);
   const [checking, setChecking] = useState(false);
   const auction = catalogAuctions.find((item) => item.id === auctionId);
+  const registration = useEligibilityWorkflowStore((store) =>
+    store.registrations.find((item) => item.auctionId === auctionId),
+  );
   const queryScenario = parse(params.get("scenario"));
   const scenario: Scenario = localOpen ? "open" : queryScenario;
   const model = config[scenario];
@@ -167,13 +174,15 @@ export function PreLiveWaitingRoomPage() {
   const goOpen = () => setLocalOpen(true);
   const retry = () => setParams({ scenario: queryScenario });
   const open = scenario === "open";
-  const blocked = [
-    "eligibility-pending",
-    "eligibility-revoked",
-    "insufficient-participants",
-    "rescheduled",
-    "paused-before-open",
-  ].includes(scenario);
+  const blocked =
+    (registration ? !canEnterAuction(registration) : false) ||
+    [
+      "eligibility-pending",
+      "eligibility-revoked",
+      "insufficient-participants",
+      "rescheduled",
+      "paused-before-open",
+    ].includes(scenario);
   const readiness = useMemo(
     () => [
       [

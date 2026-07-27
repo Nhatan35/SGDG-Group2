@@ -8,6 +8,10 @@ test.describe('PUB-002 auction catalog', () => {
 
   test('supports public catalog search, sort, actions, and empty state', async ({ page }) => {
     await expect(page.getByRole('heading', { level: 1, name: 'Khám phá các phiên đấu giá' })).toBeVisible()
+    const primaryNavigation = page.getByRole('navigation', { name: 'Điều hướng chính' })
+    await expect(primaryNavigation.getByRole('link', { name: 'Sắp diễn ra', exact: true })).toHaveCount(0)
+    await expect(page.getByRole('button', { name: 'Đã kết thúc', exact: true })).toHaveCount(0)
+    await expect(page.getByRole('button', { name: 'Đã hủy', exact: true })).toHaveCount(0)
     await expect(page.locator('.catalog-auction-grid .auction-card')).toHaveCount(6)
     const decisionCard = page.locator('.catalog-auction-grid .auction-card').first()
     const titleBox = await decisionCard.locator('h3').boundingBox()
@@ -46,6 +50,10 @@ test.describe('PUB-002 auction catalog', () => {
 
     await page.goto('/auctions')
     await expect(page.locator('.catalog-auction-grid .auction-card')).toHaveCount(6)
+    await page.goto('/auctions?status=cancelled')
+    await expect(page.locator('.catalog-auction-grid .auction-card')).toHaveCount(6)
+    await expect(page.getByRole('button', { name: 'Đã hủy', exact: true })).toHaveCount(0)
+    await page.goto('/auctions')
     await page.getByRole('button', { name: 'Giá cao – thấp' }).click()
     await expect(page).toHaveURL(/sort=price-desc/)
     const visiblePrices = await page.locator('.catalog-auction-grid .auction-price').allTextContents()

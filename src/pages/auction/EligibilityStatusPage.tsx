@@ -9,7 +9,12 @@ import {
 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
+import { Dialog } from "../../components/common/Dialog";
 import { catalogAuctions } from "../../services/mock/auctionService";
+import {
+  canEnterAuction,
+  useEligibilityWorkflowStore,
+} from "../../store/eligibilityWorkflowStore";
 import { formatMoney } from "../../utils/format";
 import "../../styles/eligibility-status.css";
 
@@ -184,8 +189,24 @@ export function EligibilityStatusPage() {
   const { auctionId } = useParams();
   const [params, setParams] = useSearchParams();
   const [refreshing, setRefreshing] = useState(false);
+  const [withdrawDialog, setWithdrawDialog] = useState(false);
+  const [withdrawMessage, setWithdrawMessage] = useState("");
   const auction = catalogAuctions.find((item) => item.id === auctionId);
-  const scenario = scenarioOf(params.get("scenario"));
+  const registration = useEligibilityWorkflowStore((store) =>
+    store.registrations.find((item) => item.auctionId === auctionId),
+  );
+  const withdraw = useEligibilityWorkflowStore((store) => store.withdraw);
+  const storedScenario =
+    registration?.eligibility === "ELIGIBLE"
+      ? "approved"
+      : registration?.eligibility === "REJECTED"
+        ? "rejected"
+        : registration?.eligibility === "REVOKED"
+          ? "revoked"
+          : registration?.eligibility === "MANUAL_REVIEW"
+            ? "manual-review"
+            : "pending";
+  const scenario = scenarioOf(params.get("scenario") || storedScenario);
   const projection = params.get("projection");
   const state = copy[scenario];
   const timeline = useMemo(
@@ -260,7 +281,8 @@ export function EligibilityStatusPage() {
       </main>
     );
   const waiting =
-    scenario === "approved" || scenario === "insufficient-participants";
+    (scenario === "approved" || scenario === "insufficient-participants") &&
+    (registration ? canEnterAuction(registration) : true);
   return (
     <main className={`eligibility-status-page status-${state.tone}`}>
       <section className="eligibility-hero">
@@ -282,6 +304,26 @@ export function EligibilityStatusPage() {
       </section>
       <div className="container eligibility-grid">
         <div>
+          {registration && (
+            <section className="decision-card registration-lifecycle-card">
+              <p>TRẠNG THÁI ĐĂNG KÝ</p>
+              <h2>{registration.lifecycle === "WITHDRAWN" ? "ĐÃ RÚT ĐĂNG KÝ" : "ĐÃ ĐĂNG KÝ"}</h2>
+              <dl>
+                <div><dt>Mã đăng ký</dt><dd>{registration.registrationId}</dd></div>
+                <div><dt>Eligibility</dt><dd>{registration.eligibility}</dd></div>
+                <div><dt>Khoản bảo đảm</dt><dd>{registration.depositReferenceStatus}</dd></div>
+                <div><dt>Hạn rút</dt><dd>{new Date(registration.withdrawalDeadline).toLocaleString("vi-VN")}</dd></div>
+                <div><dt>Cập nhật</dt><dd>{new Date(registration.updatedAt).toLocaleString("vi-VN")}</dd></div>
+              </dl>
+              {registration.lifecycle === "REGISTERED" && !registration.activeAuthoritativeBid && registration.depositReferenceStatus === "READY" && (
+                <button className="button secondary" onClick={() => setWithdrawDialog(true)}>
+                  Rút đăng ký tham gia
+                </button>
+              )}
+              {registration.lifecycle === "WITHDRAWN" && <p>Đăng ký đã rút; trạng thái này không phải là Eligibility bị từ chối. Không có cam kết hoàn tiền tự động.</p>}
+              {withdrawMessage && <p role="status">{withdrawMessage}</p>}
+            </section>
+          )}
           <section className="decision-card">
             <p>QUYẾT ĐỊNH HIỆN TẠI</p>
             <h2>{state.badge}</h2>
@@ -434,6 +476,26 @@ export function EligibilityStatusPage() {
           </section>
         </aside>
       </div>
+      {registration && (
+        <Dialog
+          open={withdrawDialog}
+          onOpenChange={setWithdrawDialog}
+          title="Xác nhận rút đăng ký?"
+          description="Bạn sẽ không thể vào phòng chờ hoặc phòng đấu giá bằng đăng ký này."
+          footer={
+            <>
+              <button className="button secondary" onClick={() => setWithdrawDialog(false)}>Giữ đăng ký</button>
+              <button className="button danger" onClick={() => {
+                const result = withdraw(registration.registrationId, "CUSTOMER", registration.version);
+                setWithdrawMessage(result.ok ? "Đã rút đăng ký. Không phát sinh tuyên bố hoàn tiền tự động." : `Không thể rút đăng ký: ${result.reason}.`);
+                setWithdrawDialog(false);
+              }}>Xác nhận rút</button>
+            </>
+          }
+        >
+          <p>Thao tác cập nhật riêng vòng đời đăng ký; Eligibility và dữ liệu Finance nguồn không bị chỉnh sửa.</p>
+        </Dialog>
+      )}
     </main>
   );
 }

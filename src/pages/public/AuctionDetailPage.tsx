@@ -874,7 +874,7 @@ export function AuctionDetailPage() {
               <div>
                 <span>{importantTime.title}</span>
                 <strong>{importantTime.value}</strong>
-                <small>{importantTime.caption}</small>
+                {!isLive && <small>{importantTime.caption}</small>}
               </div>
             </div>
           </div>

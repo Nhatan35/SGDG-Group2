@@ -65,6 +65,7 @@ export const useDemoStore = create<DemoState>()(
       login: (name) =>
         set((state) => ({
           authenticated: true,
+          actorRole: "CUSTOMER",
           userName: name || state.userName,
           walletBalance: state.walletBalance || 125000000,
         })),
