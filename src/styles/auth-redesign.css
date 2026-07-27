@@ -272,6 +272,31 @@
   margin-top: 22px;
 }
 
+.auth-shell-register .auth-card {
+  padding-block: 28px;
+}
+
+.auth-shell-register .auth-icon {
+  margin-top: 12px;
+}
+
+.auth-shell-register .auth-card form {
+  gap: 10px;
+  margin-block: 17px 13px;
+}
+
+.auth-shell-register .social-login-grid button {
+  min-height: 58px;
+}
+
+.auth-shell-register .auth-card > p {
+  margin-top: 13px;
+}
+
+.auth-shell-register .auth-trust {
+  margin-top: 15px;
+}
+
 @media (max-width: 920px) {
   .auth-shell {
     grid-template-columns: 1fr;

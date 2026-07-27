@@ -12,12 +12,16 @@ import "./styles/patterns.css";
 import "./styles/responsive.css";
 import "./styles/pages.css";
 import "./styles/news.css";
+import "./styles/help.css";
 import "./styles/auction-status.css";
 import "./styles/homepage.css";
+import "./styles/home-hero-search-spotlight-refine.css";
+import "./styles/home-auction-card-v2.css";
 import "./styles/home-auction-hero-polish.css";
 import "./styles/account.css";
 import "./styles/account-template.css";
 import "./styles/auth-redesign.css";
+import "./styles/vneid-auth.css";
 import "./styles/wallet.css";
 import "./styles/journey.css";
 import "./styles/admin.css";
@@ -49,6 +53,7 @@ import "./styles/demo.css";
 import "./styles/create-sgdg-session.css";
 import "./styles/auction-energy-motion.css";
 import "./styles/phase2-component-compat.css";
+import "./styles/home-featured-card-layout.css";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
