@@ -97,7 +97,12 @@ export function HandoverOperationsPage() {
                 ? "Case đang hold; không retry, receipt hay completion."
                 : "Action được chọn theo blocker/ readiness fixture."}
             </p>
-            {remediation ? (
+            {role === "ADMIN" ? (
+              <p className="ops-conflict">
+                Chế độ governance chỉ đọc. Transactional action tiếp tục thuộc
+                Operations workspace.
+              </p>
+            ) : remediation ? (
               <Link
                 className="button ops-destructive"
                 to="/governance/remediation/REM-PATEK-REVERSAL-001"

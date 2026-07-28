@@ -5,7 +5,7 @@ import { auctions } from '../../services/mock/auctionService'
 import { AuctionCard } from './AuctionCard'
 
 describe('AuctionCard', () => {
-  it('shows a seconds-level countdown and required metrics', () => {
+  it('shows a running countdown and required metrics while time remains', () => {
     render(<MemoryRouter><AuctionCard auction={auctions[0]}/></MemoryRouter>)
     expect(screen.getByText(/Còn \d{2}:\d{2}:\d{2}/)).toBeInTheDocument()
     expect(screen.getByText(String(auctions[0].participantCount))).toBeInTheDocument()

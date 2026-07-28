@@ -17,9 +17,9 @@ test("live bidding components carry an urgent rhythm", async ({ page }) => {
   const initialTime = await countdown.textContent();
   await expect.poll(() => countdown.textContent()).not.toBe(initialTime);
 
-  await expect(page.locator(".countdown-progress")).toHaveCSS(
+  await expect(page.locator(".auction-countdown-dial")).toHaveCSS(
     "animation-name",
-    "countdown-sweep",
+    "countdown-card-float",
   );
   await expect(page.locator(".price-card")).toHaveCount(0);
   await expect(page.locator(".composer > .button.primary")).toHaveCSS(
@@ -44,7 +44,10 @@ test("auction motion respects reduced-motion preference", async ({ page }) => {
   const liveBadge = page.locator(".auction-status.live .badge").first();
   await expect(liveBadge).toBeVisible();
   await expect(liveBadge).toHaveCSS("animation-name", "none");
-  await expect(page.locator(".bid-now")).toHaveCSS("animation-name", "none");
+  await expect(page.locator(".hero-auction-card__bid")).toHaveCSS(
+    "animation-name",
+    "none",
+  );
   await expect(page.locator(".home-live-countdown")).toHaveCSS(
     "animation-name",
     "none",
@@ -56,56 +59,52 @@ test("homepage spotlight uses fire, heartbeat and ignition rhythms", async ({
 }) => {
   await page.goto("/");
 
-  const heading = page.locator(".auction-spotlight .spotlight-heading");
+  const heading = page.locator(".hero-auction-card__topbar");
   const countdown = page.locator(
-    ".auction-spotlight .spotlight-summary .auction-countdown",
+    ".hero-auction-card__urgency .auction-countdown",
   );
-  const bidButton = page.locator(".auction-spotlight .bid-now");
+  const bidButton = page.locator(".hero-auction-card__bid");
+  const fireIcon = page.locator(
+    ".hero-auction-card__activity-icon",
+  ).first();
 
   await expect(heading).toHaveCSS(
     "animation-name",
-    "auction-energy-fire-bar",
+    "hero-card-orange-flow",
   );
   await expect(countdown).toHaveCSS(
     "animation-name",
-    "auction-energy-double-heartbeat",
+    "hero-card-countdown",
   );
   await expect(bidButton).toHaveCSS(
     "animation-name",
-    "auction-energy-cta-ignite",
+    "hero-card-bid-pulse",
   );
-  await expect(countdown.locator("svg")).toHaveCSS(
-    "animation-name",
-    "auction-energy-heartbeat-clock",
-  );
-  await expect(bidButton.locator("svg")).toHaveCSS(
-    "animation-name",
-    "auction-energy-lightning-strike",
-  );
+  await expect(fireIcon).toHaveCSS("animation-name", "hero-card-flame");
 
   const pseudoAnimations = await page.evaluate(() => {
     const headingElement = document.querySelector(
-      ".auction-spotlight .spotlight-heading",
+      ".hero-auction-card__topbar",
     );
-    const countdownElement = document.querySelector(
-      ".auction-spotlight .spotlight-summary .auction-countdown",
+    const urgencyIndicator = document.querySelector(
+      ".hero-auction-card__urgency > p span",
     );
-    const bidElement = document.querySelector(".auction-spotlight .bid-now");
+    const cardElement = document.querySelector(".hero-auction-card");
 
     return {
-      headingFire: getComputedStyle(headingElement!, "::before").animationName,
+      headingFire: getComputedStyle(headingElement!, "::after").animationName,
       countdownRing: getComputedStyle(
-        countdownElement!,
+        urgencyIndicator!,
         "::before",
       ).animationName,
-      bidFlames: getComputedStyle(bidElement!, "::before").animationName,
+      bidFlames: getComputedStyle(cardElement!, "::before").animationName,
     };
   });
 
   expect(pseudoAnimations).toEqual({
-    headingFire: "auction-energy-fire-tongues",
-    countdownRing: "auction-energy-heartbeat-ring",
-    bidFlames: "auction-energy-cta-flames",
+    headingFire: "hero-card-topbar-shine",
+    countdownRing: "hero-card-live-dot",
+    bidFlames: "hero-card-energy-sweep",
   });
 });
 

@@ -1,0 +1,146 @@
+.auction-registration-page .registration-deposit-summary {
+  margin: 22px 0;
+  padding: 20px;
+  border: 1px solid #edcaa9;
+  border-radius: 14px;
+  background: linear-gradient(145deg, #fffaf5, #fff4e9);
+}
+
+.auction-registration-page .registration-deposit-summary.is-paid {
+  border-color: #a9d8bd;
+  background: #f3fbf6;
+}
+
+.auction-registration-page .registration-deposit-title {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #ead8c8;
+}
+
+.auction-registration-page .registration-deposit-title svg {
+  width: 24px;
+  height: 24px;
+  color: #e9550d;
+}
+
+.auction-registration-page .registration-deposit-title div {
+  display: grid;
+  gap: 3px;
+}
+
+.auction-registration-page .registration-deposit-title span {
+  color: #8b6a59;
+  font-size: 13px;
+}
+
+.auction-registration-page .registration-deposit-summary dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin: 18px 0 0;
+}
+
+.auction-registration-page .registration-deposit-summary dd {
+  color: #a84813;
+  font-size: 17px;
+}
+
+.auction-registration-page .registration-deposit-warning,
+.auction-registration-page .registration-deposit-policy,
+.auction-registration-page .registration-submission-status {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 16px;
+  border-radius: 12px;
+}
+
+.auction-registration-page .registration-deposit-warning {
+  margin: 16px 0;
+  border: 1px solid #efb27f;
+  background: #fff2e5;
+}
+
+.auction-registration-page .registration-deposit-warning svg,
+.auction-registration-page .registration-deposit-policy svg {
+  flex: 0 0 auto;
+  color: #d54b0b;
+}
+
+.auction-registration-page .registration-deposit-warning p {
+  margin: 5px 0 13px;
+  color: #795f50;
+}
+
+.auction-registration-page .registration-deposit-policy {
+  margin: 16px 0;
+  background: #fff4e9;
+  color: #684839;
+}
+
+.auction-registration-page .registration-deposit-policy p {
+  margin: 0;
+}
+
+.auction-registration-page .registration-submission-status {
+  background: #effaf3;
+  color: #17653a;
+  font-weight: 750;
+}
+
+.auction-registration-page .registration-submission-status svg {
+  flex: 0 0 auto;
+}
+
+@media (max-width: 900px) {
+  .auction-registration-page .registration-stepper {
+    overflow-x: auto;
+  }
+
+  .auction-registration-page .registration-stepper button {
+    min-width: 150px;
+  }
+
+  .auction-registration-page .registration-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .auction-registration-page .registration-context {
+    order: -1;
+  }
+
+  .auction-registration-page .registration-deposit-summary dl {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .auction-registration-page .registration-hero h1 {
+    font-size: 32px;
+  }
+
+  .auction-registration-page .registration-card {
+    padding: 20px;
+  }
+
+  .auction-registration-page .registration-metadata-grid,
+  .auction-registration-page .registration-trust-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .auction-registration-page .registration-review-section,
+  .auction-registration-page .registration-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .auction-registration-page .registration-actions .primary {
+    margin-left: 0;
+  }
+
+  .auction-registration-page .registration-state {
+    padding: 70px 24px;
+  }
+}

@@ -1,0 +1,257 @@
+.content-review-page {
+  display: grid;
+  gap: 20px;
+  min-width: 0;
+}
+
+.content-review-heading span,
+.content-review-eyebrow {
+  color: var(--sgdg-sage-700);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+}
+
+.content-review-heading h1 {
+  margin: 4px 0;
+}
+
+.content-review-heading p,
+.content-review-eyebrow {
+  margin: 0;
+}
+
+.content-review-card {
+  min-width: 0;
+  border: 1px solid var(--sgdg-border);
+  border-radius: var(--radius-md);
+  background: var(--sgdg-white);
+  box-shadow: var(--shadow-sm);
+  padding: 20px;
+}
+
+.content-review-card h2 {
+  margin: 5px 0 14px;
+}
+
+.content-review-card dl,
+.content-review-dialog dl {
+  display: grid;
+  grid-template-columns: minmax(145px, max-content) minmax(0, 1fr);
+  gap: 8px 18px;
+  margin: 0 0 16px;
+}
+
+.content-review-card dt,
+.content-review-dialog dt {
+  color: var(--sgdg-text-secondary);
+}
+
+.content-review-card dd,
+.content-review-dialog dd {
+  min-width: 0;
+  margin: 0;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.content-review-identity {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.content-review-badges {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.content-review-evidence-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.content-review-blocker {
+  min-width: 0;
+  border: 1px solid #d9938c;
+  border-left-width: 5px;
+  border-radius: var(--radius-sm);
+  background: #fff3f1;
+  color: #7f211a;
+  padding: 15px 17px;
+  overflow-wrap: anywhere;
+}
+
+.content-review-blocker p {
+  margin: 5px 0 0;
+  white-space: pre-line;
+}
+
+.content-review-success {
+  min-height: 24px;
+  margin: 0;
+  color: var(--sgdg-success);
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.content-review-readiness {
+  display: grid;
+  grid-template-columns: minmax(240px, 0.55fr) minmax(0, 1fr);
+  gap: 24px;
+}
+
+.content-review-projection {
+  border-left: 4px solid var(--sgdg-sage-700);
+  padding: 9px 13px;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
+.content-review-findings {
+  display: grid;
+  gap: 16px;
+}
+
+.content-review-findings section {
+  min-width: 0;
+  border: 1px solid var(--sgdg-border);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+}
+
+.content-review-findings h3 {
+  margin: 0 0 10px;
+  font-size: 15px;
+}
+
+.content-review-findings ul {
+  display: grid;
+  gap: 10px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.content-review-findings li {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  border-left: 3px solid #c98a2f;
+  padding: 8px 12px;
+  overflow-wrap: anywhere;
+}
+
+.content-review-findings li small {
+  color: var(--sgdg-text-secondary);
+}
+
+.content-review-findings a,
+.content-review-card a:not(.button) {
+  color: var(--sgdg-info);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.content-review-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.content-review-history ol {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding-left: 24px;
+}
+
+.content-review-history li {
+  padding-left: 5px;
+  overflow-wrap: anywhere;
+}
+
+.content-review-history li strong,
+.content-review-history li span,
+.content-review-history li small {
+  display: block;
+}
+
+.content-review-history li small {
+  color: var(--sgdg-text-secondary);
+}
+
+.content-review-completion {
+  border-color: var(--sgdg-sage-300);
+  background: #f4faf5;
+}
+
+.content-review-dialog {
+  max-height: min(88vh, 820px);
+  overflow-y: auto;
+}
+
+.content-review-dialog .prototype-content-disclaimer {
+  margin-bottom: 18px;
+}
+
+.content-review-dialog-statements {
+  border-left: 4px solid var(--sgdg-sage-700);
+  padding-left: 14px;
+}
+
+.content-review-dialog-statements p {
+  margin: 5px 0;
+  font-weight: 700;
+}
+
+.dynamic-content-review-projection {
+  display: grid;
+  gap: 7px;
+  border-top: 1px solid var(--sgdg-border);
+  margin-top: 15px;
+  padding-top: 15px;
+}
+
+.dynamic-content-review-projection p {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 760px) {
+  .content-review-evidence-grid,
+  .content-review-readiness {
+    grid-template-columns: 1fr;
+  }
+
+  .content-review-identity {
+    display: grid;
+  }
+
+  .content-review-badges {
+    justify-content: flex-start;
+  }
+
+  .content-review-card dl,
+  .content-review-dialog dl {
+    grid-template-columns: 1fr;
+  }
+
+  .content-review-card dd,
+  .content-review-dialog dd {
+    margin-bottom: 8px;
+  }
+
+  .content-review-actions {
+    display: grid;
+  }
+
+  .content-review-actions .button {
+    width: 100%;
+  }
+}

@@ -17,7 +17,6 @@ import { formatMoney } from "../../utils/format";
 const links = [
   { to: "/", label: "Trang chủ" },
   { to: "/auctions", label: "Phiên đấu giá" },
-  { to: "/auctions/upcoming", label: "Sắp diễn ra" },
   { to: "/news", label: "Tin tức" },
   { to: "/help", label: "Hướng dẫn" },
 ];

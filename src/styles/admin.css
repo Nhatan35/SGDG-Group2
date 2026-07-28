@@ -562,3 +562,29 @@
   border-radius: 0;
   padding-top: 13px;
 }
+
+@media (max-width: 700px) {
+  .admin-sidebar {
+    width: 100%;
+    max-width: 100vw;
+    min-width: 0;
+    flex-direction: column;
+    overflow-x: hidden;
+  }
+
+  .admin-sidebar nav {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(44px, 1fr));
+    flex: 0 1 auto;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    overflow: visible;
+  }
+
+  .admin-sidebar nav a {
+    width: 100%;
+    min-width: 44px;
+    padding-inline: 12px;
+  }
+}

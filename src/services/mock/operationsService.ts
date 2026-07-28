@@ -404,19 +404,32 @@ export function getAuctionSessionWorkspaceFixture(
   };
 }
 export function getAuctionRuleFixture(sessionId: string, scenario?: string) {
-  if (!getAuctionSessionById(sessionId)) return undefined;
+  const session = getAuctionSessionById(sessionId);
+  if (!session) return undefined;
   const approved = scenario === "approved-snapshot";
+  const pending =
+    scenario === "pending-review" || scenario === "sensitive-change-pending";
   return {
+    sessionId: session.sessionId,
+    auctionCode: session.auctionCode,
+    assetId: session.assetId,
+    lifecycleStatus: session.lifecycleStatus,
+    managementMode: session.managementMode,
     ruleVersionId: `RULE-${sessionId}-V1`,
     version: 1,
-    status: approved ? "APPROVED_SNAPSHOT" : "DRAFT_PROPOSAL",
-    startingPrice: 2900000000,
-    minimumIncrement: 25000000,
-    depositPolicyReference: "DEP-STD-01",
+    status: approved
+      ? "APPROVED_SNAPSHOT"
+      : pending
+        ? "PENDING_REVIEW"
+        : "DRAFT_PROPOSAL",
+    updatedAt: "2026-07-24T08:30:00.000Z",
+    startingPrice: scenario === "invalid" ? 0 : 2900000000,
+    minimumIncrement: scenario === "invalid-increment" ? 3000000000 : 25000000,
+    depositPolicyReference: scenario === "incomplete" ? "" : "DEP-STD-01",
     eligibilityPolicyReference: "ELG-STD-01",
     extensionPolicyReference: "EXT-02",
     fallbackPolicyReference: "FB-READONLY",
-    immutableSnapshot: approved,
+    immutableSnapshot: approved || pending,
     sensitiveChange: scenario === "sensitive-change-pending",
   };
 }

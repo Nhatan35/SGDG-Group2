@@ -1,0 +1,44 @@
+.schedule-confirmation-page {
+  display: grid;
+  gap: 1.25rem;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+.schedule-confirmation-title {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.schedule-confirmation-evidence {
+  display: grid;
+  grid-template-columns: minmax(150px, 0.4fr) minmax(0, 1fr);
+  gap: 0.65rem 1rem;
+}
+
+.schedule-confirmation-evidence dt {
+  color: #6c655d;
+  font-weight: 600;
+}
+
+.schedule-confirmation-evidence dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 600px) {
+  .schedule-confirmation-page {
+    padding: 1rem;
+  }
+
+  .schedule-confirmation-title {
+    display: grid;
+  }
+
+  .schedule-confirmation-evidence {
+    grid-template-columns: 1fr;
+  }
+}

@@ -50,15 +50,10 @@ test("live room follows the three-zone auction layout", async ({
   expect(visualBox!.x).toBeLessThan(commandBox!.x);
   expect(commandBox!.x).toBeLessThan(competitionBox!.x);
 
-  const orbit = dial.locator(".countdown-orbit");
-  const summary = dial.locator(".countdown-summary");
-  const [orbitBox, summaryBox] = await Promise.all([
-    orbit.boundingBox(),
-    summary.boundingBox(),
-  ]);
-  expect(orbitBox).not.toBeNull();
-  expect(summaryBox).not.toBeNull();
-  expect(orbitBox!.x).toBeLessThan(summaryBox!.x);
+  await expect(dial.locator(".countdown-compact-header")).toBeVisible();
+  await expect(dial.locator(".countdown-digits")).toBeVisible();
+  await expect(dial.locator(".countdown-units")).toBeVisible();
+  await expect(dial.locator(".countdown-orbit")).toHaveCount(0);
 
   const initialTime = await dial.locator(".countdown-digits").textContent();
   await expect
@@ -84,21 +79,16 @@ test("live room prioritizes bidding information on mobile", async ({
   await page.goto("/auctions/rolex-126610lv/live");
 
   const dialBox = await page.locator(".auction-countdown-dial").boundingBox();
-  const orbitBox = await page.locator(".countdown-orbit").boundingBox();
-  const summaryBox = await page.locator(".countdown-summary").boundingBox();
   const composerBox = await page.locator(".composer").boundingBox();
   const headerMetricsBox = await page
     .locator(".live-header .live-header-session-metrics")
     .boundingBox();
 
   expect(dialBox).not.toBeNull();
-  expect(orbitBox).not.toBeNull();
-  expect(summaryBox).not.toBeNull();
   expect(composerBox).not.toBeNull();
   expect(headerMetricsBox).not.toBeNull();
   expect(headerMetricsBox!.width).toBeGreaterThan(300);
   expect(dialBox!.y).toBeLessThan(composerBox!.y);
-  expect(orbitBox!.y).toBeLessThan(summaryBox!.y);
   await expect(page.locator(".price-card")).toHaveCount(0);
   await expect
     .poll(() =>
@@ -122,16 +112,11 @@ test("live room prioritizes bidding information on mobile", async ({
   });
 });
 
-test("countdown decoration respects reduced motion", async ({ page }) => {
+test("compact countdown has no animated decoration", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/auctions/rolex-126610lv/live");
 
-  await expect(page.locator(".countdown-progress")).toHaveCSS(
-    "animation-name",
-    "none",
-  );
-  await expect(page.locator(".countdown-live-pill svg")).toHaveCSS(
-    "animation-name",
-    "none",
-  );
+  await expect(page.locator(".countdown-digits")).toBeVisible();
+  await expect(page.locator(".countdown-progress")).toHaveCount(0);
+  await expect(page.locator(".countdown-live-pill")).toHaveCount(0);
 });

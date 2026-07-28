@@ -33,8 +33,6 @@ test("auction flow", async ({ page }) => {
   await page.getByRole("button", { name: "Đăng nhập" }).click();
   await page.goto("/auctions/rolex-126610lv/live");
   await page.getByRole("button", { name: "Đặt giá thủ công" }).click();
-  await page.getByRole("button", { name: "Đồng ý đặt cọc" }).click();
-  await page.getByRole("button", { name: "Vào đấu giá" }).click();
   await page.getByRole("button", { name: "Mức tối thiểu" }).click();
   await page.getByRole("button", { name: "Tiếp tục xác nhận" }).click();
   await page.getByRole("checkbox").check();

@@ -535,9 +535,9 @@ function scheduleFor(status: AuctionStatus, index: number, id?: string) {
     status === "CLOSED" || status === "COMPLETED"
       ? Date.UTC(2026, 6, 16 + (index % 2), 9 + (index % 5), 0, 0)
       : status === "LIVE"
-        ? Date.UTC(2026, 6, 18, 8 + (index % 3), 0, 0)
+        ? Date.UTC(2026, 6, 18, 10 + (index % 3), 0, 0)
         : Date.UTC(2026, 6, 19 + (index % 10), 9 + (index % 7), 0, 0);
-  const durationMinutes = status === "LIVE" ? 75 + (index % 4) * 12 : 60;
+  const durationMinutes = status === "LIVE" ? 180 + (index % 4) * 15 : 60;
   const startsAt = new Date(base);
   const endsAt = new Date(base + durationMinutes * 60_000);
   const registrationDeadline = new Date(base - 12 * 60 * 60_000);
