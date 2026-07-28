@@ -59,11 +59,19 @@
 
 .vneid-page {
   min-height: 100vh;
+  max-width: 100%;
+  overflow-x: clip;
   background:
     radial-gradient(circle at 16% 12%, rgb(244 190 52 / 15%), transparent 25rem),
     radial-gradient(circle at 90% 80%, rgb(211 33 40 / 8%), transparent 28rem),
     #f7f4eb;
   color: #302825;
+}
+
+html:has(.vneid-page),
+body:has(.vneid-page) {
+  max-width: 100%;
+  overflow-x: hidden;
 }
 .vneid-topbar {
   display: grid;
@@ -157,7 +165,7 @@
 }
 .vneid-progress {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   margin-bottom: 18px;
 }
 .vneid-progress > div {
@@ -487,6 +495,164 @@
   display: grid;
   gap: 10px;
 }
+.vneid-face-panel {
+  display: grid;
+  gap: 18px;
+}
+
+.vneid-face-camera {
+  position: relative;
+  min-height: 330px;
+  overflow: hidden;
+  border: 1px solid #d9d2bd;
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at 50% 34%, rgba(255, 255, 255, 0.95), transparent 32%),
+    linear-gradient(145deg, #e8efe9, #c8d8ce);
+  display: grid;
+  place-items: center;
+}
+
+.vneid-face-grid {
+  position: absolute;
+  inset: 0;
+  opacity: 0.24;
+  background-image:
+    linear-gradient(rgba(24, 74, 52, 0.16) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(24, 74, 52, 0.16) 1px, transparent 1px);
+  background-size: 36px 36px;
+}
+
+.vneid-face-oval {
+  position: relative;
+  width: 174px;
+  height: 226px;
+  border: 3px solid #1b754e;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: #1b754e;
+  box-shadow: 0 0 0 12px rgba(255, 255, 255, 0.5);
+}
+
+.vneid-face-oval svg {
+  width: 78px;
+  height: 78px;
+  stroke-width: 1.25;
+}
+
+.vneid-face-camera.is-scanning .vneid-face-oval {
+  animation: vneid-face-pulse 1.1s ease-in-out infinite alternate;
+}
+
+.vneid-face-camera.is-failed .vneid-face-oval {
+  color: #b52b2f;
+  border-color: #b52b2f;
+}
+
+.vneid-scan-line {
+  position: absolute;
+  left: calc(50% - 105px);
+  width: 210px;
+  height: 2px;
+  top: 22%;
+  background: #efb51b;
+  box-shadow: 0 0 14px #efb51b;
+  animation: vneid-face-scan 1.5s ease-in-out infinite;
+}
+
+.vneid-camera-status {
+  position: absolute;
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: calc(100% - 28px);
+  padding: 9px 14px;
+  border-radius: 999px;
+  background: rgba(19, 44, 33, 0.86);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.vneid-camera-status svg {
+  width: 17px;
+  height: 17px;
+}
+
+.vneid-face-camera.is-scanning .vneid-camera-status svg {
+  animation: vneid-spin 0.9s linear infinite;
+}
+
+.vneid-face-camera.is-failed .vneid-camera-status {
+  background: rgba(133, 25, 30, 0.9);
+}
+
+.vneid-face-copy {
+  text-align: center;
+}
+
+.vneid-face-copy h2 {
+  margin-bottom: 6px;
+}
+
+.vneid-face-copy p {
+  margin: 0;
+  color: #625e55;
+  line-height: 1.55;
+}
+
+.vneid-face-guidance {
+  list-style: none;
+  margin: 0;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: #f7f4eb;
+  display: grid;
+  gap: 9px;
+  color: #3f493f;
+  font-size: 0.86rem;
+}
+
+.vneid-face-guidance li {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.vneid-face-guidance svg {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+  color: #1b754e;
+}
+
+@keyframes vneid-face-scan {
+  0%,
+  100% {
+    top: 24%;
+  }
+  50% {
+    top: 66%;
+  }
+}
+
+@keyframes vneid-face-pulse {
+  to {
+    box-shadow: 0 0 0 18px rgba(27, 117, 78, 0.14);
+  }
+}
+
+@keyframes vneid-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .vneid-result {
   position: relative;
   display: grid;
@@ -545,6 +711,10 @@
 }
 
 @media (max-width: 620px) {
+  .vneid-face-camera {
+    min-height: 290px;
+  }
+
   .vneid-topbar {
     min-height: 62px;
     padding-inline: 14px;

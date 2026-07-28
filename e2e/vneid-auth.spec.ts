@@ -31,10 +31,33 @@ test("Customer signs in through the complete VNeID consent flow", async ({
   await accept.click();
 
   await expect(
-    page.getByRole("heading", { name: "Đăng nhập thành công" }),
+    page.getByRole("heading", { name: "Xác thực khuôn mặt" }),
   ).toBeVisible();
-  await page.getByRole("button", { name: "Tiếp tục vào SGDG" }).click();
-  await expect(page).toHaveURL(/\/account\/dashboard$/);
+  await page.getByRole("button", { name: "Bắt đầu xác thực" }).click();
+  await expect(
+    page.getByText("Đang kiểm tra sống và đối chiếu..."),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Đăng nhập thành công" }),
+  ).toBeVisible({ timeout: 5_000 });
+  await page.getByRole("button", { name: "Vào trang chủ SGDG" }).click();
+  await expect(page).toHaveURL(/\/$/);
+});
+
+test("facial verification failure provides a retry path", async ({ page }) => {
+  await page.goto("/auth/vneid?scenario=face-failed");
+  await page.getByRole("button", { name: "Đăng nhập", exact: true }).click();
+  await page
+    .getByLabel(/Tôi đã đọc, hiểu mục đích xử lý dữ liệu/)
+    .check();
+  await page.getByRole("button", { name: "Xác nhận chia sẻ" }).click();
+  await page.getByRole("button", { name: "Bắt đầu xác thực" }).click();
+  await expect(
+    page.getByRole("heading", { name: "Chưa thể xác thực khuôn mặt" }),
+  ).toBeVisible({ timeout: 5_000 });
+  await expect(
+    page.getByRole("button", { name: "Thử xác thực lại" }),
+  ).toBeVisible();
 });
 
 test("VNeID refusal shares no data and offers a safe retry", async ({ page }) => {
@@ -75,11 +98,12 @@ test("Customer can register with VNeID and continue to profile completion", asyn
     .getByLabel(/Tôi đã đọc, hiểu mục đích xử lý dữ liệu/)
     .check();
   await page.getByRole("button", { name: "Xác nhận chia sẻ" }).click();
+  await page.getByRole("button", { name: "Bắt đầu xác thực" }).click();
   await expect(
     page.getByRole("heading", { name: "Đăng ký thành công" }),
-  ).toBeVisible();
-  await page.getByRole("button", { name: "Hoàn thiện hồ sơ" }).click();
-  await expect(page).toHaveURL(/\/account\/profile$/);
+  ).toBeVisible({ timeout: 5_000 });
+  await page.getByRole("button", { name: "Vào trang chủ SGDG" }).click();
+  await expect(page).toHaveURL(/\/$/);
 });
 
 test("expired VNeID request is explicit and mobile layout stays contained", async ({

@@ -1,6 +1,7 @@
 import {
   ArrowLeft,
   BadgeCheck,
+  Camera,
   CheckCircle2,
   Clock3,
   Eye,
@@ -9,6 +10,8 @@ import {
   KeyRound,
   LockKeyhole,
   LogIn,
+  RefreshCw,
+  ScanFace,
   ShieldCheck,
   Star,
   UserPlus,
@@ -90,6 +93,9 @@ export function LoginPage() {
 type VneidStep =
   | "credentials"
   | "consent"
+  | "face-ready"
+  | "face-scanning"
+  | "face-failed"
   | "declined"
   | "expired"
   | "success";
@@ -139,6 +145,21 @@ export function VneidLoginPage() {
     return () => window.clearInterval(timer);
   }, [step]);
 
+  useEffect(() => {
+    if (step !== "face-scanning") return;
+    const timer = window.setTimeout(() => {
+      const shouldFail =
+        new URLSearchParams(location.search).get("scenario") === "face-failed";
+      if (shouldFail) {
+        setStep("face-failed");
+        return;
+      }
+      login("Nguyễn Minh Anh");
+      setStep("success");
+    }, 1800);
+    return () => window.clearTimeout(timer);
+  }, [location.search, login, step]);
+
   const timeLabel = `${String(Math.floor(secondsLeft / 60)).padStart(2, "0")}:${String(
     secondsLeft % 60,
   ).padStart(2, "0")}`;
@@ -148,11 +169,6 @@ export function VneidLoginPage() {
     setSecondsLeft(300);
     setConsented(false);
     setShowData(false);
-  }
-
-  function completeVneidLogin() {
-    login("Nguyễn Minh Anh");
-    setStep("success");
   }
 
   return (
@@ -187,6 +203,9 @@ export function VneidLoginPage() {
                 (isRegistration
                   ? "Xác nhận thông tin tạo tài khoản"
                   : "Xác nhận chia sẻ thông tin")}
+              {(step === "face-ready" || step === "face-scanning") &&
+                "Xác thực khuôn mặt"}
+              {step === "face-failed" && "Chưa thể xác thực khuôn mặt"}
               {step === "declined" && "Bạn đã từ chối chia sẻ"}
               {step === "expired" && "Yêu cầu đăng nhập đã hết hạn"}
               {step === "success" &&
@@ -201,6 +220,12 @@ export function VneidLoginPage() {
                 (isRegistration
                   ? "Kiểm tra dữ liệu sẽ được dùng để khởi tạo hồ sơ Customer SGDG."
                   : "Kiểm tra phạm vi dữ liệu trước khi đồng ý chia sẻ cho SGDG.")}
+              {step === "face-ready" &&
+                "Đối chiếu người đang thao tác với ảnh chân dung trong dữ liệu định danh."}
+              {step === "face-scanning" &&
+                "Giữ khuôn mặt trong khung hình và nhìn thẳng vào camera."}
+              {step === "face-failed" &&
+                "Hình ảnh chưa đủ rõ để đối chiếu. Bạn có thể thực hiện lại."}
               {step === "declined" &&
                 "SGDG chưa nhận dữ liệu định danh và không tạo phiên đăng nhập."}
               {step === "expired" &&
@@ -217,15 +242,20 @@ export function VneidLoginPage() {
           {[
             ["1", "Xác thực"],
             ["2", "Chia sẻ"],
-            ["3", "Hoàn tất"],
+            ["3", "Khuôn mặt"],
+            ["4", "Hoàn tất"],
           ].map(([number, label], index) => {
             const activeIndex =
               step === "credentials"
                 ? 0
                 : step === "consent"
                   ? 1
-                  : step === "success"
+                  : step === "face-ready" ||
+                      step === "face-scanning" ||
+                      step === "face-failed"
                     ? 2
+                  : step === "success"
+                    ? 3
                     : 1;
             return (
               <div
@@ -381,7 +411,7 @@ export function VneidLoginPage() {
                 className="vneid-primary"
                 type="button"
                 disabled={!consented}
-                onClick={completeVneidLogin}
+                onClick={() => setStep("face-ready")}
               >
                 Xác nhận chia sẻ
               </button>
@@ -393,6 +423,85 @@ export function VneidLoginPage() {
                 Xác nhận không chia sẻ
               </button>
             </div>
+          </section>
+        )}
+
+        {(step === "face-ready" ||
+          step === "face-scanning" ||
+          step === "face-failed") && (
+          <section className="vneid-panel vneid-face-panel">
+            <div
+              className={`vneid-face-camera ${
+                step === "face-scanning" ? "is-scanning" : ""
+              } ${step === "face-failed" ? "is-failed" : ""}`}
+              aria-label="Khung mô phỏng camera xác thực khuôn mặt"
+            >
+              <span className="vneid-face-grid" aria-hidden="true" />
+              <span className="vneid-face-oval" aria-hidden="true">
+                <ScanFace />
+              </span>
+              {step === "face-scanning" && (
+                <span className="vneid-scan-line" aria-hidden="true" />
+              )}
+              <span className="vneid-camera-status">
+                {step === "face-ready" && (
+                  <>
+                    <Camera /> Camera sẵn sàng
+                  </>
+                )}
+                {step === "face-scanning" && (
+                  <>
+                    <RefreshCw /> Đang kiểm tra sống và đối chiếu...
+                  </>
+                )}
+                {step === "face-failed" && (
+                  <>
+                    <XCircle /> Chưa nhận diện đủ rõ
+                  </>
+                )}
+              </span>
+            </div>
+
+            <div className="vneid-face-copy" aria-live="polite">
+              <h2>
+                {step === "face-failed"
+                  ? "Vui lòng thử lại"
+                  : "Đưa khuôn mặt vào giữa khung hình"}
+              </h2>
+              <p>
+                {step === "face-failed"
+                  ? "Đảm bảo khuôn mặt không bị che, camera sạch và khu vực đủ ánh sáng."
+                  : "Bỏ khẩu trang, kính râm và giữ thiết bị ngang tầm mắt trong khu vực đủ sáng."}
+              </p>
+            </div>
+
+            <ul className="vneid-face-guidance">
+              <li>
+                <CheckCircle2 /> Chỉ dùng để xác minh đúng chủ thể danh tính
+              </li>
+              <li>
+                <ShieldCheck /> Không lưu ảnh camera trong bản wireframe
+              </li>
+            </ul>
+
+            {step !== "face-scanning" && (
+              <button
+                className="vneid-primary"
+                type="button"
+                onClick={() => setStep("face-scanning")}
+              >
+                {step === "face-failed" ? "Thử xác thực lại" : "Bắt đầu xác thực"}
+              </button>
+            )}
+            {step === "face-ready" && (
+              <button
+                className="vneid-text-button"
+                type="button"
+                onClick={() => setStep("consent")}
+              >
+                Quay lại bước chia sẻ
+              </button>
+            )}
           </section>
         )}
 
@@ -446,13 +555,9 @@ export function VneidLoginPage() {
             <button
               className="vneid-primary"
               type="button"
-              onClick={() =>
-                navigate(isRegistration ? "/account/profile" : from, {
-                  replace: true,
-                })
-              }
+              onClick={() => navigate("/", { replace: true })}
             >
-              {isRegistration ? "Hoàn thiện hồ sơ" : "Tiếp tục vào SGDG"}
+              Vào trang chủ SGDG
             </button>
           </section>
         )}
