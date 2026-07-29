@@ -75,7 +75,12 @@ export interface DisputeCase {
   createdAt: string;
   investigationNote: string;
   resolution?: string;
-  retentionHold?: { reason: string; createdAt: string };
+  retentionHold?: {
+    reason: string;
+    createdAt: string;
+    status: "PENDING_ADMIN_APPROVAL" | "ACTIVE" | "REJECTED";
+    decisionNote?: string;
+  };
   financialInvestigationId?: string;
   events: CaseEvent[];
 }
@@ -125,15 +130,24 @@ interface SupportState {
   createDispute: (complaintId: string, note: string) => string;
   updateDispute: (id: string, status: DisputeStatus, note: string) => void;
   requestRetentionHold: (id: string, reason: string) => void;
+  decideRetentionHold: (
+    id: string,
+    approved: boolean,
+    decisionNote: string,
+  ) => void;
   requestFinancialInvestigation: (
     id: string,
     type: FinancialInvestigation["type"],
     reference: string,
   ) => void;
   submitFinancialInvestigation: (id: string, findings: string) => void;
+  acceptFinancialInvestigation: (id: string) => void;
+  requestFinancialInvestigationInfo: (id: string, note: string) => void;
+  provideFinancialInvestigationInfo: (id: string, note: string) => void;
   acceptConversation: (id: string) => void;
   sendStaffMessage: (id: string, text: string) => void;
   forwardKnowledgeGap: (id: string) => void;
+  resolveKnowledgeGap: (proposalId: string, articleId: string) => void;
 }
 const now = "20/07/2026 19:30";
 const event = (
@@ -435,7 +449,6 @@ export const useSupportStore = create<SupportState>()(
                 status: "SUBMITTED",
                 createdAt: now,
                 evidence: [],
-                disputeId: "DSP-091",
                 events: [event(`EV-${id}`, "Complaint được gửi", "Customer")],
               },
               ...s.complaints,
@@ -504,7 +517,16 @@ export const useSupportStore = create<SupportState>()(
       updateDispute: (id, status, note) =>
         set((s) => ({
           disputes: s.disputes.map((x) =>
-            x.id === id && x.status !== "CLOSED"
+            x.id === id &&
+            x.status !== "CLOSED" &&
+            !(
+              status === "RESOLVED" &&
+              x.financialInvestigationId &&
+              s.investigations.find(
+                (investigation) =>
+                  investigation.id === x.financialInvestigationId,
+              )?.status !== "SUBMITTED"
+            )
               ? {
                   ...x,
                   status,
@@ -533,14 +555,46 @@ export const useSupportStore = create<SupportState>()(
             !x.retentionHold
               ? {
                   ...x,
-                  retentionHold: { reason, createdAt: now },
+                  retentionHold: {
+                    reason,
+                    createdAt: now,
+                    status: "PENDING_ADMIN_APPROVAL",
+                  },
                   events: [
                     ...x.events,
                     event(
                       `EV-${Date.now()}`,
-                      "Retention Hold activated",
+                      "Đã gửi đề nghị bảo toàn bằng chứng",
                       "Customer Support",
                       reason,
+                    ),
+                  ],
+                }
+              : x,
+          ),
+        })),
+      decideRetentionHold: (id, approved, decisionNote) =>
+        set((s) => ({
+          disputes: s.disputes.map((x) =>
+            x.id === id &&
+            x.retentionHold?.status === "PENDING_ADMIN_APPROVAL" &&
+            decisionNote.trim()
+              ? {
+                  ...x,
+                  retentionHold: {
+                    ...x.retentionHold,
+                    status: approved ? "ACTIVE" as const : "REJECTED" as const,
+                    decisionNote: decisionNote.trim(),
+                  },
+                  events: [
+                    ...x.events,
+                    event(
+                      `EV-${Date.now()}`,
+                      approved
+                        ? "Admin đã kích hoạt bảo toàn bằng chứng"
+                        : "Admin đã từ chối đề nghị bảo toàn bằng chứng",
+                      "Admin Governance",
+                      decisionNote,
                     ),
                   ],
                 }
@@ -550,7 +604,13 @@ export const useSupportStore = create<SupportState>()(
       requestFinancialInvestigation: (id, type, reference) =>
         set((s) => {
           const d = s.disputes.find((x) => x.id === id);
-          if (!d || d.financialInvestigationId) return s;
+          if (
+            !d ||
+            d.status !== "UNDER_INVESTIGATION" ||
+            d.financialInvestigationId ||
+            !reference.trim()
+          )
+            return s;
           const invId = `FIN-INV-${Date.now()}`;
           return {
             disputes: s.disputes.map((x) =>
@@ -583,13 +643,21 @@ export const useSupportStore = create<SupportState>()(
           };
         }),
       submitFinancialInvestigation: (id, findings) =>
-        set((s) => ({
+        set((s) => {
+          const valid = s.investigations.some(
+            (item) =>
+              item.id === id &&
+              item.status === "IN_PROGRESS" &&
+              findings.trim(),
+          );
+          if (!valid) return s;
+          return {
           investigations: s.investigations.map((x) =>
-            x.id === id
+            x.id === id && x.status === "IN_PROGRESS"
               ? {
                   ...x,
                   status: "SUBMITTED",
-                  findings,
+                  findings: findings.trim(),
                   financeStaff: "Finance Demo",
                   events: [
                     ...x.events,
@@ -619,7 +687,122 @@ export const useSupportStore = create<SupportState>()(
                 }
               : x,
           ),
+        };
+        }),
+      acceptFinancialInvestigation: (id) =>
+        set((s) => ({
+          investigations: s.investigations.map((x) =>
+            x.id === id && x.status === "REQUESTED"
+              ? {
+                  ...x,
+                  status: "IN_PROGRESS",
+                  financeStaff: "Finance Demo",
+                  events: [
+                    ...x.events,
+                    event(
+                      `EV-${Date.now()}`,
+                      "Finance tiếp nhận điều tra",
+                      "Finance",
+                    ),
+                  ],
+                }
+              : x,
+          ),
         })),
+      requestFinancialInvestigationInfo: (id, note) =>
+        set((s) => {
+          const valid = s.investigations.some(
+            (item) =>
+              item.id === id &&
+              item.status === "IN_PROGRESS" &&
+              note.trim(),
+          );
+          if (!valid) return s;
+          return {
+          investigations: s.investigations.map((x) =>
+            x.id === id && x.status === "IN_PROGRESS"
+              ? {
+                  ...x,
+                  status: "MORE_INFO_REQUIRED",
+                  findings: note,
+                  events: [
+                    ...x.events,
+                    event(
+                      `EV-${Date.now()}`,
+                      "Yêu cầu Customer Support bổ sung thông tin",
+                      "Finance",
+                      note.trim(),
+                    ),
+                  ],
+                }
+              : x,
+          ),
+          disputes: s.disputes.map((x) =>
+            x.financialInvestigationId === id
+              ? {
+                  ...x,
+                  status: "ADDITIONAL_INFORMATION_REQUIRED",
+                  events: [
+                    ...x.events,
+                    event(
+                      `EV-${Date.now()}`,
+                      "Finance yêu cầu bổ sung thông tin",
+                      "Finance",
+                      note,
+                    ),
+                  ],
+                }
+              : x,
+          ),
+        };
+        }),
+      provideFinancialInvestigationInfo: (id, note) =>
+        set((s) => {
+          const valid = s.investigations.some(
+            (item) =>
+              item.id === id &&
+              item.status === "MORE_INFO_REQUIRED" &&
+              note.trim(),
+          );
+          if (!valid) return s;
+          return {
+          investigations: s.investigations.map((x) =>
+            x.id === id && x.status === "MORE_INFO_REQUIRED"
+              ? {
+                  ...x,
+                  status: "IN_PROGRESS",
+                  findings: undefined,
+                  events: [
+                    ...x.events,
+                    event(
+                      `EV-${Date.now()}`,
+                      "Customer Support đã bổ sung thông tin",
+                      "Customer Support",
+                      note.trim(),
+                    ),
+                  ],
+                }
+              : x,
+          ),
+          disputes: s.disputes.map((x) =>
+            x.financialInvestigationId === id
+              ? {
+                  ...x,
+                  status: "FINANCIAL_INVESTIGATION_PENDING",
+                  events: [
+                    ...x.events,
+                    event(
+                      `EV-${Date.now()}`,
+                      "Đã bổ sung thông tin cho Finance",
+                      "Customer Support",
+                      note,
+                    ),
+                  ],
+                }
+              : x,
+          ),
+        };
+        }),
       acceptConversation: (id) =>
         set((s) => ({
           conversations: s.conversations.map((x) =>
@@ -662,7 +845,39 @@ export const useSupportStore = create<SupportState>()(
               : x,
           ),
         })),
+      resolveKnowledgeGap: (proposalId, articleId) =>
+        set((s) => ({
+          knowledgeGaps: s.knowledgeGaps.map((x) =>
+            x.proposalId === proposalId
+              ? {
+                  ...x,
+                  status: "RESOLVED",
+                  relatedArticle: articleId,
+                }
+              : x,
+          ),
+        })),
     }),
-    { name: "sgdg-support-demo" },
+    {
+      name: "sgdg-support-demo",
+      version: 2,
+      migrate: (persisted) => {
+        const state = persisted as Partial<SupportState>;
+        return {
+          ...state,
+          disputes: (state.disputes ?? []).map((dispute) => ({
+            ...dispute,
+            retentionHold: dispute.retentionHold
+              ? {
+                  ...dispute.retentionHold,
+                  status:
+                    dispute.retentionHold.status ??
+                    ("PENDING_ADMIN_APPROVAL" as const),
+                }
+              : undefined,
+          })),
+        };
+      },
+    },
   ),
 );

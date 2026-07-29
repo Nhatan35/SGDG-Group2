@@ -64,7 +64,5 @@ test("admin flow", async ({ page }) => {
     page.getByRole("heading", { name: "Tổng quan Administration Service" }),
   ).toBeVisible();
   await page.goto("/admin/live-ops/rolex-126610lv");
-  await expect(
-    page.getByRole("heading", { name: "Live Operations Console" }),
-  ).toBeVisible();
+  await expect(page).toHaveURL(/\/governance\/auction-configurations$/);
 });

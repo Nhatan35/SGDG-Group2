@@ -171,14 +171,14 @@ describe("Auction Content foundation UI", () => {
     renderContent(session.sessionId);
     expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
-      "Auction Content",
+      "Nội dung phiên đấu giá",
     );
   });
 
   it("02 displays the explicit prototype disclaimer", () => {
     renderContent(createLinkedSession().sessionId);
     expect(screen.getByRole("note")).toHaveTextContent(
-      "NOT STAKEHOLDER-APPROVED",
+      "CHƯA ĐƯỢC CÁC BÊN LIÊN QUAN PHÊ DUYỆT",
     );
   });
 
@@ -408,7 +408,7 @@ describe("Auction Content foundation UI", () => {
   it("23 projects NOT INITIALIZED in Session workspace", () => {
     const session = createLinkedSession();
     renderWorkspace(session.sessionId);
-    expect(screen.getByText("NOT INITIALIZED")).toBeInTheDocument();
+    expect(screen.getByText("CHƯA KHỞI TẠO")).toBeInTheDocument();
   });
 
   it("24 projects DRAFT after an incomplete save", () => {
@@ -427,7 +427,7 @@ describe("Auction Content foundation UI", () => {
     if (!saved.ok) throw new Error(saved.message);
     renderWorkspace(session.sessionId);
     expect(screen.getAllByText("DRAFT")).toHaveLength(2);
-    expect(screen.getByText("Summary: Chưa hoàn chỉnh")).toBeInTheDocument();
+    expect(screen.getByText("Tóm tắt: Chưa hoàn chỉnh")).toBeInTheDocument();
   });
 
   it("25 projects CONTENT DRAFT COMPLETE", () => {

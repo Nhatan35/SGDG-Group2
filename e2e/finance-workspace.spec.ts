@@ -14,7 +14,7 @@ test.beforeEach(async ({ page }) => {
 test("payment verification supports status, search and bank filters", async ({
   page,
 }) => {
-  await page.goto("/admin/payments");
+  await page.goto("/finance/payments");
 
   await expect(
     page.getByRole("heading", { name: "Xác minh thanh toán" }),
@@ -37,7 +37,7 @@ test("payment verification supports status, search and bank filters", async ({
 });
 
 test("finance member can open a payment verification dialog", async ({ page }) => {
-  await page.goto("/admin/payments");
+  await page.goto("/finance/payments");
 
   await page
     .getByRole("button", { name: "Xác minh PAY-2024-0528-001" })

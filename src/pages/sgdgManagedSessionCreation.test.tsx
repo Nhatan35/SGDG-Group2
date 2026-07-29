@@ -189,14 +189,14 @@ describe("SGDG-managed Session creation UI", () => {
       }),
     );
     const dialog = screen.getByRole("dialog", {
-      name: "Tạo SGDG-managed Session Draft",
+      name: "Tạo bản nháp phiên do SGDG quản lý",
     });
     expect(dialog).toHaveTextContent(assetId);
-    expect(within(dialog).getByText("Asset version")).toBeInTheDocument();
+    expect(within(dialog).getByText("Phiên bản tài sản")).toBeInTheDocument();
     expect(within(dialog).getByText("v3")).toBeInTheDocument();
     expect(dialog).toHaveTextContent("SGDG_MANAGED");
-    expect(dialog).toHaveTextContent("DRAFT · NOT_READY");
-    expect(dialog).toHaveTextContent("Approval");
+    expect(dialog).toHaveTextContent("BẢN NHÁP · CHƯA SẴN SÀNG");
+    expect(dialog).toHaveTextContent("phê duyệt");
     const confirm = within(dialog).getByRole("button", {
       name: "Xác nhận tạo bản nháp",
     });
@@ -206,7 +206,7 @@ describe("SGDG-managed Session creation UI", () => {
     const session = useAuctionSessionStore.getState().sessions[0];
     expect(session.recordKind).toBe("DYNAMIC_SGDG_MANAGED_SESSION");
     expect(
-      screen.getByRole("link", { name: "Mở workspace phiên" }),
+      screen.getByRole("link", { name: "Mở không gian phiên" }),
     ).toHaveAttribute("href", `/ops/auctions/${session.sessionId}`);
     expect(screen.getByText(/Đã tạo sgdg-managed/)).toHaveAttribute(
       "aria-live",
@@ -265,7 +265,7 @@ describe("SGDG-managed Session creation UI", () => {
       screen.getByText(/Asset đang thuộc Session/),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("link", { name: "Mở Session hiện có" }),
+      screen.getByRole("link", { name: "Mở phiên hiện có" }),
     ).toHaveAttribute(
       "href",
       "/ops/auctions/sgdg-omega-speedmaster-draft-01",

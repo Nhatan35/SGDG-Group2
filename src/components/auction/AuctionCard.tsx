@@ -2,6 +2,7 @@ import { Activity, ArrowRight, Eye, Users } from "lucide-react";
 import { Link } from "react-router-dom";
 import { ButtonLink } from "../common/Button";
 import { Card } from "../common/Card";
+import { ResilientImage } from "../common/ResilientImage";
 import type { AuctionDisplayCta } from "../../domain/auctionDisplay";
 import type { Auction } from "../../services/mock/auctionService";
 import { formatMoney } from "../../utils/format";
@@ -56,7 +57,7 @@ export function AuctionCard({
         aria-label={`${auction.assetName} — ${priceLabel} ${formatMoney(price)}`}
       >
         <div className="auction-image">
-          <img src={auction.image} alt={auction.assetName} />
+          <ResilientImage src={auction.image} alt={auction.assetName} />
           <AuctionStatus auction={auction} catalog={showCategory} compact />
         </div>
         <div className="auction-body">

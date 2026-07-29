@@ -15,9 +15,7 @@ import "../../styles/opening-request-lifecycle.css";
 export function OpeningRequestGovernanceQueuePage() {
   const records = useOpeningRequestStore((state) => state.records);
   const [params, setParams] = useSearchParams();
-  const governed = records.filter(
-    (record) => record.status === "GOVERNANCE_REVIEW",
-  );
+  const governed = records.filter((record) => record.governanceConcern);
   if (params.get("view") === "loading")
     return <LoadingState label="Đang tải hồ sơ xem xét quản trị" />;
   if (params.get("view") === "error")
@@ -31,10 +29,11 @@ export function OpeningRequestGovernanceQueuePage() {
   return (
     <>
       <header className="ops-heading">
-        <span>OPENING REQUEST GOVERNANCE</span>
+        <span>NGOẠI LỆ YÊU CẦU MỞ PHIÊN</span>
         <h1>Hồ sơ chờ xem xét quản trị</h1>
         <p>
-          Ngữ cảnh chỉ đọc dành cho ADMIN; chưa có quyền Apply Governance Hold.
+          Admin xem xét quan ngại do Nhân viên nội dung chuyển đến. Hồ sơ nguồn
+          vẫn thuộc nghiệp vụ vận hành đấu giá và chưa áp dụng quyết định giữ.
         </p>
       </header>
       {governed.length ? (
@@ -91,17 +90,17 @@ export function OpeningRequestGovernanceDetailPage() {
     state.records.find(
       (item) =>
         item.requestId === requestId &&
-        item.status === "GOVERNANCE_REVIEW",
+        item.governanceConcern,
     ),
   );
   if (!record) return <NotFoundPage />;
   return (
     <>
       <header className="ops-heading">
-        <span>OPENING REQUEST GOVERNANCE · READ ONLY</span>
+        <span>NGOẠI LỆ YÊU CẦU MỞ PHIÊN · CHỈ ĐỌC</span>
         <h1>{record.requestId}</h1>
         <p>
-          Review thông thường đã tạm dừng ở phiên bản {record.version}.
+          Thẩm định thông thường đã tạm dừng ở phiên bản {record.version}.
         </p>
       </header>
       <div className="governance-opening-grid">
@@ -138,8 +137,8 @@ export function OpeningRequestGovernanceDetailPage() {
           </dl>
           <p className="opening-review-disclosure">
             Chưa có hành động quyết định chính thức. BA cần xác nhận thẩm quyền,
-            lý do bắt buộc và transition trước khi triển khai Apply Governance
-            Hold.
+            lý do bắt buộc và bước chuyển trạng thái trước khi triển khai quyết
+            định giữ quản trị.
           </p>
         </aside>
       </div>

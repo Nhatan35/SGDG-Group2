@@ -171,8 +171,8 @@ export function AuctionContentPage() {
     return (
       <main className="auction-content-page">
         <header className="auction-content-heading">
-          <span>AUCTION OPERATIONS</span>
-          <h1>Auction Content</h1>
+          <span>VẬN HÀNH ĐẤU GIÁ</span>
+          <h1>Nội dung phiên đấu giá</h1>
         </header>
         <BlockedState
           title="Không tìm thấy dynamic Session"
@@ -185,8 +185,8 @@ export function AuctionContentPage() {
     return (
       <main className="auction-content-page">
         <header className="auction-content-heading">
-          <span>AUCTION OPERATIONS</span>
-          <h1>Auction Content</h1>
+          <span>VẬN HÀNH ĐẤU GIÁ</span>
+          <h1>Nội dung phiên đấu giá</h1>
         </header>
         <BlockedState
           title="Không có quyền truy cập"
@@ -199,8 +199,8 @@ export function AuctionContentPage() {
     return (
       <main className="auction-content-page">
         <header className="auction-content-heading">
-          <span>AUCTION OPERATIONS</span>
-          <h1>Auction Content</h1>
+          <span>VẬN HÀNH ĐẤU GIÁ</span>
+          <h1>Nội dung phiên đấu giá</h1>
         </header>
         <section className="prototype-content-disclaimer" role="note">
           <strong>{PROTOTYPE_CONTENT_POLICY.classification}</strong>
@@ -220,8 +220,8 @@ export function AuctionContentPage() {
   return (
     <main className="auction-content-page">
       <header className="auction-content-heading">
-        <span>AUCTION OPERATIONS · CONTENT FOUNDATION</span>
-        <h1>Auction Content</h1>
+        <span>VẬN HÀNH ĐẤU GIÁ · NỘI DUNG PHIÊN</span>
+        <h1>Nội dung phiên đấu giá</h1>
         <p>
           BOUNDARY DECISION: Content is versioned independently from Auction
           Session lifecycle state.
@@ -235,13 +235,13 @@ export function AuctionContentPage() {
 
       <section className="auction-content-identity" aria-labelledby="content-session-heading">
         <div>
-          <h2 id="content-session-heading">Session identity</h2>
+          <h2 id="content-session-heading">Thông tin phiên đấu giá</h2>
           <dl>
-            <dt>Session</dt>
+            <dt>Phiên đấu giá</dt>
             <dd>{session.sessionId}</dd>
-            <dt>Code</dt>
+            <dt>Mã đấu giá</dt>
             <dd>{session.auctionCode}</dd>
-            <dt>Source / mode</dt>
+            <dt>Nguồn tạo / chế độ quản lý</dt>
             <dd>
               {session.creationSource} / {session.managementMode}
             </dd>
@@ -259,8 +259,8 @@ export function AuctionContentPage() {
       <div className="auction-content-comparison">
         <section className="auction-content-panel source-panel">
           <header>
-            <p className="content-panel-eyebrow">CUSTOMER SOURCE · READ-ONLY</p>
-            <h2>Nguồn từ Opening Request — chỉ đọc</h2>
+            <p className="content-panel-eyebrow">NGUỒN KHÁCH HÀNG · CHỈ ĐỌC</p>
+            <h2>Nguồn từ yêu cầu mở phiên — chỉ đọc</h2>
           </header>
           <label>
             Request ID / version
@@ -308,8 +308,8 @@ export function AuctionContentPage() {
 
         <section className="auction-content-panel working-panel">
           <header>
-            <p className="content-panel-eyebrow">CONTENT_STAFF WORKING DRAFT</p>
-            <h2>Nội dung làm việc — Content Staff chỉnh sửa</h2>
+            <p className="content-panel-eyebrow">BẢN NHÁP CỦA NHÂN VIÊN NỘI DUNG</p>
+            <h2>Nội dung làm việc — Nhân viên nội dung chỉnh sửa</h2>
           </header>
           {content ? (
             <>
@@ -402,7 +402,7 @@ export function AuctionContentPage() {
       {content && (
         <section className="auction-content-readiness" aria-labelledby="content-completeness-heading">
           <div>
-            <h2 id="content-completeness-heading">Content completeness</h2>
+            <h2 id="content-completeness-heading">Mức độ hoàn thiện nội dung</h2>
             <p>
               Content version <strong>v{content.contentVersion}</strong> ·{" "}
               {content.completeness.complete
@@ -426,7 +426,7 @@ export function AuctionContentPage() {
               ))}
             </ul>
           ) : (
-            <p>Không còn blocking content finding.</p>
+            <p>Không còn vấn đề nội dung đang chặn.</p>
           )}
         </section>
       )}
@@ -455,7 +455,7 @@ export function AuctionContentPage() {
 
       {content && (
         <section className="auction-content-history">
-          <h2>Version history</h2>
+          <h2>Lịch sử phiên bản</h2>
           <ol>
             {content.versions
               .slice()

@@ -6,6 +6,7 @@ import {
   useSearchParams,
 } from "react-router-dom";
 import { Badge } from "../../components/common/Badge";
+import { useState } from "react";
 import {
   getHandoverOperationsFixture,
   handoverOperationsScenarios,
@@ -27,6 +28,7 @@ export function HandoverOperationsPage() {
   const { caseId } = useParams();
   const { role } = useOutletContext<Ctx>();
   const [params, setParams] = useSearchParams();
+  const [actionNotice, setActionNotice] = useState("");
   const s = params.get("scenario");
   const scenario: HandoverOperationsScenario =
     handoverOperationsScenarios.includes(s as HandoverOperationsScenario)
@@ -47,6 +49,24 @@ export function HandoverOperationsPage() {
     });
   const action = f.action;
   const remediation = scenario === "remediation";
+  const runPrimaryAction = () => {
+    if (action[0] === "CREATE_DELIVERY_RETRY") {
+      set("scenario", "in-transit");
+      setActionNotice("Đã tạo lần giao lại và chuyển sang trạng thái vận chuyển.");
+      return;
+    }
+    const targetTab =
+      action[0] === "PROPOSE_SCHEDULE"
+        ? "schedule"
+        : action[0] === "REVIEW_EVIDENCE" ||
+            action[0] === "REVIEW_RECEIPT_READINESS"
+          ? "evidence"
+          : action[0] === "PREPARE_ISSUE_RESOLUTION"
+            ? "issues"
+            : "audit";
+    set("tab", targetTab);
+    setActionNotice(`Đã mở khu vực xử lý: ${action[1]}.`);
+  };
   return (
     <>
       <header className="ops-heading handover-ops-header">
@@ -110,8 +130,11 @@ export function HandoverOperationsPage() {
                 Mở hồ sơ remediation
               </Link>
             ) : (
-              <button className="button primary">{action[1]}</button>
+              <button className="button primary" onClick={runPrimaryAction}>
+                {action[1]}
+              </button>
             )}
+            {actionNotice && <small role="status">{actionNotice}</small>}
           </section>
           <nav className="handover-ops-tabs" aria-label="Khu vực vận hành">
             {tabs.map((item) => (

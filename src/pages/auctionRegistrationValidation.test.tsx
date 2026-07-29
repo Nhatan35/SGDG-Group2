@@ -227,9 +227,9 @@ describe("Registration Validation screens and projections", () => {
     expect(screen.getByText("Membership: NOT CHECKED.")).toBeInTheDocument();
     expect(screen.getByText("Deposit: NOT CHECKED.")).toBeInTheDocument();
     expect(screen.getByText("Eligibility: NOT EVALUATED.")).toBeInTheDocument();
-    expect(screen.getAllByText(/Session: DRAFT/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Phiên: DRAFT/).length).toBeGreaterThan(0);
     expect(
-      screen.getAllByText(/Publication: NOT_READY/).length,
+      screen.getAllByText(/Công bố: NOT_READY/).length,
     ).toBeGreaterThan(0);
   });
 });

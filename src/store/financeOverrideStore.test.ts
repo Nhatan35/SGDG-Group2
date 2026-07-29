@@ -111,6 +111,47 @@ describe("controlled finance override maker-checker", () => {
     ).toEqual({ ok: false, reason: "IMMUTABLE" });
   });
 
+  it("hands an approved request back to Finance for execution", () => {
+    const request = useFinanceOverrideStore.getState().requests[0];
+    const approved = useFinanceOverrideStore
+      .getState()
+      .decide(
+        request.overrideId,
+        "ADMIN",
+        "admin@sgdg.demo",
+        request.version,
+        "APPROVE",
+        "Đủ điều kiện xử lý.",
+      );
+    expect(approved.ok).toBe(true);
+    if (!approved.ok) return;
+    const started = useFinanceOverrideStore
+      .getState()
+      .startExecution(
+        request.overrideId,
+        "FINANCE",
+        "finance@sgdg.demo",
+        approved.request.version,
+      );
+    expect(started.ok).toBe(true);
+    if (!started.ok) return;
+    const completed = useFinanceOverrideStore
+      .getState()
+      .completeExecution(
+        request.overrideId,
+        "FINANCE",
+        "finance@sgdg.demo",
+        started.request.version,
+        "Đã tạo hồ sơ khắc phục REM-001.",
+      );
+    expect(completed.ok).toBe(true);
+    if (!completed.ok) return;
+    expect(completed.request.status).toBe("COMPLETED");
+    expect(completed.request.history.at(-1)?.action).toBe(
+      "EXECUTION_COMPLETED",
+    );
+  });
+
   it("protects the distinct Finance and ADMIN routes", () => {
     expect(canVisitStaffPath("FINANCE", "/finance/override-requests/new")).toBe(true);
     expect(canVisitStaffPath("ADMIN", "/governance/finance-overrides")).toBe(true);

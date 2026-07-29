@@ -234,11 +234,11 @@ export function FinancePackagePage() {
         </section>
         <aside className="finance-rail">
           <section className="finance-panel">
-            <h2>Result & candidate</h2>
+            <h2>Kết quả và ứng viên trúng đấu giá</h2>
             <p>
               <strong>{formatMoney(item.amount)}</strong>
               <br />
-              RES-PATEK-5711R · Candidate rank 1
+              RES-PATEK-5711R · Ứng viên xếp hạng 1
             </p>
             <Link to="/ops/results/RES-PATEK-5711R">Mở Result Monitor</Link>
             <Link to="/ops/results/RES-PATEK-5711R/candidates">
@@ -246,15 +246,18 @@ export function FinancePackagePage() {
             </Link>
           </section>
           <section className="finance-panel finance-decision">
-            <h2>Finance decision</h2>
+            <h2>Quyết định của Finance</h2>
             <p>
               {item.decisionReason ||
                 "Package chỉ là supporting handoff. Không tạo Payment hoặc Final Winner."}
             </p>
             {canSend && (
-              <button className="button primary">
+              <button
+                className="button primary"
+                onClick={() => set("scenario", "submitted")}
+              >
                 <Send />
-                Gửi package
+                Gửi hồ sơ
               </button>
             )}
             {canCorrect && (
@@ -267,23 +270,36 @@ export function FinancePackagePage() {
             )}
             {canFinance && (
               <div className="finance-actions">
-                <button className="button primary">
+                <button
+                  className="button primary"
+                  onClick={() => set("scenario", "accepted")}
+                >
                   <CheckCircle2 />
-                  Accept
+                  Chấp thuận
                 </button>
-                <button className="button secondary">Request Correction</button>
-                <button className="button ops-destructive">Reject</button>
+                <button
+                  className="button secondary"
+                  onClick={() => set("scenario", "correction-requested")}
+                >
+                  Yêu cầu chỉnh sửa
+                </button>
+                <button
+                  className="button ops-destructive"
+                  onClick={() => set("scenario", "rejected")}
+                >
+                  Từ chối
+                </button>
               </div>
             )}
             {!canSend && !canCorrect && !canFinance && (
               <p className="read-only">
-                Read-only oversight. Accepted Package ≠ Payment Confirmed ≠
-                FinalWinnerConfirmed.
+                Chế độ chỉ đọc. Hồ sơ được chấp thuận không đồng nghĩa thanh
+                toán đã xác nhận hoặc người trúng đấu giá đã được chốt.
               </p>
             )}
           </section>
           <section className="finance-panel">
-            <h2>References</h2>
+            <h2>Tham chiếu</h2>
             <Link
               to={`/admin/audit?objectType=finance-package&objectId=${item.packageId}`}
             >

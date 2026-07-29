@@ -491,7 +491,7 @@ describe("Auction Configuration preparation and governance UI", () => {
     expect(
       screen.getByRole("heading", {
         level: 1,
-        name: "Configuration Governance Queue",
+        name: "Phê duyệt cấu hình phiên",
       }),
     ).toBeVisible();
     expect(
@@ -511,10 +511,10 @@ describe("Auction Configuration preparation and governance UI", () => {
     const user = userEvent.setup();
     const detail = renderAdminDetail(submitted.configurationId);
     await user.click(
-      screen.getByRole("button", { name: "Request Correction" }),
+      screen.getByRole("button", { name: "Yêu cầu chỉnh sửa" }),
     );
     const dialog = screen.getByRole("dialog", {
-      name: "Request Configuration Correction",
+      name: "Yêu cầu chỉnh sửa cấu hình",
     });
     const confirm = within(dialog).getByRole("button", {
       name: "Confirm Return",
@@ -534,7 +534,7 @@ describe("Auction Configuration preparation and governance UI", () => {
     expect(
       screen.getByRole("heading", {
         level: 2,
-        name: "ADMIN yêu cầu chỉnh sửa",
+        name: "Admin yêu cầu chỉnh sửa",
       }),
     ).toBeVisible();
     expect(
@@ -553,13 +553,13 @@ describe("Auction Configuration preparation and governance UI", () => {
     const user = userEvent.setup();
     const detail = renderAdminDetail(submitted.configurationId);
     await user.click(
-      screen.getByRole("button", { name: "Confirm Configuration" }),
+      screen.getByRole("button", { name: "Xác nhận cấu hình" }),
     );
     const dialog = screen.getByRole("dialog", {
-      name: "Confirm Configuration",
+      name: "Xác nhận cấu hình",
     });
     expect(
-      within(dialog).getByText(/Session remains DRAFT \/ NOT_READY/),
+      within(dialog).getByText(/Phiên vẫn ở trạng thái bản nháp\/chưa sẵn sàng/),
     ).toBeVisible();
     expect(
       within(dialog).getByText(/PRICE-BAND-ROOM-3/),
@@ -569,7 +569,7 @@ describe("Auction Configuration preparation and governance UI", () => {
     ).toBeVisible();
     await user.click(
       within(dialog).getByRole("button", {
-        name: "Confirm Configuration",
+        name: "Xác nhận cấu hình",
       }),
     );
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
@@ -577,7 +577,7 @@ describe("Auction Configuration preparation and governance UI", () => {
     expect(useAuctionConfigurationStore.getState().snapshots).toHaveLength(1);
     detail.unmount();
     renderSessionWorkspace(session.sessionId);
-    expect(screen.getByText(/Configuration đã xác nhận/)).toBeVisible();
+    expect(screen.getByText(/Cấu hình đã xác nhận/)).toBeVisible();
     expect(screen.getAllByText(/PRICE-BAND-ROOM-3/)[0]).toBeVisible();
     expect(screen.getAllByText(/ROOM-3/)[0]).toBeVisible();
     expect(screen.getByText("DRAFT")).toBeVisible();
@@ -589,11 +589,11 @@ describe("Auction Configuration preparation and governance UI", () => {
     submit(session, createSavedProposal(session));
     renderSessionWorkspace(session.sessionId);
     expect(
-      screen.getByText("Configuration đang chờ governed confirmation."),
+      screen.getByText("Cấu hình đang chờ Admin xác nhận."),
     ).toBeVisible();
     expect(screen.getByText("DRAFT")).toBeVisible();
     expect(screen.getByText("NOT_READY")).toBeVisible();
-    expect(screen.getByText("Approval Package chưa được tạo.")).toBeVisible();
+    expect(screen.getByText("Hồ sơ phê duyệt chưa được tạo.")).toBeVisible();
     expect(
       screen.queryByRole("link", { name: /Schedule|Publish/i }),
     ).not.toBeInTheDocument();
@@ -616,7 +616,7 @@ describe("Auction Configuration preparation and governance UI", () => {
     const user = userEvent.setup();
     renderAdminDetail(submitted.configurationId);
     const opener = screen.getByRole("button", {
-      name: "Request Correction",
+      name: "Yêu cầu chỉnh sửa",
     });
     opener.focus();
     await user.keyboard("{Enter}");

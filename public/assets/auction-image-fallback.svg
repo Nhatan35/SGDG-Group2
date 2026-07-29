@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-labelledby="title description">
+  <title id="title">Ảnh tài sản tạm thời chưa khả dụng</title>
+  <desc id="description">Hình thay thế nhẹ cho ảnh tài sản đấu giá không tải được.</desc>
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2d1a10"/>
+      <stop offset="1" stop-color="#160b06"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#background)"/>
+  <rect x="190" y="118" width="420" height="280" rx="20" fill="none" stroke="#a76a3d" stroke-width="4"/>
+  <path d="M250 338l105-104 78 74 54-52 63 82H250z" fill="#7e4b2d"/>
+  <circle cx="505" cy="190" r="34" fill="#c77a3a"/>
+  <text x="400" y="468" fill="#f0d8c2" font-family="Arial, sans-serif" font-size="28" text-anchor="middle">
+    Ảnh đang được cập nhật
+  </text>
+</svg>

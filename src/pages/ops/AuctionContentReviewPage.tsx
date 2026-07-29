@@ -32,13 +32,13 @@ const resultMessage = (
 ) => `${result.code}: ${result.message}`;
 
 const ownerLabel: Record<SessionPackageFinding["owner"], string> = {
-  CONTENT_STAFF: "Content Staff",
-  CUSTOMER_SOURCE: "Customer source",
-  PRODUCT_ASSET: "Product / Asset",
-  MEMBERSHIP: "Membership",
-  CONFIGURATION_GOVERNANCE: "Configuration Governance",
-  AUCTION_SYSTEM: "Auction System",
-  BUSINESS_DECISION: "Business Decision",
+  CONTENT_STAFF: "Nhân viên nội dung",
+  CUSTOMER_SOURCE: "Nguồn khách hàng",
+  PRODUCT_ASSET: "Sản phẩm / tài sản",
+  MEMBERSHIP: "Quản lý thành viên",
+  CONFIGURATION_GOVERNANCE: "Quản trị cấu hình",
+  AUCTION_SYSTEM: "Hệ thống đấu giá",
+  BUSINESS_DECISION: "Quyết định nghiệp vụ",
 };
 
 export function AuctionContentReviewPage() {
@@ -165,7 +165,7 @@ export function AuctionContentReviewPage() {
     }
     setSuccess(
       result.changed
-        ? `Đã kiểm tra lại Session Package · review v${result.review.reviewVersion}.`
+        ? `Đã kiểm tra lại hồ sơ phiên · thẩm định v${result.review.reviewVersion}.`
         : `Authoritative evidence không đổi · review vẫn ở v${result.review.reviewVersion}.`,
     );
   };
@@ -191,7 +191,7 @@ export function AuctionContentReviewPage() {
     }
     setDialogOpen(false);
     setSuccess(
-      `Content Review đã hoàn tất. Completion record: ${result.completionRecord?.completionRecordId}.`,
+      `Đã hoàn tất thẩm định nội dung. Biên bản hoàn tất: ${result.completionRecord?.completionRecordId}.`,
     );
   };
 
@@ -199,12 +199,12 @@ export function AuctionContentReviewPage() {
     return (
       <main className="content-review-page">
         <header className="content-review-heading">
-          <span>AUCTION OPERATIONS</span>
-          <h1>Content Review</h1>
+          <span>VẬN HÀNH ĐẤU GIÁ</span>
+          <h1>Thẩm định nội dung</h1>
         </header>
         <BlockedState
-          title="Không tìm thấy dynamic Session"
-          description="Content Review không sử dụng fixture fallback."
+          title="Không tìm thấy phiên đấu giá"
+          description="Thẩm định nội dung không sử dụng dữ liệu mẫu thay thế."
         />
       </main>
     );
@@ -213,12 +213,12 @@ export function AuctionContentReviewPage() {
     return (
       <main className="content-review-page">
         <header className="content-review-heading">
-          <span>AUCTION OPERATIONS</span>
-          <h1>Content Review</h1>
+          <span>VẬN HÀNH ĐẤU GIÁ</span>
+          <h1>Thẩm định nội dung</h1>
         </header>
         <BlockedState
           title="Không có quyền truy cập"
-          description="Chỉ CONTENT_STAFF được xem và mutate Content Review nội bộ."
+          description="Chỉ Nhân viên nội dung được xem và cập nhật hồ sơ thẩm định nội bộ."
         />
       </main>
     );
@@ -227,8 +227,8 @@ export function AuctionContentReviewPage() {
     return (
       <main className="content-review-page">
         <header className="content-review-heading">
-          <span>AUCTION OPERATIONS · SESSION PACKAGE</span>
-          <h1>Content Review</h1>
+          <span>VẬN HÀNH ĐẤU GIÁ · HỒ SƠ PHIÊN</span>
+          <h1>Thẩm định nội dung</h1>
         </header>
         <section className="prototype-content-disclaimer" role="note">
           <strong>{PROTOTYPE_CONTENT_POLICY.classification}</strong>
@@ -238,23 +238,23 @@ export function AuctionContentReviewPage() {
           <p>{SGDG_CONTENT_REVIEW_BLOCKER_MESSAGE}</p>
         </section>
         <section className="content-review-card">
-          <h2>SGDG-managed boundary</h2>
+          <h2>Phạm vi phiên do SGDG quản lý</h2>
           <dl>
-            <dt>Session</dt>
+            <dt>Phiên đấu giá</dt>
             <dd>{session.sessionId}</dd>
-            <dt>Configuration</dt>
-            <dd>BUSINESS DECISION REQUIRED</dd>
-            <dt>Auction Content</dt>
-            <dd>DEFERRED</dd>
-            <dt>Content Review</dt>
-            <dd>BLOCKED BY CONFIGURATION</dd>
-            <dt>Completion record</dt>
-            <dd>NONE</dd>
-            <dt>Approval Package</dt>
-            <dd>NONE</dd>
+            <dt>Cấu hình</dt>
+            <dd>CẦN CHỐT NGHIỆP VỤ</dd>
+            <dt>Nội dung đấu giá</dt>
+            <dd>CHƯA THỰC HIỆN</dd>
+            <dt>Thẩm định nội dung</dt>
+            <dd>ĐANG BỊ CHẶN BỞI CẤU HÌNH</dd>
+            <dt>Biên bản hoàn tất</dt>
+            <dd>CHƯA CÓ</dd>
+            <dt>Hồ sơ phê duyệt</dt>
+            <dd>CHƯA CÓ</dd>
           </dl>
           <Link className="button secondary" to={`/ops/auctions/${session.sessionId}`}>
-            Trở lại Session
+            Trở lại phiên
           </Link>
         </section>
       </main>
@@ -282,11 +282,11 @@ export function AuctionContentReviewPage() {
       : undefined;
   const notStartedBlocker = !review
     ? !content
-      ? "AUCTION_CONTENT_NOT_INITIALIZED: Khởi tạo Auction Content trước khi bắt đầu review."
+      ? "AUCTION_CONTENT_NOT_INITIALIZED: Khởi tạo nội dung đấu giá trước khi bắt đầu thẩm định."
       : legacySnapshot && !snapshot
         ? "CONFIGURATION_SNAPSHOT_LEGACY_ONLY: cần governed revalidation."
         : !snapshot
-          ? "CONFIGURATION_SNAPSHOT_MISSING: cần current confirmed Snapshot."
+          ? "CONFIGURATION_SNAPSHOT_MISSING: cần bản chụp cấu hình đã xác nhận hiện hành."
           : eligibility && !eligibility.eligible
             ? `${eligibility.code}: ${eligibility.message}`
             : ""
@@ -295,35 +295,35 @@ export function AuctionContentReviewPage() {
   return (
     <main className="content-review-page">
       <header className="content-review-heading">
-        <span>AUCTION OPERATIONS · AUTHORITATIVE SESSION PACKAGE</span>
-        <h1>Content Review</h1>
+        <span>VẬN HÀNH ĐẤU GIÁ · HỒ SƠ PHIÊN CHÍNH THỨC</span>
+        <h1>Thẩm định nội dung</h1>
         <p>
-          Review evidence is versioned independently and reads current
-          authoritative aggregates.
+          Bằng chứng thẩm định được quản lý phiên bản độc lập và đối chiếu
+          với dữ liệu chính thức hiện tại.
         </p>
       </header>
 
       <section className="prototype-content-disclaimer" role="note">
         <strong>{PROTOTYPE_CONTENT_POLICY.classification}</strong>
         <p>
-          Content Review does not classify this working content as approved,
-          public, legal, regulatory, or publishable copy.
+          Việc thẩm định không đồng nghĩa nội dung làm việc đã được phê duyệt,
+          công khai hoặc đủ điều kiện xuất bản.
         </p>
       </section>
 
       <section className="content-review-card content-review-identity">
         <div>
-          <h2>Session identity</h2>
+          <h2>Thông tin phiên đấu giá</h2>
           <dl>
-            <dt>Session ID / code</dt>
+            <dt>Mã phiên / mã đấu giá</dt>
             <dd>
               {session.sessionId} · {session.auctionCode}
             </dd>
-            <dt>Creation / management</dt>
+            <dt>Nguồn tạo / chế độ quản lý</dt>
             <dd>
               {session.creationSource} / {session.managementMode}
             </dd>
-            <dt>Session version</dt>
+            <dt>Phiên bản</dt>
             <dd>v{session.currentVersion}</dd>
           </dl>
         </div>
@@ -340,76 +340,76 @@ export function AuctionContentReviewPage() {
                   : "neutral"
             }
           >
-            {review?.status ?? "NOT STARTED"}
+            {review?.status ?? "CHƯA BẮT ĐẦU"}
           </Badge>
         </div>
       </section>
 
       <div className="content-review-evidence-grid">
         <section className="content-review-card">
-          <p className="content-review-eyebrow">CUSTOMER SOURCE · READ-ONLY</p>
-          <h2>Opening Request lineage</h2>
+          <p className="content-review-eyebrow">NGUỒN KHÁCH HÀNG · CHỈ ĐỌC</p>
+          <h2>Thông tin yêu cầu mở phiên</h2>
           <dl>
-            <dt>Request ID / version</dt>
+            <dt>Mã yêu cầu / phiên bản</dt>
             <dd>
-              {request?.requestId ?? "MISSING"} · v{request?.version ?? "—"}
+              {request?.requestId ?? "THIẾU"} · v{request?.version ?? "—"}
             </dd>
-            <dt>Original title</dt>
+            <dt>Tiêu đề ban đầu</dt>
             <dd>{request?.title ?? "—"}</dd>
-            <dt>Original purpose</dt>
+            <dt>Mục đích ban đầu</dt>
             <dd>{request?.purpose || "—"}</dd>
-            <dt>Source owner</dt>
-            <dd>{request?.ownerId ?? "—"} · Customer source</dd>
+            <dt>Chủ sở hữu nguồn</dt>
+            <dd>{request?.ownerId ?? "—"} · Nguồn khách hàng</dd>
           </dl>
         </section>
 
         <section className="content-review-card">
-          <p className="content-review-eyebrow">CONTENT STAFF · READ-ONLY HERE</p>
-          <h2>Current Auction Content</h2>
+          <p className="content-review-eyebrow">NHÂN VIÊN NỘI DUNG · CHỈ ĐỌC TẠI ĐÂY</p>
+          <h2>Nội dung đấu giá hiện tại</h2>
           <dl>
-            <dt>Content ID / version</dt>
+            <dt>Mã nội dung / phiên bản</dt>
             <dd>
-              {content?.contentId ?? "NOT INITIALIZED"} · v
+              {content?.contentId ?? "CHƯA KHỞI TẠO"} · v
               {content?.contentVersion ?? "—"}
             </dd>
-            <dt>Auction title</dt>
+            <dt>Tiêu đề đấu giá</dt>
             <dd>{content?.workingContent.auctionTitle || "Chưa có"}</dd>
-            <dt>Auction summary</dt>
+            <dt>Tóm tắt đấu giá</dt>
             <dd>{content?.workingContent.auctionSummary || "Chưa có"}</dd>
-            <dt>Completeness</dt>
+            <dt>Mức độ hoàn thiện</dt>
             <dd>
               {content?.completeness.complete
-                ? "CONTENT DRAFT COMPLETE"
-                : "INCOMPLETE"}
+                ? "BẢN NHÁP ĐÃ ĐẦY ĐỦ"
+                : "CHƯA ĐẦY ĐỦ"}
             </dd>
-            <dt>Working owner</dt>
-            <dd>Content Staff</dd>
+            <dt>Người phụ trách</dt>
+            <dd>Nhân viên nội dung</dd>
           </dl>
         </section>
 
         <section className="content-review-card">
           <p className="content-review-eyebrow">
-            CONFIGURATION GOVERNANCE · READ-ONLY
+            QUẢN TRỊ CẤU HÌNH · CHỈ ĐỌC
           </p>
-          <h2>Configuration evidence</h2>
+          <h2>Bằng chứng cấu hình</h2>
           <dl>
-            <dt>Snapshot / Proposal</dt>
+            <dt>Bản chụp / đề xuất</dt>
             <dd>
               {snapshot?.snapshotId ??
                 legacySnapshot?.snapshotId ??
-                "CURRENT SNAPSHOT MISSING"}{" "}
+                "THIẾU BẢN CHỤP HIỆN HÀNH"}{" "}
               · v
               {snapshot?.proposalVersion ??
                 legacySnapshot?.proposalVersion ??
                 "—"}
             </dd>
-            <dt>Price Band</dt>
+            <dt>Khung giá</dt>
             <dd>{snapshot?.priceBandResolution.reference ?? "—"}</dd>
-            <dt>Ordinary Room</dt>
+            <dt>Phòng đấu giá thường</dt>
             <dd>{snapshot?.roomResolution.displayName ?? "—"}</dd>
-            <dt>Member Title</dt>
+            <dt>Hạng thành viên</dt>
             <dd>{snapshot?.memberTitleReference.title ?? "—"}</dd>
-            <dt>Member Listing Fee</dt>
+            <dt>Phí niêm yết thành viên</dt>
             <dd>
               {snapshot?.listingFeeResolution.fee.kind === "AMOUNT"
                 ? `${snapshot.listingFeeResolution.fee.amountVnd.toLocaleString("vi-VN")} VND`
@@ -417,21 +417,21 @@ export function AuctionContentReviewPage() {
             </dd>
           </dl>
           <Link to={`/ops/auctions/${session.sessionId}/rules`}>
-            Mở Configuration workspace
+            Mở khu vực cấu hình
           </Link>
         </section>
 
         <section className="content-review-card">
-          <p className="content-review-eyebrow">MEMBERSHIP · READ-ONLY</p>
-          <h2>Membership evidence</h2>
+          <p className="content-review-eyebrow">THÀNH VIÊN · CHỈ ĐỌC</p>
+          <h2>Thông tin thành viên</h2>
           <dl>
-            <dt>Member ID</dt>
-            <dd>{membership?.memberId ?? "MISSING"}</dd>
-            <dt>Member Title</dt>
+            <dt>Mã thành viên</dt>
+            <dd>{membership?.memberId ?? "THIẾU"}</dd>
+            <dt>Hạng thành viên</dt>
             <dd>{membership?.title ?? "—"}</dd>
-            <dt>Reference version</dt>
+            <dt>Phiên bản tham chiếu</dt>
             <dd>{membership?.referenceVersion ?? "—"}</dd>
-            <dt>Source</dt>
+            <dt>Nguồn</dt>
             <dd>{membership?.sourceDomain ?? "—"}</dd>
           </dl>
         </section>
@@ -439,17 +439,17 @@ export function AuctionContentReviewPage() {
 
       {notStartedBlocker && (
         <section className="content-review-blocker" role="alert">
-          <strong>Content Review chưa đủ điều kiện bắt đầu</strong>
+          <strong>Thẩm định nội dung chưa đủ điều kiện bắt đầu</strong>
           <p>{notStartedBlocker}</p>
         </section>
       )}
       {currentEvidenceChanged && review && review.status !== "COMPLETED" && (
         <section className="content-review-blocker" role="alert">
-          <strong>Authoritative evidence đã thay đổi</strong>
+          <strong>Dữ liệu chính thức đã thay đổi</strong>
           <p>
-            Review đang giữ Content v{review.lastEvaluatedContentVersion};
-            current Content là v{content?.contentVersion}. Hãy explicit
-            revalidate trước khi hoàn tất.
+            Hồ sơ thẩm định đang giữ nội dung v{review.lastEvaluatedContentVersion};
+            nội dung hiện tại là v{content?.contentVersion}. Hãy kiểm tra lại
+            trước khi hoàn tất.
           </p>
         </section>
       )}
@@ -457,7 +457,7 @@ export function AuctionContentReviewPage() {
         <section className="content-review-blocker" role="alert">
           <strong>Không thể hoàn tất thao tác</strong>
           <p>{error}</p>
-          <p>Review context được giữ nguyên; không có partial commit.</p>
+          <p>Ngữ cảnh thẩm định được giữ nguyên; không ghi nhận dữ liệu dở dang.</p>
         </section>
       )}
       <p className="content-review-success" aria-live="polite">
@@ -466,37 +466,37 @@ export function AuctionContentReviewPage() {
 
       <section className="content-review-card content-review-readiness">
         <div>
-          <p className="content-review-eyebrow">SESSION PACKAGE</p>
-          <h2>Package readiness</h2>
+          <p className="content-review-eyebrow">HỒ SƠ PHIÊN</p>
+          <h2>Mức độ sẵn sàng của hồ sơ</h2>
           <p className="content-review-projection">
             {projection === "READY_FOR_APPROVAL_PACKAGE_PREPARATION"
-              ? "Ready for Approval Package preparation"
+              ? "Sẵn sàng chuẩn bị hồ sơ phê duyệt"
               : projection}
           </p>
           <p>
-            Session remains <strong>DRAFT / NOT_READY</strong>. Approval
-            Package: <strong>NOT CREATED</strong>.
+            Phiên vẫn ở trạng thái <strong>BẢN NHÁP / CHƯA SẴN SÀNG</strong>.
+            Hồ sơ phê duyệt: <strong>CHƯA TẠO</strong>.
           </p>
           <small>{PROTOTYPE_CONTENT_POLICY.classification}</small>
         </div>
         {review ? (
           <dl>
-            <dt>Review ID / version</dt>
+            <dt>Mã thẩm định / phiên bản</dt>
             <dd>
               {review.reviewId} · v{review.reviewVersion}
             </dd>
-            <dt>Last evaluated Content</dt>
+            <dt>Nội dung được đánh giá gần nhất</dt>
             <dd>
               {review.readiness.evaluatedContentId} · v
               {review.lastEvaluatedContentVersion}
             </dd>
-            <dt>Evaluated Snapshot</dt>
+            <dt>Bản chụp đã đánh giá</dt>
             <dd>{review.readiness.evaluatedConfigurationSnapshotId}</dd>
-            <dt>Evaluated Membership</dt>
+            <dt>Tham chiếu thành viên đã đánh giá</dt>
             <dd>
               {review.readiness.evaluatedMembershipReferenceVersion ?? "—"}
             </dd>
-            <dt>Blocking findings</dt>
+            <dt>Vấn đề đang chặn</dt>
             <dd>
               {
                 review.readiness.findings.filter(
@@ -506,19 +506,19 @@ export function AuctionContentReviewPage() {
             </dd>
           </dl>
         ) : (
-          <p>Content Review has not started.</p>
+          <p>Chưa bắt đầu thẩm định nội dung.</p>
         )}
       </section>
 
       {review && (
         <section className="content-review-card">
-          <h2>Findings grouped by owner</h2>
+          <h2>Vấn đề theo đơn vị phụ trách</h2>
           {findingsByOwner.length ? (
             <div className="content-review-findings">
               {findingsByOwner.map(([owner, findings]) => (
                 <section key={owner} aria-labelledby={`finding-owner-${owner}`}>
                   <h3 id={`finding-owner-${owner}`}>
-                    Owner: {ownerLabel[owner]} ({owner})
+                    Phụ trách: {ownerLabel[owner]} ({owner})
                   </h3>
                   <ul>
                     {findings.map((finding) => (
@@ -526,18 +526,18 @@ export function AuctionContentReviewPage() {
                         <strong>{finding.code}</strong>
                         <span>{finding.message}</span>
                         <small>
-                          Section: {finding.section} · Severity:{" "}
+                          Khu vực: {finding.section} · Mức độ:{" "}
                           {finding.severity} ·{" "}
                           {finding.correctableInContentWorkspace
-                            ? "Correct through Auction Content"
-                            : "Read-only external/governed finding"}
+                            ? "Chỉnh sửa tại Nội dung đấu giá"
+                            : "Vấn đề chỉ đọc từ nguồn ngoài hoặc nguồn quản trị"}
                         </small>
                         {finding.correctableInContentWorkspace && (
                           <Link
                             to={`/ops/auctions/${session.sessionId}/content`}
-                            aria-label={`Mở Auction Content để chỉnh sửa ${finding.field ?? finding.code}`}
+                            aria-label={`Mở nội dung đấu giá để chỉnh sửa ${finding.field ?? finding.code}`}
                           >
-                            Mở Auction Content để chỉnh sửa
+                            Mở nội dung đấu giá để chỉnh sửa
                           </Link>
                         )}
                       </li>
@@ -555,7 +555,7 @@ export function AuctionContentReviewPage() {
       <div className="content-review-actions">
         {!review && !notStartedBlocker && (
           <Button loading={busyAction === "start"} onClick={start}>
-            Bắt đầu Content Review
+            Bắt đầu thẩm định nội dung
           </Button>
         )}
         {review &&
@@ -568,7 +568,7 @@ export function AuctionContentReviewPage() {
               loading={busyAction === "revalidate"}
               onClick={revalidate}
             >
-              Kiểm tra lại Session Package
+              Kiểm tra lại hồ sơ phiên
             </Button>
           )}
         {review?.status === "READY_TO_COMPLETE" &&
@@ -576,61 +576,61 @@ export function AuctionContentReviewPage() {
             <Button
               onClick={() => setDialogOpen(true)}
             >
-              Hoàn tất Content Review
+              Hoàn tất thẩm định nội dung
             </Button>
           )}
         <Link
           className="button secondary"
           to={`/ops/auctions/${session.sessionId}/content`}
         >
-          Mở Auction Content
+          Mở nội dung đấu giá
         </Link>
         <Link className="button secondary" to={`/ops/auctions/${session.sessionId}`}>
-          Trở lại Session
+          Trở lại phiên
         </Link>
       </div>
 
       {completionRecord && (
         <section className="content-review-card content-review-completion">
-          <p className="content-review-eyebrow">IMMUTABLE COMPLETION EVIDENCE</p>
-          <h2>Sẵn sàng chuẩn bị Approval Package</h2>
+          <p className="content-review-eyebrow">BIÊN BẢN HOÀN TẤT BẤT BIẾN</p>
+          <h2>Sẵn sàng chuẩn bị hồ sơ phê duyệt</h2>
           <dl>
-            <dt>Completion record</dt>
+            <dt>Biên bản hoàn tất</dt>
             <dd>
               {completionRecord.completionRecordId} · record v
               {completionRecord.recordVersion}
             </dd>
-            <dt>Completed review</dt>
+            <dt>Hồ sơ thẩm định đã hoàn tất</dt>
             <dd>
               {completionRecord.reviewId} · v{completionRecord.reviewVersion}
             </dd>
-            <dt>Exact Content</dt>
+            <dt>Đúng phiên bản nội dung</dt>
             <dd>
               {completionRecord.contentId} · v
               {completionRecord.contentVersion}
             </dd>
-            <dt>Exact Snapshot</dt>
+            <dt>Đúng bản chụp cấu hình</dt>
             <dd>{completionRecord.configurationSnapshotId}</dd>
-            <dt>Outcome</dt>
-            <dd>Ready for Approval Package preparation</dd>
+            <dt>Kết quả</dt>
+            <dd>Sẵn sàng chuẩn bị hồ sơ phê duyệt</dd>
           </dl>
           <p>{completionRecord.prototypeClassification}</p>
           <p>
-            This completion evidence is application-level deeply immutable;
-            it is not described as tamper-proof backend evidence.
+            Biên bản hoàn tất được khóa ở cấp ứng dụng; đây không phải tuyên
+            bố về bằng chứng chống can thiệp ở hệ thống backend.
           </p>
           <Link
             className="button primary"
             to={`/ops/auctions/${session.sessionId}/approval-package`}
           >
-            Chuẩn bị Approval Package
+            Chuẩn bị hồ sơ phê duyệt
           </Link>
         </section>
       )}
 
       {review && (
         <section className="content-review-card content-review-history">
-          <h2>Review history · staff-only</h2>
+          <h2>Lịch sử thẩm định · chỉ dành cho nhân viên</h2>
           <ol>
             {review.history
               .slice()
@@ -639,7 +639,7 @@ export function AuctionContentReviewPage() {
                 <li key={entry.historyId}>
                   <strong>{entry.action}</strong>
                   <span>
-                    Review v{entry.reviewVersion} · Content v
+                    Thẩm định v{entry.reviewVersion} · Nội dung v
                     {entry.evaluatedContentVersion} · {entry.toStatus}
                   </span>
                   <small>
@@ -656,8 +656,8 @@ export function AuctionContentReviewPage() {
         <Dialog
           open={dialogOpen}
           onOpenChange={setDialogOpen}
-          title="Hoàn tất Content Review"
-          description="Final authoritative revalidation occurs immediately before commit."
+          title="Hoàn tất thẩm định nội dung"
+          description="Hệ thống sẽ đối chiếu lại dữ liệu chính thức ngay trước khi ghi nhận."
           size="lg"
           preventClose={busyAction === "complete"}
           panelClassName="content-review-dialog"
@@ -668,13 +668,13 @@ export function AuctionContentReviewPage() {
                 disabled={busyAction === "complete"}
                 onClick={() => setDialogOpen(false)}
               >
-                Cancel
+                Hủy
               </Button>
               <Button
                 loading={busyAction === "complete"}
                 onClick={complete}
               >
-                Complete Content Review
+                Hoàn tất thẩm định
               </Button>
             </>
           }
@@ -683,34 +683,34 @@ export function AuctionContentReviewPage() {
             <strong>{PROTOTYPE_CONTENT_POLICY.classification}</strong>
           </section>
           <dl>
-            <dt>Session ID / version</dt>
+            <dt>Mã phiên / phiên bản</dt>
             <dd>
               {session.sessionId} · v{session.currentVersion}
             </dd>
-            <dt>Review ID / version</dt>
+            <dt>Mã thẩm định / phiên bản</dt>
             <dd>
               {review.reviewId} · v{review.reviewVersion}
             </dd>
-            <dt>Opening Request</dt>
+            <dt>Yêu cầu mở phiên</dt>
             <dd>
               {review.openingRequestId} · v
               {review.openingRequestVersionAtStart}
             </dd>
-            <dt>Content ID / version</dt>
+            <dt>Mã nội dung / phiên bản</dt>
             <dd>
               {content.contentId} · v{content.contentVersion}
             </dd>
-            <dt>Auction title</dt>
+            <dt>Tiêu đề đấu giá</dt>
             <dd>{content.workingContent.auctionTitle}</dd>
-            <dt>Auction summary</dt>
+            <dt>Tóm tắt đấu giá</dt>
             <dd>{content.workingContent.auctionSummary}</dd>
-            <dt>Configuration Snapshot / Proposal</dt>
+            <dt>Bản chụp cấu hình / đề xuất</dt>
             <dd>
               {snapshot.snapshotId} · v{snapshot.proposalVersion}
             </dd>
-            <dt>Membership reference version</dt>
-            <dd>{membership?.referenceVersion ?? "MISSING"}</dd>
-            <dt>Readiness / warnings</dt>
+            <dt>Phiên bản tham chiếu thành viên</dt>
+            <dd>{membership?.referenceVersion ?? "THIẾU"}</dd>
+            <dt>Mức độ sẵn sàng / cảnh báo</dt>
             <dd>
               {review.readiness.ready ? "READY" : "BLOCKED"} /{" "}
               {
@@ -721,15 +721,15 @@ export function AuctionContentReviewPage() {
             </dd>
           </dl>
           <div className="content-review-dialog-statements">
-            <p>This completes Content Review only.</p>
-            <p>The Session remains DRAFT / NOT_READY.</p>
-            <p>No Approval Package is created or submitted.</p>
-            <p>The next step is Approval Package preparation.</p>
+            <p>Thao tác này chỉ hoàn tất bước thẩm định nội dung.</p>
+            <p>Phiên vẫn ở trạng thái BẢN NHÁP / CHƯA SẴN SÀNG.</p>
+            <p>Chưa tạo hoặc gửi hồ sơ phê duyệt.</p>
+            <p>Bước tiếp theo là chuẩn bị hồ sơ phê duyệt.</p>
           </div>
           {error && (
             <div className="content-review-blocker" role="alert">
               <p>{error}</p>
-              <p>Reload or revalidate while preserving this context.</p>
+              <p>Hãy tải lại hoặc kiểm tra lại; nội dung hiện tại vẫn được giữ nguyên.</p>
             </div>
           )}
         </Dialog>

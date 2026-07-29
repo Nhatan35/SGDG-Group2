@@ -112,7 +112,7 @@ test("Finance workspace pages are visually sound", async ({ page }) => {
   await login(page, "finance@sgdg.demo");
   await audit(page, [
     "/finance",
-    "/admin/payments",
+    "/finance/payments",
     "/finance/refunds",
     "/finance/reconciliation",
     "/finance/settlements",

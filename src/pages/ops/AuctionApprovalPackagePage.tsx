@@ -35,7 +35,7 @@ const ownerLabels: Record<ApprovalPackageFinding["owner"], string> = {
   MEMBERSHIP: "Membership",
   CONFIGURATION_GOVERNANCE: "Configuration Governance",
   CONTENT_REVIEW: "Content Review",
-  AUCTION_SYSTEM: "Auction System",
+  AUCTION_SYSTEM: "Hệ thống đấu giá",
   BUSINESS_DECISION: "Business Decision",
 };
 
@@ -239,8 +239,8 @@ export function AuctionApprovalPackagePage() {
     return (
       <main className="approval-package-page">
         <header className="approval-package-heading">
-          <span>AUCTION OPERATIONS</span>
-          <h1>Approval Package</h1>
+          <span>VẬN HÀNH ĐẤU GIÁ</span>
+          <h1>Hồ sơ phê duyệt</h1>
         </header>
         <BlockedState
           title="Không tìm thấy dynamic Session"
@@ -252,8 +252,8 @@ export function AuctionApprovalPackagePage() {
     return (
       <main className="approval-package-page">
         <header className="approval-package-heading">
-          <span>AUCTION OPERATIONS</span>
-          <h1>Approval Package</h1>
+          <span>VẬN HÀNH ĐẤU GIÁ</span>
+          <h1>Hồ sơ phê duyệt</h1>
         </header>
         <BlockedState
           title="Không có quyền truy cập"
@@ -265,8 +265,8 @@ export function AuctionApprovalPackagePage() {
     return (
       <main className="approval-package-page">
         <header className="approval-package-heading">
-          <span>AUCTION OPERATIONS · GOVERNED PACKAGE</span>
-          <h1>Approval Package</h1>
+          <span>VẬN HÀNH ĐẤU GIÁ · HỒ SƠ ĐƯỢC QUẢN TRỊ</span>
+          <h1>Hồ sơ phê duyệt</h1>
           <p>{PROTOTYPE_CONTENT_POLICY.classification}</p>
         </header>
         <section className="approval-package-alert" role="alert">
@@ -278,16 +278,16 @@ export function AuctionApprovalPackagePage() {
           </p>
         </section>
         <section className="approval-package-card">
-          <h2>Session boundary</h2>
+          <h2>Phạm vi phiên đấu giá</h2>
           <dl>
-            <dt>Session</dt>
+            <dt>Phiên đấu giá</dt>
             <dd>{session.sessionId}</dd>
-            <dt>Source / mode</dt>
+            <dt>Nguồn tạo / chế độ quản lý</dt>
             <dd>DIRECT_SGDG / SGDG_MANAGED</dd>
-            <dt>Lifecycle / publication</dt>
-            <dd>DRAFT / NOT_READY</dd>
-            <dt>Approval Package</dt>
-            <dd>BLOCKED BY CONFIGURATION</dd>
+            <dt>Vòng đời / xuất bản</dt>
+            <dd>BẢN NHÁP / CHƯA SẴN SÀNG</dd>
+            <dt>Hồ sơ phê duyệt</dt>
+            <dd>ĐANG BỊ CHẶN BỞI CẤU HÌNH</dd>
           </dl>
         </section>
       </main>
@@ -296,12 +296,12 @@ export function AuctionApprovalPackagePage() {
   return (
     <main className="approval-package-page">
       <header className="approval-package-heading">
-        <span>AUCTION OPERATIONS · GOVERNED PACKAGE PREPARATION</span>
-        <h1>Approval Package</h1>
+        <span>VẬN HÀNH ĐẤU GIÁ · CHUẨN BỊ HỒ SƠ ĐƯỢC QUẢN TRỊ</span>
+        <h1>Hồ sơ phê duyệt</h1>
         <p>{PROTOTYPE_CONTENT_POLICY.classification}</p>
         <p>
-          Package submission does not approve the Session or underlying
-          prototype content.
+          Việc gửi hồ sơ không đồng nghĩa phê duyệt phiên hoặc nội dung thử
+          nghiệm liên quan.
         </p>
       </header>
 
@@ -315,15 +315,15 @@ export function AuctionApprovalPackagePage() {
           <Badge>DRAFT / NOT_READY</Badge>
         </div>
         <dl>
-          <dt>Session code</dt>
+          <dt>Mã phiên</dt>
           <dd>{session.auctionCode}</dd>
-          <dt>Source / mode</dt>
+          <dt>Nguồn tạo / chế độ quản lý</dt>
           <dd>OPENING_REQUEST / CUSTOMER_REQUESTED</dd>
-          <dt>Session version</dt>
+          <dt>Phiên bản phiên</dt>
           <dd>v{session.currentVersion}</dd>
-          <dt>Package version</dt>
+          <dt>Phiên bản hồ sơ</dt>
           <dd>{packageValue ? `v${packageValue.packageVersion}` : "—"}</dd>
-          <dt>Eligibility</dt>
+          <dt>Điều kiện gửi duyệt</dt>
           <dd>
             {packageValue
               ? packageValue.status
@@ -351,36 +351,36 @@ export function AuctionApprovalPackagePage() {
       <div className="approval-package-grid">
         <section className="approval-package-card">
           <p className="approval-package-eyebrow">
-            CUSTOMER SOURCE · READ-ONLY
+            NGUỒN KHÁCH HÀNG · CHỈ ĐỌC
           </p>
-          <h2>Opening Request evidence</h2>
+          <h2>Bằng chứng yêu cầu mở phiên</h2>
           <dl>
-            <dt>Request</dt>
+            <dt>Yêu cầu</dt>
             <dd>
               {evidence?.openingRequest.openingRequestId ??
                 request?.requestId ??
                 "MISSING"}
             </dd>
-            <dt>Version</dt>
+            <dt>Phiên bản</dt>
             <dd>
               v
               {evidence?.openingRequest.openingRequestVersion ??
                 request?.version ??
                 "—"}
             </dd>
-            <dt>Accepted state</dt>
+            <dt>Trạng thái tiếp nhận</dt>
             <dd>
               {evidence?.openingRequest.acceptedState ??
                 request?.status ??
                 "MISSING"}
             </dd>
-            <dt>Original title</dt>
+            <dt>Tiêu đề ban đầu</dt>
             <dd>
               {evidence?.openingRequest.originalTitle ??
                 request?.title ??
                 "MISSING"}
             </dd>
-            <dt>Original purpose</dt>
+            <dt>Mục đích ban đầu</dt>
             <dd>
               {evidence?.openingRequest.originalPurpose ??
                 request?.purpose ??
@@ -391,36 +391,36 @@ export function AuctionApprovalPackagePage() {
 
         <section className="approval-package-card">
           <p className="approval-package-eyebrow">
-            AUCTION CONTENT · READ-ONLY HERE
+            NỘI DUNG ĐẤU GIÁ · CHỈ ĐỌC TẠI ĐÂY
           </p>
-          <h2>Content evidence</h2>
+          <h2>Bằng chứng nội dung</h2>
           <dl>
-            <dt>Content</dt>
+            <dt>Nội dung</dt>
             <dd>
               {evidence?.auctionContent.contentId ??
                 content?.contentId ??
                 "MISSING"}
             </dd>
-            <dt>Version</dt>
+            <dt>Phiên bản</dt>
             <dd>
               v
               {evidence?.auctionContent.contentVersion ??
                 content?.contentVersion ??
                 "—"}
             </dd>
-            <dt>Title</dt>
+            <dt>Tiêu đề</dt>
             <dd>
               {evidence?.auctionContent.auctionTitle ??
                 content?.workingContent.auctionTitle ??
                 "MISSING"}
             </dd>
-            <dt>Summary</dt>
+            <dt>Tóm tắt</dt>
             <dd>
               {evidence?.auctionContent.auctionSummary ??
                 content?.workingContent.auctionSummary ??
                 "MISSING"}
             </dd>
-            <dt>Completeness</dt>
+            <dt>Mức độ hoàn thiện</dt>
             <dd>
               {evidence?.auctionContent.completenessStatus ??
                 content?.status ??
@@ -431,24 +431,24 @@ export function AuctionApprovalPackagePage() {
 
         <section className="approval-package-card">
           <p className="approval-package-eyebrow">
-            CONFIGURATION GOVERNANCE · READ-ONLY
+            QUẢN TRỊ CẤU HÌNH · CHỈ ĐỌC
           </p>
-          <h2>Configuration evidence</h2>
+          <h2>Bằng chứng cấu hình</h2>
           <dl>
-            <dt>Snapshot</dt>
+            <dt>Bản chụp</dt>
             <dd>
               {evidence?.configuration.snapshotId ??
                 snapshot?.snapshotId ??
                 "MISSING"}
             </dd>
-            <dt>Proposal version</dt>
+            <dt>Phiên bản đề xuất</dt>
             <dd>
               v
               {evidence?.configuration.proposalVersion ??
                 configuration?.proposalVersion ??
                 "—"}
             </dd>
-            <dt>Starting Price</dt>
+            <dt>Giá khởi điểm</dt>
             <dd>
               {(
                 evidence?.configuration.startingPrice ??
@@ -456,7 +456,7 @@ export function AuctionApprovalPackagePage() {
               )?.toLocaleString("vi-VN") ?? "MISSING"}{" "}
               VND
             </dd>
-            <dt>Price Band / Room</dt>
+            <dt>Khung giá / phòng đấu giá</dt>
             <dd>
               {evidence?.configuration.priceBand ??
                 snapshot?.priceBandResolution.reference ??
@@ -466,7 +466,7 @@ export function AuctionApprovalPackagePage() {
                 snapshot?.roomResolution.roomReference ??
                 "MISSING"}
             </dd>
-            <dt>Membership</dt>
+            <dt>Thành viên</dt>
             <dd>
               {evidence?.configuration.membershipReferenceId ??
                 snapshot?.memberTitleReference.memberId ??
@@ -476,7 +476,7 @@ export function AuctionApprovalPackagePage() {
                 snapshot?.memberTitleReference.title ??
                 "MISSING"}
             </dd>
-            <dt>Listing Fee</dt>
+            <dt>Phí niêm yết</dt>
             <dd>
               {evidence
                 ? feeLabel(evidence.configuration.memberListingFee)
@@ -493,11 +493,11 @@ export function AuctionApprovalPackagePage() {
 
         <section className="approval-package-card">
           <p className="approval-package-eyebrow">
-            CONTENT REVIEW · READ-ONLY
+            THẨM ĐỊNH NỘI DUNG · CHỈ ĐỌC
           </p>
-          <h2>Completion evidence</h2>
+          <h2>Biên bản hoàn tất</h2>
           <dl>
-            <dt>Review</dt>
+            <dt>Thẩm định</dt>
             <dd>
               {evidence?.contentReview.reviewId ??
                 review?.reviewId ??
@@ -507,20 +507,20 @@ export function AuctionApprovalPackagePage() {
                 review?.reviewVersion ??
                 "—"}
             </dd>
-            <dt>Completion Record</dt>
+            <dt>Biên bản hoàn tất</dt>
             <dd>
               {evidence?.contentReview.completionRecordId ??
                 completionRecord?.completionRecordId ??
                 "MISSING"}
             </dd>
-            <dt>Readiness</dt>
+            <dt>Mức độ sẵn sàng</dt>
             <dd>
               {evidence?.contentReview.readiness ??
                 (completionRecord
                   ? "READY_FOR_APPROVAL_PACKAGE_PREPARATION"
                   : "NOT READY")}
             </dd>
-            <dt>Completed by/at</dt>
+            <dt>Người / thời điểm hoàn tất</dt>
             <dd>
               {evidence?.contentReview.completedBy ??
                 completionRecord?.completedBy ??
@@ -536,7 +536,7 @@ export function AuctionApprovalPackagePage() {
 
       {packageValue && (
         <section className="approval-package-card">
-          <h2>Package validation</h2>
+          <h2>Kiểm tra hồ sơ</h2>
           <p>
             {packageValue.preparationValidation.readyToSubmit
               ? "READY TO SUBMIT"
@@ -545,7 +545,7 @@ export function AuctionApprovalPackagePage() {
             {packageValue.preparationValidation.evaluatedContentVersion}
           </p>
           {findingsByOwner.length === 0 ? (
-            <p>Không có blocking finding.</p>
+            <p>Không có vấn đề đang chặn.</p>
           ) : (
             <div className="approval-package-findings">
               {findingsByOwner.map(([owner, findings]) => (
@@ -573,18 +573,18 @@ export function AuctionApprovalPackagePage() {
       )}
 
       <section className="approval-package-card approval-package-boundary">
-        <h2>Submission boundary</h2>
-        <p>This submits the Approval Package for ADMIN review only.</p>
-        <p>No approval decision is made by this action.</p>
-        <p>The Session remains DRAFT / NOT_READY.</p>
-        <p>No Schedule or Publication is created.</p>
+        <h2>Phạm vi gửi duyệt</h2>
+        <p>Thao tác này chỉ gửi hồ sơ để Admin xem xét.</p>
+        <p>Thao tác này chưa tạo ra quyết định phê duyệt.</p>
+        <p>Phiên vẫn ở trạng thái BẢN NHÁP / CHƯA SẴN SÀNG.</p>
+        <p>Chưa tạo lịch hoặc xuất bản.</p>
         {packageValue?.status === "SUBMITTED" && (
           <dl>
-            <dt>Submission Record</dt>
+            <dt>Biên bản gửi duyệt</dt>
             <dd>{submissionRecord?.submissionRecordId}</dd>
-            <dt>Queue state</dt>
+            <dt>Trạng thái hàng đợi</dt>
             <dd>AWAITING_ADMIN_REVIEW</dd>
-            <dt>Evidence validity</dt>
+            <dt>Hiệu lực bằng chứng</dt>
             <dd>{evidenceValidity}</dd>
           </dl>
         )}
@@ -597,12 +597,12 @@ export function AuctionApprovalPackagePage() {
             loading={busy === "create"}
             loadingText="Đang chuẩn bị"
           >
-            Chuẩn bị Approval Package
+            Chuẩn bị hồ sơ phê duyệt
           </Button>
         )}
         {packageValue?.status === "READY_TO_SUBMIT" && (
           <Button onClick={() => setDialogOpen(true)}>
-            Gửi Approval Package
+            Gửi hồ sơ phê duyệt
           </Button>
         )}
         {packageValue &&
@@ -612,7 +612,7 @@ export function AuctionApprovalPackagePage() {
               loading={busy === "refresh"}
               loadingText="Đang kiểm tra"
             >
-              Kiểm tra và làm mới Package
+              Kiểm tra và làm mới hồ sơ
             </Button>
           )}
         {packageValue?.status === "SUBMITTED" && (
@@ -624,13 +624,13 @@ export function AuctionApprovalPackagePage() {
 
       {packageValue && (
         <section className="approval-package-card approval-package-history">
-          <h2>Package history · STAFF ONLY</h2>
+          <h2>Lịch sử hồ sơ · chỉ dành cho nhân viên</h2>
           <ol>
             {packageValue.history.map((entry) => (
               <li key={entry.historyId}>
                 <strong>{entry.action}</strong>
                 <span>
-                  Package v{entry.packageVersion} · {entry.resultingStatus}
+                  Hồ sơ v{entry.packageVersion} · {entry.resultingStatus}
                 </span>
                 <small>
                   {entry.actorRole} · {entry.occurredAt} · {entry.visibility}
@@ -645,8 +645,8 @@ export function AuctionApprovalPackagePage() {
         <Dialog
           open={dialogOpen}
           onOpenChange={setDialogOpen}
-          title="Gửi Approval Package"
-          description="Final authoritative revalidation occurs before the immutable submission is recorded."
+          title="Gửi hồ sơ phê duyệt"
+          description="Hệ thống sẽ đối chiếu lại dữ liệu chính thức trước khi ghi nhận biên bản gửi."
           size="lg"
           preventClose={busy === "submit"}
           panelClassName="approval-package-dialog"
@@ -657,54 +657,54 @@ export function AuctionApprovalPackagePage() {
                 onClick={() => setDialogOpen(false)}
                 disabled={busy === "submit"}
               >
-                Cancel
+                Hủy
               </Button>
               <Button
                 onClick={submit}
                 loading={busy === "submit"}
                 loadingText="Đang gửi"
               >
-                Submit Approval Package
+                Gửi hồ sơ phê duyệt
               </Button>
             </>
           }
         >
           <dl>
-            <dt>Package</dt>
+            <dt>Hồ sơ</dt>
             <dd>
               {packageValue.packageId} · v{packageValue.packageVersion}
             </dd>
-            <dt>Session</dt>
+            <dt>Phiên đấu giá</dt>
             <dd>
               {packageValue.evidence.session.sessionId} · v
               {packageValue.evidence.session.sessionVersion}
             </dd>
-            <dt>Opening Request</dt>
+            <dt>Yêu cầu mở phiên</dt>
             <dd>
               {packageValue.evidence.openingRequest.openingRequestId} · v
               {packageValue.evidence.openingRequest.openingRequestVersion}
             </dd>
-            <dt>Content</dt>
+            <dt>Nội dung</dt>
             <dd>
               {packageValue.evidence.auctionContent.contentId} · v
               {packageValue.evidence.auctionContent.contentVersion}
             </dd>
-            <dt>Title</dt>
+            <dt>Tiêu đề</dt>
             <dd>{packageValue.evidence.auctionContent.auctionTitle}</dd>
-            <dt>Summary</dt>
+            <dt>Tóm tắt</dt>
             <dd>{packageValue.evidence.auctionContent.auctionSummary}</dd>
-            <dt>Configuration Snapshot</dt>
+            <dt>Bản chụp cấu hình</dt>
             <dd>
               {packageValue.evidence.configuration.snapshotId} · proposal v
               {packageValue.evidence.configuration.proposalVersion}
             </dd>
-            <dt>Review / Completion</dt>
+            <dt>Thẩm định / hoàn tất</dt>
             <dd>
               {packageValue.evidence.contentReview.reviewId} · v
               {packageValue.evidence.contentReview.reviewVersion} ·{" "}
               {packageValue.evidence.contentReview.completionRecordId}
             </dd>
-            <dt>Validation / warnings</dt>
+            <dt>Kiểm tra / cảnh báo</dt>
             <dd>
               {packageValue.preparationValidation.readyToSubmit
                 ? "READY TO SUBMIT"
@@ -714,10 +714,10 @@ export function AuctionApprovalPackagePage() {
           </dl>
           <div className="approval-package-dialog-statements">
             <p>{PROTOTYPE_CONTENT_POLICY.classification}</p>
-            <p>This submits the Approval Package for ADMIN review only.</p>
-            <p>No approval decision is made by this action.</p>
-            <p>The Session remains DRAFT / NOT_READY.</p>
-            <p>No Schedule or Publication is created.</p>
+            <p>Thao tác này chỉ gửi hồ sơ để Admin xem xét.</p>
+            <p>Thao tác này chưa tạo ra quyết định phê duyệt.</p>
+            <p>Phiên vẫn ở trạng thái BẢN NHÁP / CHƯA SẴN SÀNG.</p>
+            <p>Chưa tạo lịch hoặc xuất bản.</p>
           </div>
           {error && (
             <div className="approval-package-alert" role="alert">

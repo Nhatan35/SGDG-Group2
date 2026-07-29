@@ -825,7 +825,7 @@ describe("persisted Dynamic Auction Content foundation", () => {
 
   it("67 policy metadata is explicitly classified and frozen", () => {
     expect(PROTOTYPE_CONTENT_POLICY.classification).toContain(
-      "NOT STAKEHOLDER-APPROVED",
+      "CHƯA ĐƯỢC CÁC BÊN LIÊN QUAN PHÊ DUYỆT",
     );
     expect(Object.isFrozen(PROTOTYPE_CONTENT_POLICY)).toBe(true);
   });

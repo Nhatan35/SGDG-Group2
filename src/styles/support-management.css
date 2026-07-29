@@ -66,6 +66,30 @@
   margin: 0 0 14px;
   font-size: 18px;
 }
+
+.support-modal-fields {
+  display: grid;
+  grid-template-columns: 0.8fr 1.2fr;
+  gap: 12px;
+}
+
+.support-modal-fields label {
+  display: grid;
+  gap: 6px;
+  color: var(--sgdg-text-secondary);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.support-modal-fields input,
+.support-modal-fields select {
+  min-width: 0;
+  min-height: 44px;
+  border: 1px solid var(--sgdg-border);
+  border-radius: var(--radius-sm);
+  padding: 9px 11px;
+  background: var(--sgdg-white);
+}
 .support-queue-row,
 .support-list-row,
 .knowledge-row {
@@ -92,6 +116,20 @@
 .knowledge-row > svg {
   width: 18px;
   color: #8c6a55;
+}
+.support-decision-row {
+  width: 100%;
+  color: inherit;
+  text-align: left;
+  border-right: 0;
+  border-bottom: 0;
+  border-left: 0;
+  background: transparent;
+  cursor: pointer;
+}
+.support-decision-row:hover,
+.support-decision-row:focus-visible {
+  background: var(--sgdg-orange-50);
 }
 .support-toolbar {
   display: flex;

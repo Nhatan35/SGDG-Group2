@@ -139,7 +139,7 @@ describe("linked Auction Session cross-role UI", () => {
     expect(within(dialog).getByText(String(accepted.version))).toBeInTheDocument();
     expect(dialog).toHaveTextContent(accepted.assetReference);
     expect(dialog).toHaveTextContent("DRAFT · NOT_READY");
-    expect(dialog).toHaveTextContent("không tạo Approval Package");
+    expect(dialog).toHaveTextContent("không tạo hồ sơ phê duyệt");
     await user.click(
       screen.getByRole("button", { name: "Xác nhận tạo bản nháp" }),
     );
@@ -151,7 +151,7 @@ describe("linked Auction Session cross-role UI", () => {
       }),
     ).not.toBeInTheDocument();
     expect(
-      screen.getByRole("link", { name: "Mở workspace phiên" }),
+      screen.getByRole("link", { name: "Mở không gian phiên" }),
     ).toHaveAttribute("href", `/ops/auctions/${sessions[0].sessionId}`);
     expect(screen.getByText(/Đã tạo bản nháp phiên/)).toHaveAttribute(
       "aria-live",

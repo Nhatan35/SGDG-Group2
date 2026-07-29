@@ -5,7 +5,12 @@ import type { ActorRole } from "../types/domain";
 export type ControlledFinanceAction =
   | "RE_REVIEW_FINANCE_PACKAGE"
   | "ROUTE_TO_REMEDIATION";
-export type FinanceOverrideStatus = "PENDING" | "APPROVED" | "REJECTED";
+export type FinanceOverrideStatus =
+  | "PENDING"
+  | "APPROVED"
+  | "IN_PROGRESS"
+  | "COMPLETED"
+  | "REJECTED";
 
 export interface FinanceOverrideRequest {
   overrideId: string;
@@ -65,6 +70,19 @@ interface FinanceOverrideState {
     reviewerId: string,
     expectedVersion: number,
     decision: "APPROVE" | "REJECT",
+    reason: string,
+  ) => Result;
+  startExecution: (
+    overrideId: string,
+    actor: ActorRole,
+    actorId: string,
+    expectedVersion: number,
+  ) => Result;
+  completeExecution: (
+    overrideId: string,
+    actor: ActorRole,
+    actorId: string,
+    expectedVersion: number,
     reason: string,
   ) => Result;
   resetForTests: () => void;
@@ -154,6 +172,72 @@ export const useFinanceOverrideStore = create<FinanceOverrideState>()(
           history: [
             ...request.history,
             { at, actorId: reviewerId, action: decision, reason: reason.trim() },
+          ],
+        };
+        set((state) => ({
+          requests: state.requests.map((item) =>
+            item.overrideId === overrideId ? next : item,
+          ),
+        }));
+        return { ok: true, request: next };
+      },
+      startExecution: (overrideId, actor, actorId, expectedVersion) => {
+        const request = get().requests.find(
+          (item) => item.overrideId === overrideId,
+        );
+        if (!request) return { ok: false, reason: "NOT_FOUND" };
+        if (actor !== "FINANCE") return { ok: false, reason: "FORBIDDEN" };
+        if (request.version !== expectedVersion)
+          return { ok: false, reason: "STALE" };
+        if (request.status !== "APPROVED")
+          return { ok: false, reason: "IMMUTABLE" };
+        const at = new Date().toISOString();
+        const next: FinanceOverrideRequest = {
+          ...request,
+          status: "IN_PROGRESS",
+          version: request.version + 1,
+          history: [
+            ...request.history,
+            { at, actorId, action: "EXECUTION_STARTED" },
+          ],
+        };
+        set((state) => ({
+          requests: state.requests.map((item) =>
+            item.overrideId === overrideId ? next : item,
+          ),
+        }));
+        return { ok: true, request: next };
+      },
+      completeExecution: (
+        overrideId,
+        actor,
+        actorId,
+        expectedVersion,
+        reason,
+      ) => {
+        const request = get().requests.find(
+          (item) => item.overrideId === overrideId,
+        );
+        if (!request) return { ok: false, reason: "NOT_FOUND" };
+        if (actor !== "FINANCE") return { ok: false, reason: "FORBIDDEN" };
+        if (request.version !== expectedVersion)
+          return { ok: false, reason: "STALE" };
+        if (request.status !== "IN_PROGRESS")
+          return { ok: false, reason: "IMMUTABLE" };
+        if (!reason.trim()) return { ok: false, reason: "INVALID" };
+        const at = new Date().toISOString();
+        const next: FinanceOverrideRequest = {
+          ...request,
+          status: "COMPLETED",
+          version: request.version + 1,
+          history: [
+            ...request.history,
+            {
+              at,
+              actorId,
+              action: "EXECUTION_COMPLETED",
+              reason: reason.trim(),
+            },
           ],
         };
         set((state) => ({

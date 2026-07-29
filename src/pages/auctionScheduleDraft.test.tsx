@@ -38,7 +38,7 @@ describe("Schedule Draft preparation UI", () => {
     const authority = prepareApprovedScheduleAuthority();
     renderSchedule(authority.session.sessionId);
     expect(
-      screen.getByRole("heading", { level: 1, name: "Schedule Preparation" }),
+      screen.getByRole("heading", { level: 1, name: "Chuẩn bị lịch phiên" }),
     ).toBeInTheDocument();
     expect(screen.getByText(authority.decision.decisionId, { exact: false }))
       .toBeInTheDocument();
@@ -94,7 +94,7 @@ describe("Schedule Draft preparation UI", () => {
     );
     expect(screen.getByText("COMPLETE")).toBeInTheDocument();
     expect(screen.getByText("2")).toBeInTheDocument();
-    expect(screen.getByText("Không có finding.")).toBeInTheDocument();
+    expect(screen.getByText("Không có vấn đề.")).toBeInTheDocument();
     expect(screen.getByText(/Registration: NOT OPEN/)).toBeInTheDocument();
     expect(screen.queryByText("CONFIRMED")).not.toBeInTheDocument();
   });

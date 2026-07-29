@@ -175,7 +175,7 @@ export function CreateSgdgManagedSessionPage() {
       return {
         ok: false,
         code: "ASSET_NOT_FOUND",
-        message: "Chưa có Asset readiness reference.",
+        message: "Chưa có tham chiếu mức độ sẵn sàng của tài sản.",
       };
     setBusy(true);
     const result = createSession({
@@ -193,7 +193,7 @@ export function CreateSgdgManagedSessionPage() {
       setError("");
       setCreatedSessionId(result.session.sessionId);
       setSuccess(
-        `Đã tạo ${result.session.sessionId} · ${result.session.auctionCode}. Session vẫn là DRAFT / NOT_READY.`,
+        `Đã tạo ${result.session.sessionId} · ${result.session.auctionCode}. Phiên vẫn là BẢN NHÁP / CHƯA SẴN SÀNG.`,
       );
       return result;
     }
@@ -207,15 +207,15 @@ export function CreateSgdgManagedSessionPage() {
         <span>QUẢN LÝ PHIÊN ĐẤU GIÁ</span>
         <h1>Tạo phiên do SGDG quản lý</h1>
         <p>
-          Chuẩn bị Session Draft từ một Product/Auction Asset reference hiện
-          có. Asset facts chỉ được đọc qua readiness reference.
+          Chuẩn bị bản nháp phiên từ một tham chiếu sản phẩm/tài sản hiện
+          có. Thông tin tài sản chỉ được đọc qua tham chiếu mức độ sẵn sàng.
         </p>
       </header>
 
       <p className="create-disclosure">
         <ShieldCheck aria-hidden="true" />
-        Creation source: DIRECT_SGDG · Management mode: SGDG_MANAGED · chỉ
-        tạo DRAFT / NOT_READY
+        Nguồn tạo: DIRECT_SGDG · Chế độ quản lý: SGDG_MANAGED · chỉ tạo
+        BẢN NHÁP / CHƯA SẴN SÀNG
       </p>
 
       <div className="create-grid">
@@ -223,9 +223,9 @@ export function CreateSgdgManagedSessionPage() {
           <div className="create-section-heading">
             <div>
               <span>BƯỚC 1</span>
-              <h2>Chọn Asset reference</h2>
+              <h2>Chọn tham chiếu tài sản</h2>
             </div>
-            <Badge tone="info">PRODUCT_ASSET · READ ONLY</Badge>
+            <Badge tone="info">SẢN PHẨM/TÀI SẢN · CHỈ ĐỌC</Badge>
           </div>
           <label className="create-field">
             <span>Tài sản</span>
@@ -257,7 +257,7 @@ export function CreateSgdgManagedSessionPage() {
                 <div>
                   <span>THAM CHIẾU HIỆN TẠI</span>
                   <h2 id="asset-reference-heading">
-                    Asset readiness reference
+                    Tham chiếu mức độ sẵn sàng của tài sản
                   </h2>
                 </div>
                 <Badge tone={externalBlocked ? "warning" : "success"}>
@@ -266,35 +266,35 @@ export function CreateSgdgManagedSessionPage() {
               </div>
               <dl>
                 <div>
-                  <dt>Reference ID</dt>
+                  <dt>Mã tham chiếu</dt>
                   <dd>{reference.referenceId}</dd>
                 </div>
                 <div>
-                  <dt>Asset version</dt>
+                  <dt>Phiên bản tài sản</dt>
                   <dd>v{reference.assetVersion}</dd>
                 </div>
                 <div>
-                  <dt>Approval</dt>
+                  <dt>Phê duyệt</dt>
                   <dd>{reference.approvalStatus}</dd>
                 </div>
                 <div>
-                  <dt>Availability</dt>
+                  <dt>Tình trạng khả dụng</dt>
                   <dd>{reference.availabilityStatus}</dd>
                 </div>
                 <div>
-                  <dt>Restriction</dt>
+                  <dt>Hạn chế</dt>
                   <dd>{reference.restrictionStatus ?? "Không có"}</dd>
                 </div>
                 <div>
-                  <dt>Hold</dt>
+                  <dt>Tạm giữ</dt>
                   <dd>{reference.holdStatus ?? "Không có"}</dd>
                 </div>
                 <div>
-                  <dt>Observed</dt>
+                  <dt>Thời điểm ghi nhận</dt>
                   <dd>{reference.observedAt}</dd>
                 </div>
                 <div>
-                  <dt>Refreshed</dt>
+                  <dt>Thời điểm làm mới</dt>
                   <dd>{reference.refreshedAt ?? "Chưa làm mới"}</dd>
                 </div>
               </dl>
@@ -313,9 +313,9 @@ export function CreateSgdgManagedSessionPage() {
           <div className="create-section-heading">
             <div>
               <span>BƯỚC 2</span>
-              <h2>Thông tin Session Draft</h2>
+              <h2>Thông tin bản nháp phiên</h2>
             </div>
-            <Badge tone="neutral">CONTENT_STAFF</Badge>
+            <Badge tone="neutral">NHÂN VIÊN NỘI DUNG</Badge>
           </div>
           <label className="create-field">
             <span>Tiêu đề phiên</span>
@@ -355,7 +355,7 @@ export function CreateSgdgManagedSessionPage() {
             )}
           </label>
           <label className="create-field">
-            <span>Owner / Assignee</span>
+            <span>Người phụ trách</span>
             <input
               value={draft.ownerId}
               onChange={(event) => updateDraft("ownerId", event.target.value)}
@@ -370,7 +370,7 @@ export function CreateSgdgManagedSessionPage() {
             (validated || externalBlocked) &&
             readiness.findings.length > 0 && (
             <section className="readiness-findings" aria-labelledby="findings">
-              <h2 id="findings">Readiness findings</h2>
+              <h2 id="findings">Kết quả kiểm tra mức độ sẵn sàng</h2>
               <ul>
                 {readiness.findings.map((finding) => (
                   <li key={`${finding.code}-${finding.field ?? "asset"}`}>
@@ -388,7 +388,7 @@ export function CreateSgdgManagedSessionPage() {
                         <Link
                           to={`/ops/auctions/${finding.existingSessionId}`}
                         >
-                          Mở Session hiện có
+                          Mở phiên hiện có
                         </Link>
                       )}
                     </div>
@@ -415,12 +415,12 @@ export function CreateSgdgManagedSessionPage() {
                 to={`/ops/auctions/${createdSessionId}`}
                 variant="primary"
               >
-                Mở workspace phiên
+                Mở không gian phiên
               </ButtonLink>
             ) : !draft.assetId ? (
               <>
                 <Button disabled>Chọn tài sản</Button>
-                <small>Chọn một Asset reference để bắt đầu.</small>
+                <small>Chọn một tham chiếu tài sản để bắt đầu.</small>
               </>
             ) : reference && !externalBlocked && !stale && readiness.ready ? (
               <Button onClick={() => setDialogOpen(true)}>
@@ -440,10 +440,10 @@ export function CreateSgdgManagedSessionPage() {
         </section>
 
         <aside className="create-rail">
-          <h2>Readiness</h2>
+          <h2>Mức độ sẵn sàng</h2>
           {[
             [role === "CONTENT_STAFF", "Content Staff có authority"],
-            [Boolean(reference), "Đã có Asset readiness reference"],
+            [Boolean(reference), "Đã có tham chiếu mức độ sẵn sàng của tài sản"],
             [
               reference?.approvalStatus === "APPROVED",
               "Asset đã APPROVED",
@@ -465,7 +465,7 @@ export function CreateSgdgManagedSessionPage() {
               {String(label)}
             </p>
           ))}
-          <h2>Execution boundary</h2>
+          <h2>Phạm vi thao tác</h2>
           <p>
             Ready chỉ cho phép tạo Session DRAFT. Configuration, Content
             Review, Approval Package, Schedule và Publication chưa được tạo.
@@ -511,8 +511,8 @@ function SgdgManagedCreationDialog({
   return (
     <Dialog
       open
-      title="Tạo SGDG-managed Session Draft"
-      description="Auction System sẽ final-revalidate Draft và Asset reference trước khi tạo."
+      title="Tạo bản nháp phiên do SGDG quản lý"
+      description="Hệ thống đấu giá sẽ kiểm tra lại bản nháp và tham chiếu tài sản ngay trước khi tạo."
       preventClose={busy}
       onOpenChange={(open) => {
         if (!open && !busy) onClose();
@@ -530,33 +530,33 @@ function SgdgManagedCreationDialog({
     >
       <dl className="opening-review-dialog-reference">
         <div>
-          <dt>Session title</dt>
+          <dt>Tiêu đề phiên</dt>
           <dd>{draft.title}</dd>
         </div>
         <div>
-          <dt>Asset reference</dt>
+          <dt>Tham chiếu tài sản</dt>
           <dd>{draft.assetId}</dd>
         </div>
         <div>
-          <dt>Asset version</dt>
+          <dt>Phiên bản tài sản</dt>
           <dd>v{assetVersion}</dd>
         </div>
         <div>
-          <dt>Readiness reference</dt>
+          <dt>Tham chiếu mức độ sẵn sàng</dt>
           <dd>{referenceId}</dd>
         </div>
         <div>
-          <dt>Management mode</dt>
+          <dt>Chế độ quản lý</dt>
           <dd>SGDG_MANAGED</dd>
         </div>
         <div>
-          <dt>Target state</dt>
-          <dd>DRAFT · NOT_READY</dd>
+          <dt>Trạng thái sau khi tạo</dt>
+          <dd>BẢN NHÁP · CHƯA SẴN SÀNG</dd>
         </div>
       </dl>
       <p className="opening-review-disclosure">
-        Chỉ Session Draft được tạo. Configuration, Approval, Schedule,
-        Publication và Registration không xảy ra.
+        Chỉ bản nháp phiên được tạo. Cấu hình, phê duyệt, lịch, xuất bản và
+        đăng ký tham gia chưa được thực hiện.
       </p>
       {commandError && (
         <p className="ops-conflict" role="alert">

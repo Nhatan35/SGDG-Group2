@@ -290,10 +290,10 @@ describe("Content Review page and Session readiness projection", () => {
     renderReview(prepareCustomer().session.sessionId);
     expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
-      "Content Review",
+      "Thẩm định nội dung",
     );
     expect(screen.getByRole("note")).toHaveTextContent(
-      "NOT STAKEHOLDER-APPROVED",
+      "CHƯA ĐƯỢC CÁC BÊN LIÊN QUAN PHÊ DUYỆT",
     );
   });
 
@@ -302,12 +302,12 @@ describe("Content Review page and Session readiness projection", () => {
     const prepared = prepareCustomer();
     renderReview(prepared.session.sessionId);
     const start = screen.getByRole("button", {
-      name: "Bắt đầu Content Review",
+      name: "Bắt đầu thẩm định nội dung",
     });
     expect(start).toBeInTheDocument();
     expect(
       screen.getAllByRole("button", {
-        name: /Bắt đầu Content Review|Kiểm tra lại Session Package|Hoàn tất Content Review/,
+        name: /Bắt đầu thẩm định nội dung|Kiểm tra lại hồ sơ phiên|Hoàn tất thẩm định nội dung/,
       }),
     ).toHaveLength(1);
     await user.click(start);
@@ -316,7 +316,7 @@ describe("Content Review page and Session readiness projection", () => {
       screen.getByText("CONTENT_REVIEW_READY_TO_COMPLETE"),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: "Hoàn tất Content Review" }),
+      screen.getByRole("button", { name: "Hoàn tất thẩm định nội dung" }),
     ).toBeInTheDocument();
   });
 
@@ -331,7 +331,7 @@ describe("Content Review page and Session readiness projection", () => {
       "Phiên SGDG-managed chưa có cấu hình hiện hành",
     );
     expect(
-      screen.queryByRole("button", { name: "Bắt đầu Content Review" }),
+      screen.queryByRole("button", { name: "Bắt đầu thẩm định nội dung" }),
     ).not.toBeInTheDocument();
     expect(useAuctionContentReviewStore.getState().reviews).toEqual([]);
   });
@@ -340,21 +340,21 @@ describe("Content Review page and Session readiness projection", () => {
     const prepared = prepareCustomer();
     renderReview(prepared.session.sessionId);
     const source = screen.getByRole("heading", {
-      name: "Opening Request lineage",
+      name: "Thông tin yêu cầu mở phiên",
     }).closest("section")!;
     expect(source).toHaveTextContent(prepared.session.openingRequestId!);
     expect(source).toHaveTextContent("Customer source");
     const contentCard = screen.getByRole("heading", {
-      name: "Current Auction Content",
+      name: "Nội dung đấu giá hiện tại",
     }).closest("section")!;
     expect(contentCard).toHaveTextContent(prepared.content.contentId);
     expect(contentCard.querySelector("input, textarea")).toBeNull();
     const configCard = screen.getByRole("heading", {
-      name: "Configuration evidence",
+      name: "Bằng chứng cấu hình",
     }).closest("section")!;
     expect(within(configCard).getByText(/snapshot/)).toBeInTheDocument();
     const membershipCard = screen.getByRole("heading", {
-      name: "Membership evidence",
+      name: "Thông tin thành viên",
     }).closest("section")!;
     expect(within(membershipCard).getByText("MEMBERSHIP-MOCK-V1")).toBeInTheDocument();
   });
@@ -364,17 +364,17 @@ describe("Content Review page and Session readiness projection", () => {
     const prepared = prepareCustomer({ incomplete: true });
     renderReview(prepared.session.sessionId);
     await user.click(
-      screen.getByRole("button", { name: "Bắt đầu Content Review" }),
+      screen.getByRole("button", { name: "Bắt đầu thẩm định nội dung" }),
     );
     expect(screen.getByText("AUCTION_SUMMARY_REQUIRED")).toBeInTheDocument();
     expect(
       screen.getByRole("heading", {
-        name: /Owner: Content Staff \(CONTENT_STAFF\)/,
+        name: /Phụ trách: Nhân viên nội dung \(CONTENT_STAFF\)/,
       }),
     ).toBeInTheDocument();
     expect(
       screen.getByRole("link", {
-        name: "Mở Auction Content để chỉnh sửa auctionSummary",
+        name: "Mở nội dung đấu giá để chỉnh sửa auctionSummary",
       }),
     ).toHaveAttribute(
       "href",
@@ -410,7 +410,7 @@ describe("Content Review page and Session readiness projection", () => {
     const correctedResult = corrected!;
     if (!correctedResult.ok) throw new Error(correctedResult.message);
     expect(screen.getByRole("alert")).toHaveTextContent(
-      `Review đang giữ Content v${review.lastEvaluatedContentVersion}`,
+      `Hồ sơ thẩm định đang giữ nội dung v${review.lastEvaluatedContentVersion}`,
     );
     expect(
       screen.getAllByText(
@@ -418,7 +418,7 @@ describe("Content Review page and Session readiness projection", () => {
       ).length,
     ).toBeGreaterThan(0);
     await user.click(
-      screen.getByRole("button", { name: "Kiểm tra lại Session Package" }),
+      screen.getByRole("button", { name: "Kiểm tra lại hồ sơ phiên" }),
     );
     expect(
       useAuctionContentReviewStore.getState().reviews[0],
@@ -445,10 +445,10 @@ describe("Content Review page and Session readiness projection", () => {
       });
     });
     expect(screen.getByRole("alert")).toHaveTextContent(
-      "Authoritative evidence đã thay đổi",
+      "Dữ liệu chính thức đã thay đổi",
     );
     expect(
-      screen.getByRole("heading", { name: "Package readiness" }),
+      screen.getByRole("heading", { name: "Mức độ sẵn sàng của hồ sơ" }),
     ).toBeInTheDocument();
     expect(useAuctionContentReviewStore.getState().completionRecords).toEqual(
       [],
@@ -461,10 +461,10 @@ describe("Content Review page and Session readiness projection", () => {
     startReview(prepared);
     renderReview(prepared.session.sessionId);
     await user.click(
-      screen.getByRole("button", { name: "Hoàn tất Content Review" }),
+      screen.getByRole("button", { name: "Hoàn tất thẩm định nội dung" }),
     );
     const dialog = screen.getByRole("dialog", {
-      name: "Hoàn tất Content Review",
+      name: "Hoàn tất thẩm định nội dung",
     });
     expect(dialog).toHaveTextContent(
       `${prepared.session.sessionId} · v${prepared.session.currentVersion}`,
@@ -473,11 +473,11 @@ describe("Content Review page and Session readiness projection", () => {
       `${prepared.content.contentId} · v${prepared.content.contentVersion}`,
     );
     expect(dialog).toHaveTextContent(prepared.snapshot.snapshotId);
-    expect(dialog).toHaveTextContent("This completes Content Review only.");
+    expect(dialog).toHaveTextContent("Thao tác này chỉ hoàn tất bước thẩm định nội dung.");
     expect(dialog).toHaveTextContent(
-      "No Approval Package is created or submitted.",
+      "Chưa tạo hoặc gửi hồ sơ phê duyệt.",
     );
-    expect(dialog).toHaveTextContent("The Session remains DRAFT / NOT_READY.");
+    expect(dialog).toHaveTextContent("Phiên vẫn ở trạng thái BẢN NHÁP / CHƯA SẴN SÀNG.");
   });
 
   it("executes completion once, announces success, and renders immutable evidence read-only", async () => {
@@ -486,26 +486,26 @@ describe("Content Review page and Session readiness projection", () => {
     startReview(prepared);
     renderReview(prepared.session.sessionId);
     await user.click(
-      screen.getByRole("button", { name: "Hoàn tất Content Review" }),
+      screen.getByRole("button", { name: "Hoàn tất thẩm định nội dung" }),
     );
     await user.click(
-      screen.getByRole("button", { name: "Complete Content Review" }),
+      screen.getByRole("button", { name: "Hoàn tất thẩm định" }),
     );
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
-    expect(screen.getByText(/Completion record:/)).toHaveAttribute(
+    expect(screen.getByText(/Biên bản hoàn tất:/)).toHaveAttribute(
       "aria-live",
       "polite",
     );
     expect(
       screen.getByRole("heading", {
-        name: "Sẵn sàng chuẩn bị Approval Package",
+        name: "Sẵn sàng chuẩn bị hồ sơ phê duyệt",
       }),
     ).toBeInTheDocument();
     expect(
-      screen.getAllByText("Ready for Approval Package preparation"),
-    ).toHaveLength(2);
+      screen.getAllByText("Sẵn sàng chuẩn bị hồ sơ phê duyệt").length,
+    ).toBeGreaterThanOrEqual(2);
     expect(
-      screen.queryByRole("button", { name: "Hoàn tất Content Review" }),
+      screen.queryByRole("button", { name: "Hoàn tất thẩm định nội dung" }),
     ).not.toBeInTheDocument();
     expect(useAuctionContentReviewStore.getState().completionRecords).toHaveLength(
       1,
@@ -531,10 +531,10 @@ describe("Content Review page and Session readiness projection", () => {
     renderWorkspace(prepared.session.sessionId);
     expect(screen.getByText("COMPLETED")).toBeInTheDocument();
     expect(
-      screen.getByText(/Ready for Approval Package preparation/),
+      screen.getByText(/Sẵn sàng chuẩn bị hồ sơ phê duyệt/),
     ).toBeInTheDocument();
-    expect(screen.getByText(/Session: DRAFT · Publication: NOT_READY/)).toBeInTheDocument();
-    expect(screen.getAllByText(/Approval Package: NOT CREATED/).length).toBeGreaterThan(0);
+    expect(screen.getByText(/Phiên: DRAFT · Công bố: NOT_READY/)).toBeInTheDocument();
+    expect(screen.getAllByText(/Hồ sơ phê duyệt: NOT CREATED/).length).toBeGreaterThan(0);
     expect(
       screen.queryByRole("button", { name: "Submit for Approval" }),
     ).not.toBeInTheDocument();
@@ -553,7 +553,7 @@ describe("Content Review page and Session readiness projection", () => {
         screen.getByRole("heading", { name: "Không có quyền truy cập" }),
       ).toBeInTheDocument();
       expect(
-        screen.queryByRole("button", { name: "Bắt đầu Content Review" }),
+        screen.queryByRole("button", { name: "Bắt đầu thẩm định nội dung" }),
       ).not.toBeInTheDocument();
       expect(useAuctionContentReviewStore.getState().reviews).toEqual([]);
     });
@@ -567,7 +567,7 @@ describe("Content Review page and Session readiness projection", () => {
       screen.getByText(/content-review-linked-orq-cus-2026-001-v4/),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("heading", { name: "Package readiness" }).closest(
+      screen.getByRole("heading", { name: "Mức độ sẵn sàng của hồ sơ" }).closest(
         ".content-review-card",
       ),
     ).toHaveClass("content-review-card");

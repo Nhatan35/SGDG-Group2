@@ -287,18 +287,18 @@ describe("Approval Package workspace and read-only ADMIN queue", () => {
     renderPackage(prepared.session.sessionId);
     expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
     expect(
-      screen.getByText(/PROTOTYPE CONTENT MODEL/),
+      screen.getByText(/MÔ HÌNH NỘI DUNG THỬ NGHIỆM/),
     ).toBeVisible();
     expect(
       screen.getByText(prepared.completion.completionRecordId),
     ).toBeVisible();
     await user.click(
       screen.getByRole("button", {
-        name: "Chuẩn bị Approval Package",
+        name: "Chuẩn bị hồ sơ phê duyệt",
       }),
     );
     expect(
-      screen.getByRole("button", { name: "Gửi Approval Package" }),
+      screen.getByRole("button", { name: "Gửi hồ sơ phê duyệt" }),
     ).toBeVisible();
     expect(screen.getByText(/READY TO SUBMIT/)).toBeVisible();
     expect(
@@ -312,26 +312,26 @@ describe("Approval Package workspace and read-only ADMIN queue", () => {
     const user = userEvent.setup();
     renderPackage(prepared.session.sessionId);
     await user.click(
-      screen.getByRole("button", { name: "Gửi Approval Package" }),
+      screen.getByRole("button", { name: "Gửi hồ sơ phê duyệt" }),
     );
     const dialog = screen.getByRole("dialog", {
-      name: "Gửi Approval Package",
+      name: "Gửi hồ sơ phê duyệt",
     });
     expect(dialog).toHaveTextContent(
-      "This submits the Approval Package for ADMIN review only.",
+      "Thao tác này chỉ gửi hồ sơ để Admin xem xét.",
     );
     expect(dialog).toHaveTextContent(
-      "No approval decision is made by this action.",
+      "Thao tác này chưa tạo ra quyết định phê duyệt.",
     );
     expect(dialog).toHaveTextContent(
-      "The Session remains DRAFT / NOT_READY.",
+      "Phiên vẫn ở trạng thái BẢN NHÁP / CHƯA SẴN SÀNG.",
     );
     expect(dialog).toHaveTextContent(
-      "No Schedule or Publication is created.",
+      "Chưa tạo lịch hoặc xuất bản.",
     );
     await user.click(
       within(dialog).getByRole("button", {
-        name: "Submit Approval Package",
+        name: "Gửi hồ sơ phê duyệt",
       }),
     );
     expect(
@@ -339,7 +339,7 @@ describe("Approval Package workspace and read-only ADMIN queue", () => {
     ).toBeVisible();
     expect(screen.getByText("AWAITING_ADMIN_REVIEW")).toBeVisible();
     expect(
-      screen.queryByRole("button", { name: "Gửi Approval Package" }),
+      screen.queryByRole("button", { name: "Gửi hồ sơ phê duyệt" }),
     ).not.toBeInTheDocument();
     expect(useAuctionSessionStore.getState().sessions[0]).toMatchObject({
       lifecycleStatus: "DRAFT",
@@ -364,11 +364,11 @@ describe("Approval Package workspace and read-only ADMIN queue", () => {
     const user = userEvent.setup();
     renderPackage(prepared.session.sessionId);
     await user.click(
-      screen.getByRole("button", { name: "Gửi Approval Package" }),
+      screen.getByRole("button", { name: "Gửi hồ sơ phê duyệt" }),
     );
     await user.click(
       within(screen.getByRole("dialog")).getByRole("button", {
-        name: "Submit Approval Package",
+        name: "Gửi hồ sơ phê duyệt",
       }),
     );
     expect(
@@ -383,7 +383,7 @@ describe("Approval Package workspace and read-only ADMIN queue", () => {
     ).toHaveLength(0);
     expect(
       screen.getByRole("button", {
-        name: "Kiểm tra và làm mới Package",
+        name: "Kiểm tra và làm mới hồ sơ",
       }),
     ).toBeVisible();
   });
@@ -422,7 +422,7 @@ describe("Approval Package workspace and read-only ADMIN queue", () => {
     );
     expect(
       screen.queryByRole("button", {
-        name: "Chuẩn bị Approval Package",
+        name: "Chuẩn bị hồ sơ phê duyệt",
       }),
     ).not.toBeInTheDocument();
   });
@@ -490,10 +490,10 @@ describe("Approval Package workspace and read-only ADMIN queue", () => {
       </MemoryRouter>,
     );
     expect(
-      screen.getAllByText(/Approval Package: SUBMITTED/).length,
+      screen.getAllByText(/Hồ sơ phê duyệt: SUBMITTED/).length,
     ).toBeGreaterThan(0);
-    expect(screen.getByText(/Queue: AWAITING_ADMIN_REVIEW/)).toBeVisible();
-    expect(screen.getByText("Session Approval: NOT STARTED.")).toBeVisible();
+    expect(screen.getByText(/Hàng đợi Admin: AWAITING_ADMIN_REVIEW/)).toBeVisible();
+    expect(screen.getByText("Phê duyệt phiên: NOT STARTED.")).toBeVisible();
     expect(screen.getAllByText(/DRAFT/).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/NOT_READY/).length).toBeGreaterThan(0);
   });
@@ -507,7 +507,7 @@ describe("Approval Package workspace and read-only ADMIN queue", () => {
     expect(screen.getByText("Không có quyền truy cập")).toBeVisible();
     expect(
       screen.queryByRole("button", {
-        name: "Chuẩn bị Approval Package",
+        name: "Chuẩn bị hồ sơ phê duyệt",
       }),
     ).not.toBeInTheDocument();
   });

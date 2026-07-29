@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it } from "vitest";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
@@ -120,7 +120,7 @@ describe("Opening Request cross-role UI", () => {
       </MemoryRouter>,
     );
     await user.click(
-      screen.getByRole("button", { name: "Accept for Draft" }),
+      screen.getByRole("button", { name: "Tiếp nhận để chuẩn bị" }),
     );
     const dialog = screen.getByRole("dialog", {
       name: "Tiếp nhận để chuẩn bị bản nháp",
@@ -133,7 +133,7 @@ describe("Opening Request cross-role UI", () => {
       "Hồ sơ hợp lệ để tiếp nhận cho bước chuẩn bị bản nháp.",
     );
     await user.click(
-      screen.getByRole("button", { name: "Tiếp nhận để chuẩn bị" }),
+      within(dialog).getByRole("button", { name: "Tiếp nhận để chuẩn bị" }),
     );
     expect(
       useOpeningRequestStore
@@ -384,7 +384,7 @@ describe("Opening Request cross-role UI", () => {
       screen.getByText(/Scenario fixture tương thích chỉ đọc/),
     ).toBeInTheDocument();
     expect(
-      screen.queryByRole("button", { name: "Accept for Draft" }),
+      screen.queryByRole("button", { name: "Tiếp nhận để chuẩn bị" }),
     ).not.toBeInTheDocument();
   });
 });

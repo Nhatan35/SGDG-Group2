@@ -60,7 +60,7 @@ export function AdminLoginPage() {
       );
       return;
     }
-    adminLogin(role);
+    adminLogin(role, email.trim().toLowerCase());
     navigate(staffRoleMeta[role].workspace, { replace: true });
   }
   return (
@@ -123,6 +123,10 @@ export function AdminLoginPage() {
               </p>
             )}
             <button className="button primary">Đăng nhập</button>
+            <small>
+              Kiểm thử maker–checker: admin@sgdg.demo và
+              admin.checker@sgdg.demo.
+            </small>
           </form>
         </section>
       </section>
@@ -147,7 +151,9 @@ export function AdminDashboardPage() {
                 {i === 1 ? "ƯU TIÊN" : "XỬ LÝ"}
               </Badge>
               <strong>{x}</strong>
-              <button className="button ghost">Mở</button>
+              <button className="button ghost" disabled title="Hàng đợi minh họa">
+                Mở
+              </button>
             </div>
           ))}
         </Panel>
@@ -163,16 +169,20 @@ export function AdminDashboardPage() {
 }
 export function AdminUsersPage() {
   const { role } = useOutletContext<Context>();
-  const [dialog, setDialog] = useState<string | null>(null);
+  const [dialog, setDialog] = useState<{
+    title: string;
+    mode: "view" | "create" | "kyc" | "access";
+    accountId?: string;
+  } | null>(null);
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState("ALL");
-  const accountRows = [
+  const [accountRows, setAccountRows] = useState(() => [
     { id: "USR-1025", name: "Nguyễn Văn A", email: "nguyenvana@gmail.com", phone: "0909***125", userRole: "Người mua", kyc: "KYC 2", kycNote: "Đã xác minh", state: "ACTIVE", date: "20/05/2026" },
     { id: "USR-1024", name: "Trần Thị B", email: "tranb@gmail.com", phone: "0918***456", userRole: "Người bán", kyc: "KYC 1", kycNote: "Chờ duyệt", state: "PENDING", date: "20/05/2026" },
     { id: "USR-1023", name: "Lê Minh C", email: "leminhc@gmail.com", phone: "0933***789", userRole: "Người mua", kyc: "KYC 2", kycNote: "Đã xác minh", state: "ACTIVE", date: "19/05/2026" },
     { id: "USR-1022", name: "Phạm Hoàng D", email: "phamhoangd@gmail.com", phone: "0945***321", userRole: "Quản trị viên", kyc: "KYC 3", kycNote: "Đã xác minh", state: "ACTIVE", date: "18/05/2026" },
     { id: "USR-1021", name: "Đỗ Thùy E", email: "dothuye@gmail.com", phone: "0977***654", userRole: "Người mua", kyc: "KYC 1", kycNote: "Chờ bổ sung", state: "LOCKED", date: "18/05/2026" },
-  ];
+  ]);
   const filteredAccounts = accountRows.filter((account) => {
     const keyword = query.trim().toLowerCase();
     return (
@@ -219,7 +229,9 @@ export function AdminUsersPage() {
           <button
             type="button"
             className="management-create-button"
-            onClick={() => setDialog("Thêm người dùng mới")}
+            onClick={() =>
+              setDialog({ title: "Thêm người dùng mô phỏng", mode: "create" })
+            }
           >
             <UserPlus aria-hidden="true" /> Thêm người dùng
           </button>
@@ -265,9 +277,9 @@ export function AdminUsersPage() {
                   <td>{account.date}</td>
                   <td>
                     <div className="management-row-actions">
-                      <button type="button" aria-label={`Xem ${account.name}`} title="Xem hồ sơ" onClick={() => setDialog(`Xem hồ sơ ${account.name}`)}><Eye aria-hidden="true" /></button>
-                      <button type="button" aria-label={`Duyệt eKYC ${account.name}`} title="Duyệt eKYC" onClick={() => setDialog(`Cập nhật eKYC ${account.name}`)}><FileCheck2 aria-hidden="true" /></button>
-                      <button type="button" className={account.state === "LOCKED" ? "warning" : ""} aria-label={`Khóa ${account.name}`} title="Quản lý truy cập" onClick={() => setDialog(`Cập nhật quyền truy cập ${account.name}`)}><LockKeyhole aria-hidden="true" /></button>
+                      <button type="button" aria-label={`Xem ${account.name}`} title="Xem hồ sơ" onClick={() => setDialog({ title: `Xem hồ sơ ${account.name}`, mode: "view", accountId: account.id })}><Eye aria-hidden="true" /></button>
+                      <button type="button" aria-label={`Duyệt eKYC ${account.name}`} title="Duyệt eKYC" disabled={account.kycNote === "Đã xác minh"} onClick={() => setDialog({ title: `Duyệt eKYC ${account.name}`, mode: "kyc", accountId: account.id })}><FileCheck2 aria-hidden="true" /></button>
+                      <button type="button" className={account.state === "LOCKED" ? "warning" : ""} aria-label={`${account.state === "LOCKED" ? "Mở khóa" : "Khóa"} ${account.name}`} title="Quản lý truy cập" onClick={() => setDialog({ title: `${account.state === "LOCKED" ? "Mở khóa" : "Khóa tài khoản"} ${account.name}`, mode: "access", accountId: account.id })}><LockKeyhole aria-hidden="true" /></button>
                     </div>
                   </td>
                 </tr>
@@ -280,7 +292,54 @@ export function AdminUsersPage() {
       </section>
       {dialog && (
         <AuditDialog
-          title={dialog}
+          title={dialog.title}
+          readOnly={dialog.mode === "view"}
+          onConfirm={() => {
+            if (dialog.mode === "create") {
+              const id = `USR-${Date.now()}`;
+              setAccountRows((current) => [
+                {
+                  id,
+                  name: "Customer demo mới",
+                  email: "customer.new@sgdg.demo",
+                  phone: "09** *** ***",
+                  userRole: "Người mua",
+                  kyc: "KYC 0",
+                  kycNote: "Chưa bắt đầu",
+                  state: "PENDING",
+                  date: new Date().toLocaleDateString("vi-VN"),
+                },
+                ...current,
+              ]);
+            }
+            if (dialog.mode === "kyc") {
+              setAccountRows((current) =>
+                current.map((account) =>
+                  account.id === dialog.accountId
+                    ? {
+                        ...account,
+                        kyc: "KYC 2",
+                        kycNote: "Đã xác minh",
+                        state: "ACTIVE",
+                      }
+                    : account,
+                ),
+              );
+            }
+            if (dialog.mode === "access") {
+              setAccountRows((current) =>
+                current.map((account) =>
+                  account.id === dialog.accountId
+                    ? {
+                        ...account,
+                        state:
+                          account.state === "LOCKED" ? "ACTIVE" : "LOCKED",
+                      }
+                    : account,
+                ),
+              );
+            }
+          }}
           close={() => setDialog(null)}
         />
       )}
@@ -290,6 +349,15 @@ export function AdminUsersPage() {
 export function AdminAssetsPage() {
   const { role } = useOutletContext<Context>();
   const edit = role === "ADMIN" || role === "CONTENT_STAFF";
+  const [assetRows, setAssetRows] = useState(() =>
+    assets.map(([id, name, status], index) => ({
+      id,
+      name,
+      status,
+      files: index === 2 ? "Thiếu 1 tệp" : "Đầy đủ",
+    })),
+  );
+  const [selectedAsset, setSelectedAsset] = useState<string | null>(null);
   return (
     <AdminPage
       title="Quản lý tài sản"
@@ -297,24 +365,44 @@ export function AdminAssetsPage() {
     >
       <Filters />
       <Table headers={["Mã", "Tài sản", "Trạng thái", "Hồ sơ", "Thao tác"]}>
-        {assets.map((x, i) => (
-          <tr key={x[0]}>
-            <td>{x[0]}</td>
+        {assetRows.map((x, i) => (
+          <tr key={x.id}>
+            <td>{x.id}</td>
             <td>
-              <strong>{x[1]}</strong>
+              <strong>{x.name}</strong>
             </td>
+            <td><Badge tone={i < 2 ? "success" : "warning"}>{x.status}</Badge></td>
+            <td>{x.files}</td>
             <td>
-              <Badge tone={i < 2 ? "success" : "warning"}>{x[2]}</Badge>
-            </td>
-            <td>{i === 2 ? "Thiếu 1 tệp" : "Đầy đủ"}</td>
-            <td>
-              <button disabled={!edit} className="button ghost">
+              <button disabled={!edit} className="button ghost" onClick={() => setSelectedAsset(x.id)}>
                 {edit ? "Biên tập" : "Chỉ xem"}
               </button>
             </td>
           </tr>
         ))}
       </Table>
+      {selectedAsset && (
+        <AuditDialog
+          title={`Cập nhật hồ sơ tài sản ${selectedAsset}`}
+          onConfirm={() =>
+            setAssetRows((current) =>
+              current.map((asset) =>
+                asset.id === selectedAsset
+                  ? {
+                      ...asset,
+                      files: "Đầy đủ",
+                      status:
+                        asset.status === "DRAFT"
+                          ? "UNDER_REVIEW"
+                          : asset.status,
+                    }
+                  : asset,
+              ),
+            )
+          }
+          close={() => setSelectedAsset(null)}
+        />
+      )}
     </AdminPage>
   );
 }
@@ -506,13 +594,16 @@ export function LiveOpsPage() {
 export function AdminPaymentsPage() {
   const { role } = useOutletContext<Context>();
   const verify = role === "ADMIN" || role === "FINANCE";
-  const [dialog, setDialog] = useState<string | null>(null);
+  const [dialog, setDialog] = useState<{
+    id: string;
+    mode: "view" | "verify";
+  } | null>(null);
   const [activeStatus, setActiveStatus] = useState<
     "ALL" | "PENDING" | "VERIFIED" | "REJECTED"
   >("PENDING");
   const [query, setQuery] = useState("");
   const [bank, setBank] = useState("ALL");
-  const transactions = [
+  const [transactions, setTransactions] = useState(() => [
     ["PAY-2024-0528-001", "anh***28@gmail.com", "BIDV", "7921", 450_000_000, "Thanh toán phiên #AUC-2024-0528-001", "PENDING"],
     ["PAY-2024-0530-002", "minh***89@gmail.com", "Vietcombank", "1234", 3_250_000_000, "Thanh toán phiên #AUC-2024-0530-045", "PENDING"],
     ["PAY-2024-0526-003", "lan***86@gmail.com", "Techcombank", "5678", 650_000_000, "Thanh toán đặt cọc #AUC-2024-0519-045", "VERIFIED"],
@@ -527,7 +618,7 @@ export function AdminPaymentsPage() {
     amount: Number(amount),
     content: String(content),
     status: status as "PENDING" | "VERIFIED" | "REJECTED",
-  }));
+  })));
   const statusTabs = [
     ["ALL", "Tất cả"],
     ["PENDING", "Chờ xác minh"],
@@ -630,13 +721,17 @@ export function AdminPaymentsPage() {
                         disabled={!verify}
                         aria-label={`Xác minh ${transaction.id}`}
                         title={verify ? "Xác minh giao dịch" : "Không có quyền"}
-                        onClick={() => setDialog(transaction.id)}
+                        onClick={() =>
+                          setDialog({ id: transaction.id, mode: "verify" })
+                        }
                       ><FileCheck2 aria-hidden="true" /></button>
                       <button
                         type="button"
                         aria-label={`Xem ${transaction.id}`}
                         title="Xem chi tiết"
-                        onClick={() => setDialog(transaction.id)}
+                        onClick={() =>
+                          setDialog({ id: transaction.id, mode: "view" })
+                        }
                       ><Eye aria-hidden="true" /></button>
                     </div>
                   </td>
@@ -652,16 +747,34 @@ export function AdminPaymentsPage() {
           <span>Hiển thị {filteredTransactions.length} / {transactions.length} giao dịch mới nhất</span>
           <nav aria-label="Phân trang giao dịch">
             <button type="button" disabled>‹</button>
-            <button type="button" className="active">1</button>
-            <button type="button">2</button>
-            <button type="button">3</button>
-            <button type="button">›</button>
+            <button type="button" className="active" disabled>1</button>
+            <button type="button" disabled title="Dữ liệu demo chỉ có một trang">2</button>
+            <button type="button" disabled title="Dữ liệu demo chỉ có một trang">3</button>
+            <button type="button" disabled>›</button>
           </nav>
         </footer>
       </section>
       {dialog && (
         <AuditDialog
-          title={`Xác nhận thanh toán ${dialog} & kích hoạt bàn giao`}
+          title={
+            dialog.mode === "verify"
+              ? `Xác minh thanh toán ${dialog.id}`
+              : `Chi tiết thanh toán ${dialog.id}`
+          }
+          readOnly={dialog.mode === "view"}
+          onConfirm={
+            dialog.mode === "verify"
+              ? () =>
+                  setTransactions((current) =>
+                    current.map((transaction) =>
+                      transaction.id === dialog.id &&
+                      transaction.status === "PENDING"
+                        ? { ...transaction, status: "VERIFIED" as const }
+                        : transaction,
+                    ),
+                  )
+              : undefined
+          }
           close={() => setDialog(null)}
         />
       )}
@@ -669,6 +782,7 @@ export function AdminPaymentsPage() {
   );
 }
 export function AdminReportsPage() {
+  const [exported, setExported] = useState(false);
   const reports = [
     ["Khối lượng phiên", 78],
     ["Tỷ lệ hoàn tất", 91],
@@ -687,7 +801,12 @@ export function AdminReportsPage() {
           <option>30 ngày gần nhất</option>
           <option>Quý hiện tại</option>
         </select>
-        <button className="button secondary">Xuất báo cáo</button>
+        <button
+          className="button secondary"
+          onClick={() => setExported(true)}
+        >
+          {exported ? "Đã chuẩn bị bản xuất mô phỏng" : "Xuất báo cáo"}
+        </button>
       </div>
       <div className="report-grid">
         {reports.map(([label, value], i) => (
@@ -804,12 +923,12 @@ function ManagementFooter({ shown, total }: { shown: number; total: number }) {
       <span>Hiển thị {shown ? `1 - ${shown}` : "0"} / {total.toLocaleString("vi-VN")} kết quả</span>
       <nav aria-label="Phân trang danh sách">
         <button type="button" disabled>‹</button>
-        <button type="button" className="active">1</button>
-        <button type="button">2</button>
-        <button type="button">3</button>
+        <button type="button" className="active" disabled>1</button>
+        <button type="button" disabled title="Dữ liệu demo chỉ có một trang">2</button>
+        <button type="button" disabled title="Dữ liệu demo chỉ có một trang">3</button>
         <span>…</span>
-        <button type="button">26</button>
-        <button type="button">›</button>
+        <button type="button" disabled title="Dữ liệu demo chỉ có một trang">26</button>
+        <button type="button" disabled>›</button>
       </nav>
     </footer>
   );
@@ -848,15 +967,26 @@ function Table({
     </div>
   );
 }
-function AuditDialog({ title, close }: { title: string; close: () => void }) {
+function AuditDialog({
+  title,
+  close,
+  onConfirm,
+  readOnly = false,
+}: {
+  title: string;
+  close: () => void;
+  onConfirm?: () => void;
+  readOnly?: boolean;
+}) {
   const [reason, setReason] = useState("");
+  const isReadOnly = readOnly || title.startsWith("Xem ");
   return (
     <div className="modal-backdrop">
       <section role="dialog" aria-modal="true" className="audit-dialog">
         <ShieldAlert />
         <h2>{title}</h2>
-        <p>Hành động sẽ được ghi vào audit log.</p>
-        <label>
+        <p>{isReadOnly ? "Thông tin chỉ đọc từ dữ liệu mô phỏng." : "Hành động sẽ được ghi vào nhật ký audit."}</p>
+        {!isReadOnly && <label>
           Lý do bắt buộc
           <textarea
             autoFocus
@@ -864,17 +994,18 @@ function AuditDialog({ title, close }: { title: string; close: () => void }) {
             value={reason}
             onChange={(e) => setReason(e.target.value)}
           />
-        </label>
+        </label>}
         <div>
-          <button className="button secondary" onClick={close}>
-            Hủy
-          </button>
+          {!isReadOnly && <button className="button secondary" onClick={close}>Hủy</button>}
           <button
-            disabled={!reason.trim()}
+            disabled={!isReadOnly && !reason.trim()}
             className="button primary"
-            onClick={close}
+            onClick={() => {
+              onConfirm?.();
+              close();
+            }}
           >
-            Xác nhận
+            {isReadOnly ? "Đóng" : "Xác nhận"}
           </button>
         </div>
       </section>

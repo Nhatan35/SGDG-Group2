@@ -4,6 +4,8 @@ export interface Auction extends AuctionSummary {
   category: string;
   region: string;
   image: string;
+  displayImage?: string;
+  transparentDisplayImage?: string;
   startPrice: number;
   startsAt: string;
   registrationDeadline: string;
@@ -66,6 +68,23 @@ const featuredProductImages: Record<string, string> = {
   "phone-07": "/assets/catalog-phone-07-hd.png",
   "vehicle-07": "/assets/catalog-vehicle-07-hd.png",
   "art-07": "/assets/catalog-art-07-hd.png",
+};
+
+const auctionRoomDisplayImages: Record<
+  string,
+  Pick<Auction, "displayImage" | "transparentDisplayImage">
+> = {
+  "painting-dalat": {
+    displayImage: "/images/auction-room/featured/featured-painting.webp",
+  },
+  "watch-07": {
+    transparentDisplayImage:
+      "/images/auction-room/featured/featured-watch.png",
+  },
+  "jewelry-07": {
+    transparentDisplayImage:
+      "/images/auction-room/featured/featured-jewelry.png",
+  },
 };
 
 const statusPattern: AuctionStatus[] = [
@@ -478,6 +497,7 @@ function createAuction(
     image:
       featuredProductImages[auctionId] ??
       `/assets/catalog-generated/${config.slug}-${String(itemIndex + 1).padStart(2, "0")}.jpg`,
+    ...auctionRoomDisplayImages[auctionId],
     status,
     startPrice,
     currentPrice,

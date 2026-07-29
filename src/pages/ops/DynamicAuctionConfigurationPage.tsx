@@ -144,7 +144,7 @@ export function DynamicAuctionConfigurationPage({
       <section className="configuration-page" aria-busy="true">
         <header className="ops-heading">
           <div>
-            <span>AUCTION CONFIGURATION</span>
+            <span>CẤU HÌNH ĐẤU GIÁ</span>
             <h1>Cấu hình phiên đấu giá</h1>
           </div>
         </header>
@@ -156,7 +156,7 @@ export function DynamicAuctionConfigurationPage({
       <section className="configuration-page">
         <header className="ops-heading">
           <div>
-            <span>AUCTION CONFIGURATION</span>
+            <span>CẤU HÌNH ĐẤU GIÁ</span>
             <h1>Cấu hình phiên đấu giá</h1>
           </div>
         </header>
@@ -264,7 +264,7 @@ export function DynamicAuctionConfigurationPage({
     <section className="configuration-page">
       <header className="ops-heading">
         <div>
-          <span>AUCTION CONFIGURATION · CONTENT STAFF</span>
+          <span>CẤU HÌNH ĐẤU GIÁ · NHÂN VIÊN NỘI DUNG</span>
           <h1>Cấu hình phiên đấu giá</h1>
           <p>
             Configuration confirmation không phải Session Approval, Schedule
@@ -284,30 +284,30 @@ export function DynamicAuctionConfigurationPage({
 
       <div className="configuration-layout">
         <section className="ops-panel configuration-context">
-          <h2>Session và lineage</h2>
+          <h2>Phiên đấu giá và nguồn dữ liệu</h2>
           <dl className="configuration-definition-grid">
             <div>
-              <dt>Session</dt>
+              <dt>Phiên đấu giá</dt>
               <dd>{session.sessionId}</dd>
             </div>
             <div>
-              <dt>Auction code</dt>
+              <dt>Mã đấu giá</dt>
               <dd>{session.auctionCode}</dd>
             </div>
             <div>
-              <dt>Creation source</dt>
+              <dt>Nguồn tạo</dt>
               <dd>{session.creationSource}</dd>
             </div>
             <div>
-              <dt>Management mode</dt>
+              <dt>Chế độ quản lý</dt>
               <dd>{session.managementMode} · governed read-only</dd>
             </div>
             <div>
-              <dt>Session version</dt>
+              <dt>Phiên bản</dt>
               <dd>v{session.currentVersion}</dd>
             </div>
             <div>
-              <dt>Configuration</dt>
+              <dt>Cấu hình</dt>
               <dd>
                 {proposal
                   ? `${proposal.configurationId} · proposal v${proposal.proposalVersion}`
@@ -330,9 +330,9 @@ export function DynamicAuctionConfigurationPage({
         </section>
 
         <aside className="ops-panel configuration-readiness">
-          <h2>Readiness</h2>
+          <h2>Mức độ sẵn sàng</h2>
           {!proposal ? (
-            <p>Configuration chưa được bắt đầu.</p>
+            <p>Chưa bắt đầu cấu hình.</p>
           ) : (
             validation.findings.map((finding) => (
               <article
@@ -374,7 +374,7 @@ export function DynamicAuctionConfigurationPage({
 
       {proposal?.correctionContext && (
         <section className="ops-panel configuration-correction" role="alert">
-          <h2>ADMIN yêu cầu chỉnh sửa</h2>
+          <h2>Admin yêu cầu chỉnh sửa</h2>
           <p>{proposal.correctionContext.reason}</p>
           <p>
             Phần bị ảnh hưởng:{" "}
@@ -385,7 +385,7 @@ export function DynamicAuctionConfigurationPage({
 
       {proposal && (
         <section className="ops-panel configuration-policy-panel">
-          <h2>Auction Room and Member Listing Fee</h2>
+          <h2>Phòng đấu giá và phí niêm yết thành viên</h2>
           <p className="configuration-policy-disclaimer">
             <strong>{AUCTION_ROOM_FEE_POLICY_DISCLAIMER}</strong>
           </p>
@@ -396,13 +396,13 @@ export function DynamicAuctionConfigurationPage({
           <p>{PRICE_BAND_NORMALIZATION_DISCLAIMER}</p>
           <dl className="configuration-definition-grid">
             <div>
-              <dt>Decision</dt>
+              <dt>Quyết định</dt>
               <dd className="configuration-wrap-id">
                 {policy.decisionId} · v{policy.decisionVersion}
               </dd>
             </div>
             <div>
-              <dt>Authority</dt>
+              <dt>Thẩm quyền</dt>
               <dd>{policy.authorityType}</dd>
             </div>
             <div>
@@ -414,7 +414,7 @@ export function DynamicAuctionConfigurationPage({
               <dd>{formatMoney(localRules.startingPrice)}</dd>
             </div>
             <div>
-              <dt>Room and Member Listing Fee Resolution Complete?</dt>
+              <dt>Đã xác định đủ phòng đấu giá và phí niêm yết?</dt>
               <dd>{proposal.overallConfigurationResolutionState}</dd>
             </div>
             <div>
@@ -434,7 +434,7 @@ export function DynamicAuctionConfigurationPage({
               </dd>
             </div>
             <div>
-              <dt>Membership reference ID</dt>
+              <dt>Mã tham chiếu thành viên</dt>
               <dd>
                 {proposal.memberTitleReference
                   ? proposal.memberTitleReference.memberId
@@ -444,7 +444,7 @@ export function DynamicAuctionConfigurationPage({
               </dd>
             </div>
             <div>
-              <dt>Membership reference version</dt>
+              <dt>Phiên bản tham chiếu thành viên</dt>
               <dd>
                 {proposal.memberTitleReference?.referenceVersion ??
                   (session.managementMode === "SGDG_MANAGED"
@@ -453,7 +453,7 @@ export function DynamicAuctionConfigurationPage({
               </dd>
             </div>
             <div>
-              <dt>Member Title</dt>
+              <dt>Hạng thành viên</dt>
               <dd>
                 {proposal.memberTitleReference?.title ??
                   (session.managementMode === "SGDG_MANAGED"
@@ -528,7 +528,7 @@ export function DynamicAuctionConfigurationPage({
             <p role="status">Đã gửi để ADMIN xác nhận · read-only.</p>
           )}
           {proposal.status === "CONFIRMED" && snapshot && (
-            <p role="status">Confirmed policy evidence is immutable.</p>
+            <p role="status">Bằng chứng chính sách đã xác nhận không thể chỉnh sửa.</p>
           )}
           {proposal.legacyPolicyState && legacySnapshot && (
             <p role="status">
@@ -627,11 +627,11 @@ export function DynamicAuctionConfigurationPage({
             </div>
             <dl className="configuration-definition-grid">
               <div>
-                <dt>Proposed starting price</dt>
+                <dt>Giá khởi điểm đề xuất</dt>
                 <dd>{formatMoney(localRules.startingPrice)}</dd>
               </div>
               <div>
-                <dt>Proposed minimum increment</dt>
+                <dt>Bước giá tối thiểu đề xuất</dt>
                 <dd>{formatMoney(localRules.minimumIncrement)}</dd>
               </div>
               <div>
@@ -733,7 +733,7 @@ export function DynamicAuctionConfigurationPage({
 
       {proposal && (
         <section className="ops-panel configuration-history">
-          <h2>Lịch sử Configuration</h2>
+          <h2>Lịch sử cấu hình</h2>
           <ol>
             {proposal.history.map((entry) => (
               <li key={entry.historyId}>

@@ -29,6 +29,14 @@
   display: grid;
   margin-top: 15px;
 }
+.admin-nav-section {
+  margin: 14px 10px 4px;
+  color: #9f968d;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
 .admin-sidebar a {
   display: flex;
   align-items: center;

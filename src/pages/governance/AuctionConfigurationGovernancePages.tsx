@@ -60,8 +60,8 @@ export function AuctionConfigurationGovernanceQueuePage() {
   if (role !== "ADMIN")
     return (
       <section className="configuration-page">
-        <h1>Configuration Governance</h1>
-        <p role="alert">ACCESS_DENIED</p>
+        <h1>Quản trị cấu hình phiên</h1>
+        <p role="alert">Bạn không có quyền truy cập chức năng này.</p>
       </section>
     );
 
@@ -69,27 +69,27 @@ export function AuctionConfigurationGovernanceQueuePage() {
     <section className="configuration-page">
       <header className="ops-heading">
         <div>
-          <span>GOVERNANCE · ADMIN ONLY</span>
-          <h1>Configuration Governance Queue</h1>
+          <span>QUẢN TRỊ · DÀNH CHO ADMIN</span>
+          <h1>Phê duyệt cấu hình phiên</h1>
           <p>
-            Narrow queue for Configuration confirmation only. This is not
-            Session Approval.
+            Hàng đợi xác nhận cấu hình do Nhân viên nội dung gửi lên. Xác nhận
+            cấu hình không đồng nghĩa với phê duyệt hoặc công bố phiên.
           </p>
         </div>
       </header>
       <section className="ops-panel configuration-queue">
-        <h2>Submitted and governed proposals</h2>
+        <h2>Đề xuất đã gửi và lịch sử xử lý</h2>
         <div className="configuration-table-wrap">
           <table>
             <thead>
               <tr>
-                <th>Configuration</th>
-                <th>Session</th>
-                <th>Source / mode</th>
-                <th>Proposal</th>
-                <th>Submitted</th>
-                <th>Blocker</th>
-                <th>Status</th>
+                <th>Cấu hình</th>
+                <th>Phiên đấu giá</th>
+                <th>Nguồn / chế độ</th>
+                <th>Phiên bản đề xuất</th>
+                <th>Ngày gửi</th>
+                <th>Điều kiện cần xử lý</th>
+                <th>Trạng thái</th>
               </tr>
             </thead>
             <tbody>
@@ -149,7 +149,13 @@ export function AuctionConfigurationGovernanceQueuePage() {
           </table>
         </div>
         {!governed.length && (
-          <p>Chưa có Configuration Proposal nào trong governance queue.</p>
+          <div className="configuration-empty">
+            <h3>Chưa có đề xuất cấu hình</h3>
+            <p>
+              Dữ liệu sẽ xuất hiện khi Nhân viên nội dung hoàn tất cấu hình
+              phiên và chọn “Gửi phê duyệt”.
+            </p>
+          </div>
         )}
       </section>
     </section>
@@ -199,8 +205,8 @@ export function AuctionConfigurationGovernanceDetailPage() {
   if (role !== "ADMIN")
     return (
       <section className="configuration-page">
-        <h1>Configuration Governance</h1>
-        <p role="alert">ACCESS_DENIED</p>
+        <h1>Quản trị cấu hình phiên</h1>
+        <p role="alert">Bạn không có quyền truy cập chức năng này.</p>
       </section>
     );
   if (!proposal || !session) return <NotFoundPage />;
@@ -265,7 +271,7 @@ export function AuctionConfigurationGovernanceDetailPage() {
       <header className="ops-heading">
         <div>
           <span>GOVERNANCE · CONFIGURATION CONFIRMATION</span>
-          <h1>Configuration Proposal Detail</h1>
+          <h1>Chi tiết đề xuất cấu hình</h1>
           <p>{proposal.configurationId}</p>
         </div>
         <Badge
@@ -285,7 +291,7 @@ export function AuctionConfigurationGovernanceDetailPage() {
 
       <div className="configuration-layout">
         <section className="ops-panel">
-          <h2>Session identity and lineage</h2>
+          <h2>Thông tin phiên và nguồn hình thành</h2>
           <dl className="configuration-definition-grid">
             <div>
               <dt>Session</dt>
@@ -468,7 +474,7 @@ export function AuctionConfigurationGovernanceDetailPage() {
                 setDialog("correction");
               }}
             >
-              Request Correction
+              Yêu cầu chỉnh sửa
             </Button>
             <Button
               onClick={() => {
@@ -481,7 +487,7 @@ export function AuctionConfigurationGovernanceDetailPage() {
               }
               aria-describedby="configuration-confirm-help"
             >
-              Confirm Configuration
+              Xác nhận cấu hình
             </Button>
             <small id="configuration-confirm-help">
               {proposal.overallConfigurationResolutionState === "READY"
@@ -529,7 +535,7 @@ export function AuctionConfigurationGovernanceDetailPage() {
       </section>
 
       <section className="ops-panel configuration-history">
-        <h2>Submission and immutable-looking history</h2>
+        <h2>Lịch sử gửi và xử lý cấu hình</h2>
         <ol>
           {proposal.history.map((entry) => (
             <li key={entry.historyId}>
@@ -551,7 +557,7 @@ export function AuctionConfigurationGovernanceDetailPage() {
         onOpenChange={(open) => {
           if (!open) closeDialog();
         }}
-        title="Request Configuration Correction"
+        title="Yêu cầu chỉnh sửa cấu hình"
         description={`${session.sessionId} · ${proposal.configurationId} · proposal v${proposal.proposalVersion}`}
         initialFocusRef={correctionReasonRef}
         preventClose={busy}
@@ -613,8 +619,8 @@ export function AuctionConfigurationGovernanceDetailPage() {
         onOpenChange={(open) => {
           if (!open) closeDialog();
         }}
-        title="Confirm Configuration"
-        description="Configuration confirmation only"
+        title="Xác nhận cấu hình"
+        description="Chỉ xác nhận cấu hình, chưa phê duyệt hoặc công bố phiên"
         preventClose={busy}
         footer={
           <>
@@ -622,7 +628,7 @@ export function AuctionConfigurationGovernanceDetailPage() {
               Cancel
             </Button>
             <Button onClick={runConfirm} loading={busy}>
-              Confirm Configuration
+              Xác nhận cấu hình
             </Button>
           </>
         }
@@ -737,9 +743,9 @@ export function AuctionConfigurationGovernanceDetailPage() {
           ordinary-Room configuration. Separate governed policies are required
           before either special Room can be used.
         </p>
-        <p>This confirms Configuration only.</p>
-        <p>The Session remains DRAFT / NOT_READY.</p>
-        <p>No Approval Package, Schedule or Publication is created.</p>
+        <p>Thao tác này chỉ xác nhận cấu hình.</p>
+        <p>Phiên vẫn ở trạng thái bản nháp/chưa sẵn sàng.</p>
+        <p>Chưa tạo hồ sơ phê duyệt, lịch hoặc bản công bố.</p>
         {error && (
           <p className="ops-conflict" role="alert">
             {error}

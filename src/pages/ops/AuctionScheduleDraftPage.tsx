@@ -94,7 +94,7 @@ export function AuctionScheduleDraftPage() {
   if (!session)
     return (
       <main className="schedule-workspace">
-        <h1>Schedule Preparation</h1>
+        <h1>Chuẩn bị lịch phiên</h1>
         <BlockedState
           title="Session not found"
           description="Không tìm thấy dynamic Auction Session."
@@ -104,7 +104,7 @@ export function AuctionScheduleDraftPage() {
   if (actorRole !== "CONTENT_STAFF")
     return (
       <main className="schedule-workspace">
-        <h1>Schedule Preparation</h1>
+        <h1>Chuẩn bị lịch phiên</h1>
         <BlockedState
           title="Unauthorized"
           description="Only CONTENT_STAFF may prepare a Schedule Draft."
@@ -188,37 +188,37 @@ export function AuctionScheduleDraftPage() {
   return (
     <main className="schedule-workspace">
       <header>
-        <p className="schedule-eyebrow">AUCTION OPERATIONS · PROTOTYPE</p>
-        <h1>Schedule Preparation</h1>
+        <p className="schedule-eyebrow">VẬN HÀNH ĐẤU GIÁ · BẢN MÔ PHỎNG</p>
+        <h1>Chuẩn bị lịch phiên</h1>
         <p className="schedule-disclaimer">
           {PROTOTYPE_SCHEDULE_CLASSIFICATION}
         </p>
       </header>
 
       <section className="schedule-evidence" aria-label="Schedule evidence">
-        <h2>Authoritative evidence</h2>
+        <h2>Dữ liệu chính thức</h2>
         <dl>
           <div>
-            <dt>Session</dt>
+            <dt>Phiên đấu giá</dt>
             <dd>{session.sessionId}</dd>
           </div>
           <div>
-            <dt>Session state</dt>
+            <dt>Trạng thái phiên</dt>
             <dd>{session.lifecycleStatus} / {session.publicationStatus}</dd>
           </div>
           <div>
-            <dt>Approval Decision</dt>
+            <dt>Quyết định phê duyệt</dt>
             <dd>
               {decision?.decisionId ?? "NOT RECORDED"} ·{" "}
               {decision?.outcome ?? "NOT APPROVED"}
             </dd>
           </div>
           <div>
-            <dt>Evidence validity</dt>
+            <dt>Hiệu lực bằng chứng</dt>
             <dd>{evidenceValidity ?? "NOT AVAILABLE"}</dd>
           </div>
           <div>
-            <dt>Configured Auction Room (read-only)</dt>
+            <dt>Phòng đấu giá đã cấu hình (chỉ đọc)</dt>
             <dd>{snapshot?.roomResolution.displayName ?? "NOT RESOLVED"}</dd>
           </div>
         </dl>
@@ -228,8 +228,8 @@ export function AuctionScheduleDraftPage() {
         <BlockedState title={blocker.code} description={blocker.message} />
       ) : !draft ? (
         <section className="schedule-card">
-          <h2>Schedule Draft</h2>
-          <p>Schedule: NOT CREATED</p>
+          <h2>Bản nháp lịch phiên</h2>
+          <p>Lịch phiên: CHƯA TẠO</p>
           <Button variant="primary" onClick={create}>
             Tạo Schedule Draft
           </Button>
@@ -237,15 +237,15 @@ export function AuctionScheduleDraftPage() {
       ) : (
         <section className="schedule-card">
           <div className="schedule-status-row">
-            <div><span>Status</span><strong>{draft.status}</strong></div>
+            <div><span>Trạng thái</span><strong>{draft.status}</strong></div>
             <div>
-              <span>Completeness</span>
+              <span>Mức độ hoàn thiện</span>
               <strong>
                 {draft.completeness.complete ? "COMPLETE" : "INCOMPLETE"}
               </strong>
             </div>
             <div>
-              <span>scheduleVersion</span>
+              <span>Phiên bản lịch</span>
               <strong>{draft.scheduleVersion}</strong>
             </div>
           </div>
@@ -279,7 +279,7 @@ export function AuctionScheduleDraftPage() {
             ))}
           </div>
           <div className="schedule-findings" aria-live="polite">
-            <h3>Completeness findings</h3>
+            <h3>Kết quả kiểm tra mức độ hoàn thiện</h3>
             {draft.completeness.findingCodes.length ? (
               <ul>
                 {draft.completeness.findingCodes.map((code) => (
@@ -287,14 +287,14 @@ export function AuctionScheduleDraftPage() {
                 ))}
               </ul>
             ) : (
-              <p>Không có finding.</p>
+              <p>Không có vấn đề.</p>
             )}
           </div>
           <Button variant="primary" onClick={save}>
             Lưu Schedule Draft
           </Button>
           <div className="schedule-history">
-            <h3>Draft history</h3>
+            <h3>Lịch sử bản nháp</h3>
             <ol>
               {draft.history.map((entry) => (
                 <li key={entry.historyId}>
@@ -310,8 +310,8 @@ export function AuctionScheduleDraftPage() {
       {error && <p role="alert">{error}</p>}
       {success && <p role="status">{success}</p>}
       <aside className="schedule-boundary">
-        <strong>Schedule Draft chưa phải lịch đã xác nhận.</strong>
-        <p>Việc lưu Draft không mở Registration và không xuất bản Auction.</p>
+        <strong>Bản nháp lịch chưa phải lịch đã xác nhận.</strong>
+        <p>Việc lưu bản nháp không mở đăng ký và không xuất bản phiên đấu giá.</p>
         <p>
           Schedule Confirmation: NOT STARTED · Registration: NOT OPEN ·
           Publication: NOT STARTED
