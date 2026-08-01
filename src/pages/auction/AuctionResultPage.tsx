@@ -1,4 +1,11 @@
-import { Clock3, FileCheck2, History, ShieldAlert } from "lucide-react";
+import {
+  CircleDollarSign,
+  Clock3,
+  FileCheck2,
+  History,
+  ShieldAlert,
+} from "lucide-react";
+import { useEffect } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import { Badge } from "../../components/common/Badge";
 import { ButtonLink } from "../../components/common/Button";
@@ -12,22 +19,102 @@ import {
 } from "../../services/mock/auctionResultService";
 import { formatDateTime, formatMoney } from "../../utils/format";
 import { formatDuration, useDemoClock } from "../../hooks/useDemoClock";
+import {
+  type AuctionDepositStatus,
+  useDemoStore,
+} from "../../store/demoStore";
+import { useFinanceFlowStore } from "../../store/financeFlowStore";
 import { NotFoundPage } from "../NotFoundPage";
 import "../../styles/auction-result.css";
+
+const depositStatusLabels: Record<AuctionDepositStatus, string> = {
+  ACTIVE: "Đang được giữ",
+  ON_HOLD: "Tạm giữ để đối soát",
+  REFUND_PENDING: "Đang chờ hoàn cọc",
+  REFUNDED: "Đã hoàn vào ví",
+  FORFEITED: "Đã thu cọc",
+  APPLIED_TO_PAYMENT: "Đã khấu trừ thanh toán",
+};
 
 export function AuctionResultPage() {
   const { auctionId } = useParams();
   const now = useDemoClock();
   const auction = auctions.find((item) => item.id === auctionId);
   const [params, setParams] = useSearchParams();
-
-  if (!auction) return <NotFoundPage />;
-
   const requested = params.get("scenario");
   const scenario = resultScenarios.includes(requested as AuctionResultScenario)
     ? (requested as AuctionResultScenario)
     : "rank-1-invited";
-  const fixture = getAuctionResultFixture(auction.id, scenario);
+  const fixture = getAuctionResultFixture(auction?.id ?? "", scenario);
+  const userName = useDemoStore((state) => state.userName);
+  const bankAccount = useDemoStore((state) => state.bankAccounts[0]);
+  const depositRecord = useDemoStore((state) =>
+    auctionId ? state.auctionDepositRecords[auctionId] : undefined,
+  );
+  const holdDeposit = useDemoStore((state) => state.holdAuctionDeposit);
+  const releaseDepositHold = useDemoStore(
+    (state) => state.releaseAuctionDepositHold,
+  );
+  const requestDepositRefund = useDemoStore(
+    (state) => state.requestAuctionDepositRefund,
+  );
+  const createDepositRefund = useFinanceFlowStore(
+    (state) => state.createDepositRefundRequest,
+  );
+
+  useEffect(() => {
+    if (!auction || !fixture) return;
+
+    if (scenario === "payment-ambiguous") {
+      holdDeposit(auction.id);
+      return;
+    }
+
+    const refundReason =
+      scenario === "cancelled"
+        ? ("AUCTION_CANCELLED" as const)
+        : scenario === "top3-exhausted"
+          ? ("AUCTION_FAILED" as const)
+          : scenario === "not-top-3"
+            ? ("NOT_WINNER" as const)
+            : null;
+
+    if (!refundReason) {
+      releaseDepositHold(auction.id);
+      return;
+    }
+
+    requestDepositRefund(auction.id, refundReason);
+    const record =
+      useDemoStore.getState().auctionDepositRecords[auction.id];
+    if (!record || record.status !== "REFUND_PENDING") return;
+
+    const reasonLabels = {
+      NOT_WINNER: "Hoàn cọc do khách hàng không trúng đấu giá",
+      AUCTION_CANCELLED: "Hoàn cọc do phiên đấu giá bị hủy",
+      AUCTION_FAILED: "Hoàn cọc do phiên không hình thành người thắng hợp lệ",
+    } as const;
+    createDepositRefund({
+      auctionId: auction.id,
+      depositReference: record.reference,
+      customer: userName,
+      amount: record.amount,
+      bankName: bankAccount?.bankName ?? "Ví SGDG",
+      reason: reasonLabels[refundReason],
+    });
+  }, [
+    auction,
+    bankAccount?.bankName,
+    createDepositRefund,
+    fixture,
+    holdDeposit,
+    releaseDepositHold,
+    requestDepositRefund,
+    scenario,
+    userName,
+  ]);
+
+  if (!auction) return <NotFoundPage />;
 
   if (!fixture) {
     return (
@@ -215,6 +302,36 @@ export function AuctionResultPage() {
               {auction.code} · {auction.category}
             </p>
           </section>
+
+          {depositRecord && (
+            <section
+              className={`result-deposit-card status-${depositRecord.status.toLowerCase()}`}
+              aria-live="polite"
+            >
+              <CircleDollarSign aria-hidden="true" />
+              <div>
+                <span>TIỀN CỌC CỦA BẠN</span>
+                <h2>{depositStatusLabels[depositRecord.status]}</h2>
+              </div>
+              <strong>{formatMoney(depositRecord.amount)}</strong>
+              <p>
+                {depositRecord.status === "REFUND_PENDING"
+                  ? "Hệ thống đã chuyển yêu cầu sang Finance. Tiền sẽ được cộng lại vào ví sau khi lệnh hoàn tất."
+                  : depositRecord.status === "REFUNDED"
+                    ? "Khoản cọc đã được cộng lại vào số dư khả dụng trong ví."
+                    : depositRecord.status === "ON_HOLD"
+                      ? "Khoản cọc chưa bị thu hoặc hoàn trong thời gian đối soát nghĩa vụ."
+                      : "Khoản cọc tiếp tục được xử lý theo kết quả và nghĩa vụ thanh toán."}
+              </p>
+              <ButtonLink
+                variant="secondary"
+                to="/account/deposits"
+                fullWidth
+              >
+                Xem lịch sử tiền cọc
+              </ButtonLink>
+            </section>
+          )}
 
           {!cancelled && (
             <section className="result-top-three">

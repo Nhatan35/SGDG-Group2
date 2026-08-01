@@ -63,15 +63,30 @@ export type AuctionStatusProps = {
   auction: Auction;
   compact?: boolean;
   showBadge?: boolean;
+  segmented?: boolean;
   catalog?: boolean;
   extended?: boolean;
   connectionState?: AuctionConnectionPresentationState;
 };
 
+function getSegmentedTime(target: string, now: number) {
+  const totalSeconds = Math.max(
+    0,
+    Math.floor((new Date(target).getTime() - now) / 1000),
+  );
+
+  return [
+    Math.floor(totalSeconds / 3_600),
+    Math.floor((totalSeconds % 3_600) / 60),
+    totalSeconds % 60,
+  ].map((value) => String(value).padStart(2, "0"));
+}
+
 export function AuctionStatus({
   auction,
   compact = false,
   showBadge = true,
+  segmented = false,
   extended = false,
   connectionState = "CONNECTED",
 }: AuctionStatusProps) {
@@ -104,10 +119,28 @@ export function AuctionStatus({
         </Badge>
       )}
       {!compact && (
-        <span className="auction-countdown">
-          <Clock3 aria-hidden="true" />
-          {getTimeLabel(auction, status, now)}
-        </span>
+        segmented && liveEnergy ? (
+          <span
+            className="auction-countdown auction-countdown--segmented"
+            aria-label={getTimeLabel(auction, status, now)}
+          >
+            <span aria-hidden="true">
+              {getSegmentedTime(auction.endsAt, now).map((value, index) => (
+                <span className="auction-countdown__part" key={index}>
+                  {index > 0 && (
+                    <i className="auction-countdown__separator">:</i>
+                  )}
+                  <b>{value}</b>
+                </span>
+              ))}
+            </span>
+          </span>
+        ) : (
+          <span className="auction-countdown">
+            <Clock3 aria-hidden="true" />
+            {getTimeLabel(auction, status, now)}
+          </span>
+        )
       )}
     </div>
   );

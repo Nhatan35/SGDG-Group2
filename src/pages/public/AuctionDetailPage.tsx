@@ -23,6 +23,7 @@ import {
 } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { AuctionCard } from "../../components/auction/AuctionCard";
+import { AssetStoryExperience } from "../../components/auction/AssetStoryExperience";
 import { AuctionStatus } from "../../components/auction/AuctionStatus";
 import {
   Button,
@@ -44,6 +45,7 @@ import {
 } from "../../services/mock/auctionService";
 import { formatDuration, useDemoClock } from "../../hooks/useDemoClock";
 import "../../styles/auction-detail.css";
+import "../../styles/auction-detail-story.css";
 import { formatMoney } from "../../utils/format";
 
 type TabId = "overview" | "asset" | "rules" | "timeline";
@@ -978,6 +980,8 @@ export function AuctionDetailPage() {
           openRules={() => setRulesOpen(true)}
         />
       </section>
+
+      <AssetStoryExperience auction={auction} />
 
       <section className="container detail-related">
         <div className="detail-related-heading">

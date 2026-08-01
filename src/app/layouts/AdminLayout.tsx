@@ -47,7 +47,11 @@ const navigation = {
     ["/admin/configurations", "Platform Configuration", Settings],
     ["/admin/notifications", "Notification Governance", BellRing],
     ["/admin/search-governance", "Search Governance", SearchCheck],
-    ["/governance/opening-requests", "Opening Request Governance", ClipboardCheck],
+    [
+      "/governance/opening-requests",
+      "Opening Request Governance",
+      ClipboardCheck,
+    ],
     [
       "/governance/auction-configurations",
       "Configuration Governance",
@@ -102,7 +106,7 @@ const navigation = {
   FINANCE: [
     ["/finance", "Tổng quan tài chính", LayoutDashboard],
     ["/admin/payments", "Xác minh thanh toán", CreditCard],
-    ["/finance/investigations", "Financial Investigation", FileClock],
+    ["/finance/investigations", "Điều tra giao dịch", FileClock],
     ["/finance/refunds", "Hoàn tiền", ReceiptText],
     ["/finance/reconciliation", "Đối soát", ClipboardCheck],
     ["/finance/settlements", "Quyết toán & chi trả", Boxes],

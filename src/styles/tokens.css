@@ -161,6 +161,7 @@
   --sgdg-sticky-offset: 145px;
 
   /* Typography foundation. */
+  --sgdg-font-family-brand-serif: "Cormorant Garamond", Georgia, "Times New Roman", serif;
   --sgdg-font-family-display: "Be Vietnam Pro", Inter, system-ui, sans-serif;
   --sgdg-font-family-body: "Be Vietnam Pro", Inter, system-ui, sans-serif;
   --sgdg-font-family-numeric: "Be Vietnam Pro", Inter, system-ui, sans-serif;

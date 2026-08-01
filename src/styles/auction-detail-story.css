@@ -1,0 +1,39 @@
+.auction-detail-page .auction-detail-story-experience {
+  margin-top: clamp(58px, 7vw, 96px);
+  border-top: 1px solid #ead8c7;
+}
+
+.auction-detail-page .auction-detail-story-experience .home-story {
+  overflow: clip;
+}
+
+.auction-detail-page .auction-detail-story-experience .home-story-visual {
+  background: #d4b18d;
+}
+
+.auction-detail-page .auction-detail-story-experience .home-story-visual > img {
+  object-fit: cover;
+  object-position: center;
+}
+
+.auction-detail-page
+  .auction-detail-story-experience
+  .home-story-dossier,
+.auction-detail-page
+  .auction-detail-story-experience
+  .home-story-editorial,
+.auction-detail-page .auction-detail-story-experience .home-story-faq {
+  scroll-margin-top: 104px;
+}
+
+.auction-detail-page
+  .auction-detail-story-experience
+  .home-story-dossier__reference {
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 760px) {
+  .auction-detail-page .auction-detail-story-experience {
+    margin-top: 42px;
+  }
+}

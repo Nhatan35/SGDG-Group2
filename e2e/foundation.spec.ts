@@ -33,13 +33,18 @@ test("auction flow", async ({ page }) => {
   await page.getByRole("button", { name: "Đăng nhập" }).click();
   await page.goto("/auctions/rolex-126610lv/live");
   await page.getByRole("button", { name: "Đặt giá thủ công" }).click();
+  await page.getByRole("button", { name: "Đồng ý đặt cọc" }).click();
+  await page.getByRole("button", { name: "Vào đấu giá" }).click();
   await page.getByRole("button", { name: "Mức tối thiểu" }).click();
   await page.getByRole("button", { name: "Tiếp tục xác nhận" }).click();
   await page.getByRole("checkbox").check();
   await page.getByRole("button", { name: "Xác nhận đặt giá" }).click();
   await expect(
-    page.getByRole("heading", { name: "Bid đã được chấp nhận" }),
+    page.getByRole("heading", { name: "Giá mới" }),
   ).toBeVisible();
+  await expect(page.getByText("SBD 018", { exact: true })).toBeVisible();
+  await expect(page.getByText("Tự động đóng sau 1 phút")).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Đặt giá mới" })).toHaveCount(0);
 });
 test("winner flow", async ({ page }) => {
   await page.goto("/auth/login");

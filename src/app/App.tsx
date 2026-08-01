@@ -22,8 +22,12 @@ import {
 import { AccountLayout } from "./layouts/AccountLayout";
 import {
   DashboardPage,
+  DepositsPage,
   KycPage,
   MembershipPage,
+  MyAuctionsPage,
+  MyDeliveriesPage,
+  MyPaymentsPage,
   NotificationsPage,
   ProfilePage,
   WatchlistPage,
@@ -117,7 +121,7 @@ import {
   ReconciliationPage,
   RefundsPage,
   SettlementsPage,
-} from "../pages/admin/StaffWorkspacePages";
+} from "../pages/admin/FinanceWorkspacePages";
 import { AuctionRegistrationWizard } from "../pages/auction/AuctionRegistrationWizard";
 import { EligibilityStatusPage } from "../pages/auction/EligibilityStatusPage";
 import { PreLiveWaitingRoomPage } from "../pages/auction/PreLiveWaitingRoomPage";
@@ -369,9 +373,13 @@ export function App() {
             <Route path="/account/dashboard" element={<DashboardPage />} />
             <Route path="/account/profile" element={<ProfilePage />} />
             <Route path="/account/wallet" element={<WalletPage />} />
+            <Route path="/account/deposits" element={<DepositsPage />} />
             <Route path="/account/kyc" element={<KycPage />} />
             <Route path="/account/membership" element={<MembershipPage />} />
             <Route path="/account/watchlist" element={<WatchlistPage />} />
+            <Route path="/account/auctions" element={<MyAuctionsPage />} />
+            <Route path="/account/payments" element={<MyPaymentsPage />} />
+            <Route path="/account/deliveries" element={<MyDeliveriesPage />} />
             <Route
               path="/account/notifications"
               element={<NotificationsPage />}

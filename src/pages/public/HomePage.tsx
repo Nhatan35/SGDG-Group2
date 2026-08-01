@@ -27,6 +27,7 @@ import { AuctionCard } from "../../components/auction/AuctionCard";
 import { AuctionStatus } from "../../components/auction/AuctionStatus";
 import { ButtonLink } from "../../components/common/Button";
 import { HomeCampaignBanner } from "../../components/home/HomeCampaignBanner";
+import { HomeMarketingExperience } from "../../components/home/HomeMarketingExperience";
 import { LiveAuctionShowcase } from "../../components/home/LiveAuctionShowcase";
 import { auctions } from "../../services/mock/auctionService";
 import { formatMoney } from "../../utils/format";
@@ -67,6 +68,19 @@ const spotlightAuctions = spotlightAuctionIds.flatMap((auctionId) => {
   const auction = auctions.find((item) => item.id === auctionId);
   return auction ? [auction] : [];
 });
+
+const spotlightIntroductions: Record<string, string> = {
+  "rolex-126610lv":
+    "Submariner mặt xanh biểu tượng, bền bỉ trong sử dụng và giàu sức hút sưu tầm.",
+  "patek-nautilus":
+    "Nautilus vàng hồng, dáng thể thao thanh lịch cùng mặt số nâu chuyển sắc cuốn hút.",
+  "antique-01":
+    "Bình gốm men lam mang nét cổ điển, họa tiết giàu nhịp điệu và hồ sơ rõ ràng.",
+  "collectible-01":
+    "Leica M6 Titanium kết hợp cơ chế rangefinder kinh điển với lớp hoàn thiện hiếm.",
+  "real-estate-01":
+    "Căn hộ hai phòng ngủ tại Thảo Điền, sáng thoáng và sở hữu tầm nhìn sông rộng mở.",
+};
 
 function AuctionExpertIcon({ compact = false }: { compact?: boolean }) {
   return (
@@ -152,19 +166,103 @@ export function HomePage() {
 
   return (
     <>
+      <section className="category-strip">
+        {categories.map(([label, Icon]) => (
+          <Link
+            key={label}
+            to={`/auctions?category=${encodeURIComponent(label)}`}
+          >
+            <Icon />
+            <span>{label}</span>
+          </Link>
+        ))}
+      </section>
       <section className="home-redesign-hero">
+        <div
+          key={`backdrop-${featured.id}`}
+          className={`home-hero-backdrop home-hero-backdrop--${featured.id}`}
+          aria-hidden="true"
+        >
+          <img src={featured.image} alt="" fetchPriority="high" />
+        </div>
+        <div className="home-hero-preload" aria-hidden="true">
+          {spotlightAuctions.map((auction) => (
+            <img key={auction.id} src={auction.image} alt="" />
+          ))}
+        </div>
+        <button
+          className="home-hero-stage-arrow home-hero-stage-arrow--previous"
+          type="button"
+          aria-label="Xem sản phẩm đấu giá trước"
+          onClick={showPreviousSpotlight}
+        >
+          <ChevronLeft aria-hidden="true" />
+        </button>
+        <button
+          className="home-hero-stage-arrow home-hero-stage-arrow--next"
+          type="button"
+          aria-label="Xem sản phẩm đấu giá tiếp theo"
+          onClick={showNextSpotlight}
+        >
+          <ChevronRight aria-hidden="true" />
+        </button>
         <div className="container home-redesign-grid">
-          <div className="home-intro">
-            <span className="eyebrow">NỀN TẢNG ĐẤU GIÁ TRỰC TUYẾN</span>
-            <h1>
-              Đấu giá thông minh
-              <br />
-              <span>Giá trị xứng tầm</span>
-            </h1>
-            <p>
-              Nền tảng đấu giá trực tuyến minh bạch, nhanh chóng và an toàn cho
-              mọi giá trị bạn tìm kiếm.
+          <div
+            className="home-intro home-product-overlay"
+            onMouseEnter={() => setSpotlightPaused(true)}
+            onMouseLeave={() => setSpotlightPaused(false)}
+          >
+            <div className="home-product-overlay__topbar">
+              <AuctionStatus auction={featured} compact />
+              <div
+                className="hero-auction-card__dots"
+                aria-label="Chọn tài sản nổi bật"
+              >
+                {spotlightAuctions.map((auction, index) => (
+                  <button
+                    key={auction.id}
+                    type="button"
+                    className={index === spotlightIndex ? "active" : ""}
+                    aria-label={`Xem ${auction.assetName}`}
+                    aria-current={
+                      index === spotlightIndex ? "true" : undefined
+                    }
+                    onClick={() => showSpotlight(index)}
+                  />
+                ))}
+              </div>
+            </div>
+            <span className="eyebrow">
+              {featured.category} · {featured.code}
+            </span>
+            <h1>{featured.assetName}</h1>
+            <p className="home-product-overlay__summary">
+              {spotlightIntroductions[featured.id] ?? featured.description}
             </p>
+            <div className="home-product-overlay__facts">
+              <div>
+                <span>Giá hiện tại</span>
+                <strong aria-label={`Giá hiện tại ${formatMoney(featured.currentPrice)}`}>
+                  {formatMoney(featured.currentPrice)}
+                </strong>
+              </div>
+              <div>
+                <span>Kết thúc sau</span>
+                <AuctionStatus
+                  auction={featured}
+                  showBadge={false}
+                  segmented
+                />
+              </div>
+            </div>
+            <ButtonLink
+              variant="live"
+              className="home-product-overlay__bid"
+              to={`/auctions/${featured.id}/live`}
+              leftIcon={<Zap />}
+            >
+              Tham gia phiên
+            </ButtonLink>
             <form className="home-filter-bar">
               <label>
                 Danh mục
@@ -329,6 +427,11 @@ export function HomePage() {
                   <span className="hero-auction-card__code">
                     Mã đấu giá: {featured.code}
                   </span>
+                  <p className="hero-auction-card__summary">
+                    <span>Giới thiệu tài sản</span>
+                    {spotlightIntroductions[featured.id] ??
+                      featured.description}
+                  </p>
                   <div className="hero-auction-card__urgency">
                     <p>
                       Kết thúc sau <span>Sắp chốt phiên</span>
@@ -350,26 +453,43 @@ export function HomePage() {
                     to={`/auctions/${featured.id}/live`}
                     leftIcon={<Zap />}
                   >
-                    Đặt giá ngay
+                    Tham gia phiên
                   </ButtonLink>
                 </div>
               </div>
             </div>
           </article>
+          <aside className="home-estimate-callout">
+            <span>ĐỊNH GIÁ CÙNG SGDG</span>
+            <h2>Đang cân nhắc bán tài sản? Bắt đầu bằng định giá.</h2>
+            <p>
+              Công cụ định giá giúp bạn khám phá giá trị tài sản và nhận tư vấn
+              phù hợp trước khi đưa ra quyết định.
+            </p>
+            <Link to="/help">
+              Yêu cầu định giá <ArrowRight aria-hidden="true" />
+            </Link>
+          </aside>
         </div>
       </section>
-      <LiveAuctionShowcase auctions={auctions} />
       <section className="container home-featured">
         <div className="featured-heading">
-          <h2>🔥 ĐẤU GIÁ NỔI BẬT</h2>
+          <div>
+            <span>CATALOG THÁNG 07</span>
+            <h2>Phiên đấu giá đáng chú ý</h2>
+          </div>
           <Link to="/auctions">
-            Xem tất cả <ArrowRight />
+            Xem toàn bộ lịch phiên <ArrowRight />
           </Link>
         </div>
         <div className="featured-layout">
           <div className="auction-list-grid featured-auctions">
-            {featuredAuctions.map((item) => (
-              <AuctionCard key={item.id} auction={item} />
+            {featuredAuctions.slice(0, 4).map((item) => (
+              <AuctionCard
+                key={item.id}
+                auction={item}
+                segmentedCountdown
+              />
             ))}
           </div>
           <aside className="trust-panel">
@@ -395,17 +515,8 @@ export function HomePage() {
           </aside>
         </div>
       </section>
-      <section className="category-strip">
-        {categories.map(([label, Icon]) => (
-          <Link
-            key={label}
-            to={`/auctions?category=${encodeURIComponent(label)}`}
-          >
-            <Icon />
-            <span>{label}</span>
-          </Link>
-        ))}
-      </section>
+      <HomeMarketingExperience />
+      <LiveAuctionShowcase auctions={auctions} />
       <HomeCampaignBanner />
       <div className={chatOpen ? "home-chat-widget open" : "home-chat-widget"}>
         {chatOpen && (

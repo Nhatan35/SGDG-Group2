@@ -702,40 +702,6 @@
   width: 1.15rem;
 }
 
-.leaderboard-live-state {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  color: #c8e8ce;
-  font-size: 0.66rem;
-}
-
-.leaderboard-live-state::before {
-  width: 0.38rem;
-  height: 0.38rem;
-  border-radius: 50%;
-  background: #38c965;
-  box-shadow: 0 0 0 3px rgba(56, 201, 101, 0.11);
-  content: "";
-}
-
-.live-room .leaderboard-controls {
-  padding: 0.65rem 1rem;
-  border-bottom: 1px solid rgba(255, 192, 108, 0.18);
-}
-
-.live-room .leaderboard-controls button {
-  border-color: rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.04);
-  color: rgba(255, 255, 255, 0.62);
-}
-
-.live-room .leaderboard-controls button.is-active {
-  border-color: rgba(255, 126, 34, 0.35);
-  background: rgba(239, 91, 18, 0.12);
-  color: #ffad61;
-}
-
 .live-room .leaderboard-row {
   display: grid;
   grid-template-columns: 34px minmax(0, 1fr) auto;

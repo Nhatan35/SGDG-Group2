@@ -85,6 +85,66 @@
   color: #f4510b;
 }
 
+.account-nav-group {
+  display: grid;
+}
+
+.account-nav-group__toggle {
+  display: grid;
+  width: 100%;
+  min-height: 48px;
+  grid-template-columns: 18px minmax(0, 1fr) 16px;
+  gap: 10px;
+  align-items: center;
+  border: 0;
+  border-radius: 8px;
+  padding: 14px;
+  background: transparent;
+  color: #3b281f;
+  font-size: 13px;
+  font-weight: 750;
+  text-align: left;
+  cursor: pointer;
+}
+
+.account-nav-group__toggle:hover,
+.account-nav-group__toggle.active {
+  background: #fff7f1;
+  color: #d84c0c;
+}
+
+.account-nav-group__toggle.active {
+  font-weight: 800;
+}
+
+.account-nav-group__chevron {
+  transition: transform 180ms ease;
+}
+
+.account-nav-group.open .account-nav-group__chevron {
+  transform: rotate(180deg);
+}
+
+.account-nav-group__submenu {
+  display: grid;
+  gap: 2px;
+  margin: 2px 0 6px 17px;
+  padding-left: 9px;
+  border-left: 1px solid #efc6aa;
+}
+
+.account-shell .account-sidebar nav .account-nav-group__submenu a {
+  min-height: 42px;
+  padding: 10px 12px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.account-shell .account-sidebar nav .account-nav-group__submenu a svg {
+  width: 15px;
+  height: 15px;
+}
+
 .account-shell .account-sidebar svg {
   width: 16px;
   height: 16px;

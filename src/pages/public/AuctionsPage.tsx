@@ -3,12 +3,11 @@ import {
   Check,
   ChevronDown,
   Clock3,
-  Search,
   SlidersHorizontal,
   Tag,
   X,
 } from "lucide-react";
-import { FormEvent, Fragment, useMemo } from "react";
+import { Fragment, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import {
   AuctionCard,
@@ -196,13 +195,6 @@ export function AuctionsPage() {
     value: string;
     label: string;
   }>;
-  const submitSearch = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    updateParams({
-      q: new FormData(event.currentTarget).get("q")?.toString().trim() || null,
-    });
-  };
-
   return (
     <div className="auction-catalog-page">
       <section className="catalog-hero">
@@ -232,25 +224,6 @@ export function AuctionsPage() {
               </span>
             </div>
           </div>
-          <form
-            className="catalog-search"
-            role="search"
-            onSubmit={submitSearch}
-          >
-            <label className="sr-only" htmlFor="catalog-search">
-              Tìm kiếm phiên đấu giá
-            </label>
-            <Search aria-hidden="true" />
-            <input
-              id="catalog-search"
-              name="q"
-              defaultValue={query}
-              placeholder="Tìm tài sản, danh mục hoặc mã phiên"
-            />
-            <Button type="submit">
-              Tìm kiếm
-            </Button>
-          </form>
         </div>
       </section>
       <div

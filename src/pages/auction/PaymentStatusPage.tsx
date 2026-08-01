@@ -27,6 +27,7 @@ import { Dialog } from "../../components/common/Dialog";
 import { BlockedState } from "../../components/feedback/States";
 import { useDemoClock } from "../../hooks/useDemoClock";
 import { auctions } from "../../services/mock/auctionService";
+import { useDemoStore } from "../../store/demoStore";
 import { formatMoney } from "../../utils/format";
 import { buildVietQrPayload } from "../../utils/vietQr";
 import { NotFoundPage } from "../NotFoundPage";
@@ -193,16 +194,38 @@ export function PaymentStatusPage() {
   const [otpCode, setOtpCode] = useState("");
   const [otpError, setOtpError] = useState("");
   const [resendMessage, setResendMessage] = useState("");
+  const activeDepositAmount = useDemoStore((state) =>
+    auctionId ? (state.auctionDeposits[auctionId] ?? 0) : 0,
+  );
+  const depositRecord = useDemoStore((state) =>
+    auctionId ? state.auctionDepositRecords[auctionId] : undefined,
+  );
+  const forfeitDeposit = useDemoStore(
+    (state) => state.forfeitAuctionDeposit,
+  );
+  const applyDepositToPayment = useDemoStore(
+    (state) => state.applyAuctionDepositToPayment,
+  );
   const requestedDuration = Number(params.get("duration"));
   const paymentWindowMs =
     Number.isFinite(requestedDuration) && requestedDuration > 0
       ? Math.min(requestedDuration, 1800) * 1000
       : 30 * 60 * 1000;
   const deadline = PAYMENT_DEMO_ANCHOR_MS + paymentWindowMs;
-  const remainingMs = Math.max(0, deadline - now);
+  const forcedExpired = ["expired", "defaulted"].includes(
+    params.get("scenario") ?? "",
+  );
+  const remainingMs = forcedExpired ? 0 : Math.max(0, deadline - now);
   const winningPrice = auction?.currentPrice || auction?.startPrice || 0;
   const serviceFee = Math.round(winningPrice * 0.01);
   const totalDue = winningPrice + serviceFee;
+  const depositOffset =
+    depositRecord?.status === "APPLIED_TO_PAYMENT"
+      ? depositRecord.amount
+      : ["ACTIVE", "ON_HOLD"].includes(depositRecord?.status ?? "")
+        ? depositRecord?.amount ?? 0
+        : activeDepositAmount;
+  const remainingDue = Math.max(0, totalDue - depositOffset);
   const transferCode = `SGD-${(auction?.code ?? "PAYMENT").replace("SGD-", "")}-Ten cua ban`;
   const expired = remainingMs <= 0 && !paid;
   const hours = Math.floor(remainingMs / 3_600_000);
@@ -211,12 +234,12 @@ export function PaymentStatusPage() {
   const twoDigits = (value: number) => value.toString().padStart(2, "0");
 
   useEffect(() => {
-    if (!auction || totalDue <= 0) return;
+    if (!auction || remainingDue <= 0) return;
     let active = true;
     const payload = buildVietQrPayload({
       bankBin: BANK_BIN,
       accountNumber: BANK_ACCOUNT,
-      amount: totalDue,
+      amount: remainingDue,
       additionalInfo: transferCode,
     });
     QRCode.toDataURL(payload, {
@@ -237,7 +260,12 @@ export function PaymentStatusPage() {
     return () => {
       active = false;
     };
-  }, [auction, totalDue, transferCode]);
+  }, [auction, remainingDue, transferCode]);
+
+  useEffect(() => {
+    if (!auction || !expired) return;
+    forfeitDeposit(auction.id);
+  }, [auction, expired, forfeitDeposit]);
 
   if (!auction) return <NotFoundPage />;
 
@@ -266,6 +294,7 @@ export function PaymentStatusPage() {
     }
     setProcessing(true);
     window.setTimeout(() => {
+      applyDepositToPayment(auction.id);
       setPaid(true);
       setProcessing(false);
     }, 850);
@@ -278,6 +307,7 @@ export function PaymentStatusPage() {
     setOtpError("");
     setProcessing(true);
     window.setTimeout(() => {
+      applyDepositToPayment(auction.id);
       setPaid(true);
       setProcessing(false);
       setVerificationOpen(false);
@@ -300,7 +330,10 @@ export function PaymentStatusPage() {
           <CheckCircle2 aria-hidden="true" />
           <div>
             <h2>Thanh toán đã được ghi nhận</h2>
-            <p>Số tiền {formatMoney(totalDue)} đã được cập nhật vào giao dịch.</p>
+            <p>
+              Số tiền {formatMoney(remainingDue)} đã được cập nhật; tiền cọc{" "}
+              {formatMoney(depositOffset)} đã được khấu trừ.
+            </p>
           </div>
           <ButtonLink
             to={`/me/handover/HO-5711R-2026?scenario=in-transit&auctionId=${auction.id}`}
@@ -324,10 +357,44 @@ export function PaymentStatusPage() {
               <dd>{formatMoney(serviceFee)}</dd>
             </div>
             <div>
-              <dt>Tổng thanh toán</dt>
+              <dt>Tổng nghĩa vụ</dt>
               <dd>{formatMoney(totalDue)}</dd>
             </div>
+            {depositOffset > 0 && (
+              <div className="payment-deposit-offset">
+                <dt>Khấu trừ tiền cọc</dt>
+                <dd>-{formatMoney(depositOffset)}</dd>
+              </div>
+            )}
+            <div>
+              <dt>Còn phải thanh toán</dt>
+              <dd>{formatMoney(remainingDue)}</dd>
+            </div>
           </dl>
+
+          {depositRecord?.status === "FORFEITED" ? (
+            <div className="payment-deposit-consequence forfeited" role="alert">
+              <ShieldCheck aria-hidden="true" />
+              <div>
+                <strong>Khoản cọc đã bị thu do quá hạn thanh toán</strong>
+                <span>
+                  Tiền cọc không được hoàn lại và nghĩa vụ Candidate đã kết
+                  thúc.
+                </span>
+              </div>
+            </div>
+          ) : depositOffset > 0 ? (
+            <div className="payment-deposit-consequence">
+              <ShieldCheck aria-hidden="true" />
+              <div>
+                <strong>Tiền cọc sẽ được khấu trừ</strong>
+                <span>
+                  {formatMoney(depositOffset)} được trừ trực tiếp khỏi tổng số
+                  tiền cần thanh toán.
+                </span>
+              </div>
+            </div>
+          ) : null}
 
           <div className="payment-section-heading">
             <div>
@@ -393,7 +460,7 @@ export function PaymentStatusPage() {
             <BlockedState
               compact
               title="Đã quá hạn thanh toán"
-              description="Tác vụ thanh toán hiện không khả dụng. Vui lòng liên hệ hỗ trợ để kiểm tra nghĩa vụ."
+              description="Tác vụ thanh toán không còn khả dụng. Nếu có tiền cọc, hệ thống đã chuyển khoản cọc sang trạng thái bị thu do không hoàn tất nghĩa vụ đúng hạn."
               primaryAction={
                 <ButtonLink variant="secondary" to="/help">
                   Liên hệ hỗ trợ
@@ -436,7 +503,7 @@ export function PaymentStatusPage() {
                     <>
                       <img
                         src={qrDataUrl}
-                        alt={`Mã VietQR thanh toán ${formatMoney(totalDue)} cho giao dịch ${transferCode}`}
+                        alt={`Mã VietQR thanh toán ${formatMoney(remainingDue)} cho giao dịch ${transferCode}`}
                       />
                       <ScanLine className="payment-qr-scan-line" aria-hidden="true" />
                     </>
@@ -454,7 +521,7 @@ export function PaymentStatusPage() {
                 </div>
                 <div className="payment-qr-amount">
                   <span>Số tiền đã điền sẵn</span>
-                  <strong>{formatMoney(totalDue)}</strong>
+                  <strong>{formatMoney(remainingDue)}</strong>
                 </div>
                 <p>
                   <Smartphone aria-hidden="true" />
@@ -544,7 +611,7 @@ export function PaymentStatusPage() {
               </div>
               <ol className="payment-card-steps">
                 <li><span>1</span><p>Điền chính xác thông tin thẻ ở bên trái.</p></li>
-                <li><span>2</span><p>Kiểm tra số tiền {formatMoney(totalDue)}.</p></li>
+                <li><span>2</span><p>Kiểm tra số tiền {formatMoney(remainingDue)}.</p></li>
                 <li><span>3</span><p>Xác thực OTP hoặc 3D Secure từ ngân hàng.</p></li>
               </ol>
               <div className="payment-secure-badge">
@@ -635,7 +702,7 @@ export function PaymentStatusPage() {
           </div>
           <div>
             <dt>Số tiền xác thực</dt>
-            <dd>{formatMoney(totalDue)}</dd>
+            <dd>{formatMoney(remainingDue)}</dd>
           </div>
         </dl>
 

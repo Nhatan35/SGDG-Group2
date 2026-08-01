@@ -208,6 +208,139 @@
   gap: 10px;
 }
 
+.wallet-payout-history {
+  margin-top: 16px;
+}
+
+.wallet-payout-history .panel-title {
+  align-items: flex-start;
+}
+
+.wallet-payout-history .panel-title > div {
+  min-width: 0;
+}
+
+.wallet-payout-history .panel-title h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
+.wallet-payout-history .panel-title p {
+  margin: 5px 0 0;
+  color: var(--sgdg-text-secondary);
+  font-size: 12px;
+}
+
+.wallet-payout-history .panel-title > span {
+  flex: 0 0 auto;
+  border-radius: 999px;
+  padding: 6px 10px;
+  background: #fff0e5;
+  color: #bd4c16;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.wallet-payout-list {
+  display: grid;
+  gap: 9px;
+  margin-top: 16px;
+}
+
+.wallet-payout-list article {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr) auto auto;
+  gap: 12px;
+  align-items: center;
+  border: 1px solid #ead9cb;
+  border-radius: 12px;
+  padding: 12px;
+  background: #fffdf9;
+}
+
+.wallet-payout-icon {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border-radius: 11px;
+  background: #fff0e5;
+  color: #dc5517;
+}
+
+.wallet-payout-icon.paid {
+  background: #edf5e9;
+  color: #5d7848;
+}
+
+.wallet-payout-icon.rejected {
+  background: #fbecea;
+  color: #b44b3c;
+}
+
+.wallet-payout-icon svg {
+  width: 19px;
+}
+
+.wallet-payout-list article > div {
+  display: grid;
+  gap: 2px;
+}
+
+.wallet-payout-list article > div strong {
+  font-size: 12px;
+}
+
+.wallet-payout-list article > div small,
+.wallet-payout-list article > div time {
+  color: var(--sgdg-text-secondary);
+  font-size: 10px;
+}
+
+.wallet-payout-list article > strong {
+  color: #3d2b22;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.wallet-payout-status {
+  border-radius: 999px;
+  padding: 6px 9px;
+  background: #fff2e5;
+  color: #b4511c;
+  font-size: 10px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.wallet-payout-status.approved,
+.wallet-payout-status.processing {
+  background: #eaf2f6;
+  color: #4b6f80;
+}
+
+.wallet-payout-status.paid {
+  background: #edf5e9;
+  color: #597443;
+}
+
+.wallet-payout-status.rejected {
+  background: #fbecea;
+  color: #b34b3c;
+}
+
+.wallet-payout-empty {
+  margin: 16px 0 0;
+  border: 1px dashed #e6cbb7;
+  border-radius: 12px;
+  padding: 18px;
+  background: #fff9f4;
+  color: var(--sgdg-text-secondary);
+  text-align: center;
+}
+
 @media (max-width: 850px) {
   .wallet-grid,
   .bank-add-form {
@@ -234,5 +367,15 @@
 
   .bank-account-list .badge {
     grid-column: 2;
+  }
+
+  .wallet-payout-list article {
+    grid-template-columns: 42px minmax(0, 1fr);
+  }
+
+  .wallet-payout-list article > strong,
+  .wallet-payout-status {
+    grid-column: 2;
+    justify-self: start;
   }
 }

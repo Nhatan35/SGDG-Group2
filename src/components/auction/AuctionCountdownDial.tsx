@@ -1,4 +1,4 @@
-import { Clock3, Flame, Gavel } from "lucide-react";
+import { Clock3, Gavel } from "lucide-react";
 
 type AuctionCountdownDialProps = {
   remainingMs: number;
@@ -33,11 +33,6 @@ export function AuctionCountdownDial({
           : `Thời gian còn lại ${accessibleTime}`
       }
     >
-      <span className="countdown-fire-aura" aria-hidden="true">
-        {Array.from({ length: 10 }, (_, index) => (
-          <Flame key={index} />
-        ))}
-      </span>
       <span className="countdown-gavel-mark" aria-hidden="true">
         <Gavel />
       </span>
