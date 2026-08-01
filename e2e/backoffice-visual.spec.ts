@@ -119,6 +119,7 @@ test("Finance workspace pages are visually sound", async ({ page }) => {
     "/finance/reports",
     "/finance/investigations",
     "/finance/investigations/FIN-INV-088",
+    "/finance/override-requests/new",
     "/ops/finance-packages/FIN-PKG-PATEK-5711R-V1",
   ]);
   await page.goto("/finance");
@@ -162,9 +163,15 @@ test("Public CMS projections and route directory are visually sound", async ({
     "/demo",
   ]);
   await page.goto("/auctions/upcoming");
-  const primaryNavigation = page.getByRole("navigation", { name: "Điều hướng chính" });
-  await expect(primaryNavigation.getByRole("link", { name: "Sắp diễn ra", exact: true })).toHaveClass(/active/);
-  await expect(primaryNavigation.getByRole("link", { name: "Phiên đấu giá", exact: true })).not.toHaveClass(/active/);
+  const primaryNavigation = page.getByRole("navigation", {
+    name: "Điều hướng chính",
+  });
+  await expect(
+    primaryNavigation.getByRole("link", { name: "Sắp diễn ra", exact: true }),
+  ).toHaveCount(0);
+  await expect(
+    primaryNavigation.getByRole("link", { name: "Phiên đấu giá", exact: true }),
+  ).not.toHaveClass(/active/);
 });
 
 test("Customer-facing support journeys are visually sound", async ({

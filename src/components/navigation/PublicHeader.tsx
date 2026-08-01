@@ -1,14 +1,19 @@
 ﻿import {
+  ArrowRight,
+  Bell,
   ChevronDown,
+  Gavel,
   Heart,
+  LayoutDashboard,
   LogOut,
   Menu,
-  ShieldCheck,
+  Search,
   UserCircle,
+  UserRound,
   Wallet,
   X,
 } from "lucide-react";
-import { useState } from "react";
+import { type FormEvent, useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { Button } from "../common/Button";
 import { useDemoStore } from "../../store/demoStore";
@@ -17,7 +22,6 @@ import { formatMoney } from "../../utils/format";
 const links = [
   { to: "/", label: "Trang chủ" },
   { to: "/auctions", label: "Phiên đấu giá" },
-  { to: "/auctions/upcoming", label: "Sắp diễn ra" },
   { to: "/news", label: "Tin tức" },
   { to: "/help", label: "Hướng dẫn" },
 ];
@@ -25,8 +29,15 @@ const links = [
 export function PublicHeader() {
   const [open, setOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
-  const { authenticated, userName, walletBalance, logout } = useDemoStore();
+  const {
+    authenticated,
+    userName,
+    walletBalance,
+    unreadNotifications,
+    logout,
+  } = useDemoStore();
   const initial = userName.trim().slice(0, 1).toUpperCase() || "U";
 
   function handleLogout() {
@@ -34,6 +45,13 @@ export function PublicHeader() {
     setAccountOpen(false);
     setOpen(false);
     navigate("/", { replace: true });
+  }
+
+  function handleSearch(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const query = searchQuery.trim();
+    setOpen(false);
+    navigate(query ? `/auctions?q=${encodeURIComponent(query)}` : "/auctions");
   }
 
   return (
@@ -65,18 +83,55 @@ export function PublicHeader() {
             </NavLink>
           ))}
         </nav>
+        <form
+          className="header-search"
+          role="search"
+          aria-label="Tìm kiếm phiên đấu giá"
+          onSubmit={handleSearch}
+        >
+          <Search className="header-search__icon" aria-hidden="true" />
+          <input
+            type="search"
+            value={searchQuery}
+            onChange={(event) => setSearchQuery(event.target.value)}
+            placeholder="Tìm tài sản, phiên đấu giá..."
+            aria-label="Từ khóa tìm kiếm"
+          />
+          <button type="submit" aria-label="Tìm kiếm">
+            <ArrowRight aria-hidden="true" />
+          </button>
+        </form>
         <div className="header-actions">
-          <span className="trust-mark">
-            <ShieldCheck size={16} />
-            Minh bạch & an toàn
-          </span>
-          <Link
-            className="button ghost"
-            to="/account/watchlist"
-            aria-label="Danh sách theo dõi"
-          >
-            <Heart size={20} />
-          </Link>
+          {authenticated && (
+            <div className="header-notification">
+              <Link
+                className="header-notification__button"
+                to="/account/notifications"
+                aria-label={
+                  unreadNotifications > 0
+                    ? "Thông báo, có 1 thông báo mới"
+                    : "Thông báo"
+                }
+              >
+                <Bell aria-hidden="true" />
+                {unreadNotifications > 0 && (
+                  <span className="header-notification__badge">1</span>
+                )}
+              </Link>
+              <div className="header-notification__preview" role="tooltip">
+                {unreadNotifications > 0 ? (
+                  <>
+                    <span>Thông báo mới</span>
+                    <strong>Bạn đang dẫn đầu</strong>
+                    <p>Giá trả 450.000.000 đ đã được chấp nhận.</p>
+                    <small>2 phút trước · Nhấn để xem chi tiết</small>
+                  </>
+                ) : (
+                  <p>Bạn không có thông báo mới.</p>
+                )}
+              </div>
+            </div>
+          )}
           {authenticated ? (
             <div className="header-account">
               <Link
@@ -124,6 +179,7 @@ export function PublicHeader() {
                     to="/account/dashboard"
                     onClick={() => setAccountOpen(false)}
                   >
+                    <LayoutDashboard />
                     Tổng quan tài khoản
                   </Link>
                   <Link
@@ -139,6 +195,7 @@ export function PublicHeader() {
                     to="/account/bids"
                     onClick={() => setAccountOpen(false)}
                   >
+                    <Gavel />
                     Lịch sử đấu giá
                   </Link>
                   <Link
@@ -146,6 +203,7 @@ export function PublicHeader() {
                     to="/account/watchlist"
                     onClick={() => setAccountOpen(false)}
                   >
+                    <Heart />
                     Danh sách theo dõi
                   </Link>
                   <button role="menuitem" type="button" onClick={handleLogout}>
@@ -156,14 +214,23 @@ export function PublicHeader() {
               )}
             </div>
           ) : (
-            <>
-              <Link className="button secondary" to="/auth/login">
+            <div className="header-guest-actions">
+              <Link className="header-guest-login" to="/auth/login">
+                <UserRound aria-hidden="true" />
                 Đăng nhập
               </Link>
-              <Link className="button primary" to="/auth/register">
-                Đăng ký
-              </Link>
-            </>
+              <div className="header-guest-meta">
+                <span className="header-language" aria-label="Ngôn ngữ: Tiếng Việt">
+                  VI <ChevronDown aria-hidden="true" />
+                </span>
+                <Link to="/help" aria-label="Trung tâm trợ giúp">
+                  <span aria-hidden="true">?</span>
+                </Link>
+                <Link to="/account/watchlist" aria-label="Danh sách theo dõi">
+                  <Heart aria-hidden="true" />
+                </Link>
+              </div>
+            </div>
           )}
           <Button
             variant="ghost"

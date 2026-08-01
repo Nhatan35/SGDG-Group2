@@ -1,16 +1,19 @@
 import {
   Activity,
   AlertCircle,
+  BellRing,
   CheckCircle2,
   CreditCard,
   Crown,
   Eye,
+  Flame,
   Gavel,
   ShieldCheck,
   Users,
   Wallet,
+  X,
 } from "lucide-react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { catalogAuctions } from "../../services/mock/auctionService";
 import {
@@ -26,6 +29,10 @@ import {
 import { AuctionCountdownDial } from "../../components/auction/AuctionCountdownDial";
 import { Button } from "../../components/common/Button";
 import { Dialog } from "../../components/common/Dialog";
+import {
+  canEnterAuction,
+  useEligibilityWorkflowStore,
+} from "../../store/eligibilityWorkflowStore";
 import { useDemoStore } from "../../store/demoStore";
 import { formatMoney } from "../../utils/format";
 import { useDemoClock } from "../../hooks/useDemoClock";
@@ -33,33 +40,42 @@ import "../../styles/live-auction-room.css";
 import "../../styles/live-deposit-gate.css";
 import "../../styles/live-auction-mocks.css";
 import "../../styles/live-auction-room-redesign.css";
+import "../../styles/live-outbid-notification.css";
+import "../../styles/live-auction-luxury-bidding.css";
 
 type Step = "entry" | "confirmation" | "validating" | "result";
 type Outcome =
   "accepted" | "below-minimum" | "stale-price" | "duplicate" | "error";
 type LeaderboardEntry = {
-  alias: string;
+  bidderNumber: string;
   amount: number;
   bids: number;
   isCurrentUser?: boolean;
+};
+type OutbidNotice = {
+  id: string;
+  competitorNumber: string;
+  competitorAmount: number;
+  nextMinimum: number;
 };
 type DepositAction = "manual-bid" | "autobid";
 type DepositStep = "confirm" | "need-topup" | "gateway" | "success";
 
 const rule = "QD-2026.07";
+const currentUserBidderNumber = "SBD 018";
 const defaultLeaderboard = [
-  { alias: "Bạn", amount: 450_000_000, bids: 18, isCurrentUser: true },
-  { alias: "Mi***A", amount: 445_000_000, bids: 16 },
-  { alias: "An***B", amount: 440_000_000, bids: 12 },
-  { alias: "Qu***C", amount: 435_000_000, bids: 9 },
-  { alias: "Ha***D", amount: 430_000_000, bids: 7 },
+  { bidderNumber: "SBD 027", amount: 450_000_000, bids: 16 },
+  { bidderNumber: "SBD 031", amount: 445_000_000, bids: 12 },
+  { bidderNumber: "SBD 044", amount: 440_000_000, bids: 9 },
+  { bidderNumber: "SBD 052", amount: 435_000_000, bids: 7 },
+  { bidderNumber: "SBD 068", amount: 430_000_000, bids: 5 },
 ] satisfies LeaderboardEntry[];
 const patekLeaderboard = [
-  { alias: "Bạn", amount: 3_250_000_000, bids: 18, isCurrentUser: true },
-  { alias: "Mi***A", amount: 3_225_000_000, bids: 16 },
-  { alias: "An***B", amount: 3_200_000_000, bids: 12 },
-  { alias: "Qu***C", amount: 3_175_000_000, bids: 9 },
-  { alias: "Ha***D", amount: 3_150_000_000, bids: 7 },
+  { bidderNumber: "SBD 027", amount: 3_250_000_000, bids: 16 },
+  { bidderNumber: "SBD 031", amount: 3_225_000_000, bids: 12 },
+  { bidderNumber: "SBD 044", amount: 3_200_000_000, bids: 9 },
+  { bidderNumber: "SBD 052", amount: 3_175_000_000, bids: 7 },
+  { bidderNumber: "SBD 068", amount: 3_150_000_000, bids: 5 },
 ] satisfies LeaderboardEntry[];
 
 function AuctionMetrics() {
@@ -103,8 +119,10 @@ function AuctionActivity({ items }: { items: readonly string[] }) {
 
 function LeaderboardPanel({
   leaderboard,
+  isOutbid,
 }: {
   leaderboard: LeaderboardEntry[];
+  isOutbid: boolean;
 }) {
   return (
     <section className="live-mock-leaderboard">
@@ -113,17 +131,17 @@ function LeaderboardPanel({
           <Crown aria-hidden="true" />
           Bảng xếp hạng đấu giá
         </h2>
-        <span className="leaderboard-live-state">Tự động cập nhật</span>
+        <div className="leaderboard-header-meta">
+          <span className="leaderboard-bidder-number">
+            Số báo danh của bạn: <b>018</b>
+          </span>
+        </div>
       </header>
-      <nav className="leaderboard-controls" aria-label="Cách xếp hạng">
-        <button className="is-active">Theo giá đấu</button>
-        <button>Theo hoạt động</button>
-      </nav>
       <ol>
         {leaderboard.map((entry, index) => (
           <li
-            className={`leaderboard-row${entry.isCurrentUser ? " is-current" : ""}`}
-            key={entry.alias}
+            className={`leaderboard-row${entry.isCurrentUser ? " is-current" : ""}${entry.isCurrentUser && isOutbid ? " is-outbid" : ""}`}
+            key={entry.bidderNumber}
           >
             <b className="leaderboard-rank">
               {index === 0 ? (
@@ -134,8 +152,16 @@ function LeaderboardPanel({
             </b>
             <div className="leaderboard-person">
               <strong>
-                {entry.alias}
-                {entry.isCurrentUser && <small>Bạn · dẫn đầu</small>}
+                {entry.bidderNumber}
+                {entry.isCurrentUser && (
+                  <small>
+                    {isOutbid
+                      ? "Bạn · vừa bị vượt giá"
+                      : index === 0
+                        ? "Bạn · dẫn đầu"
+                        : `Bạn · hạng #${index + 1}`}
+                  </small>
+                )}
               </strong>
               <small>● Online · {entry.bids} lượt đấu</small>
             </div>
@@ -147,8 +173,8 @@ function LeaderboardPanel({
         ))}
       </ol>
       <p className="leaderboard-note">
-        <Users aria-hidden="true" /> Cạnh tranh rất sát sao! Mỗi bước giá đều
-        quan trọng.
+        <Users aria-hidden="true" /> Danh tính được bảo mật bằng số báo danh.
+        Mỗi bước giá đều được ghi nhận minh bạch.
       </p>
     </section>
   );
@@ -158,6 +184,7 @@ function ManualBidModal({
   price,
   minimum,
   increment,
+  initialAmount,
   onClose,
   onAccepted,
   onRejected,
@@ -166,16 +193,24 @@ function ManualBidModal({
   price: number;
   minimum: number;
   increment: number;
+  initialAmount?: number | null;
   onClose: () => void;
   onAccepted: (amount: number) => void;
   onRejected: (amount: number, code: BidRejectionCode, reason: string) => void;
   outcome: Outcome;
 }) {
   const [step, setStep] = useState<Step>("entry");
-  const [value, setValue] = useState("");
+  const [value, setValue] = useState(() =>
+    initialAmount ? String(initialAmount) : "",
+  );
   const [error, setError] = useState("");
   const [ack, setAck] = useState(false);
   const input = useRef<HTMLInputElement>(null);
+  const onCloseRef = useRef(onClose);
+
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  }, [onClose]);
 
   const amount = Number(value);
   const valid = amount >= minimum && (amount - price) % increment === 0;
@@ -215,8 +250,13 @@ function ManualBidModal({
       setStep("result");
     }, 700);
   };
+  useEffect(() => {
+    if (step !== "result" || outcome !== "accepted") return;
+    const autoCloseTimer = window.setTimeout(() => onCloseRef.current(), 60_000);
+    return () => window.clearTimeout(autoCloseTimer);
+  }, [outcome, step]);
   const titles: Record<Outcome, string> = {
-    accepted: "Bid đã được chấp nhận",
+    accepted: "Giá mới",
     "below-minimum": "Mức giá chưa hợp lệ",
     "stale-price": "Giá hiện tại đã thay đổi",
     duplicate: "Bid trùng lặp",
@@ -238,7 +278,7 @@ function ManualBidModal({
         if (!open) onClose();
       }}
       title={dialogTitle}
-      panelClassName="bid-modal"
+      panelClassName={`bid-modal${step === "result" && outcome === "accepted" ? " bid-success-modal" : ""}`}
       initialFocusRef={step === "entry" ? input : undefined}
       preventClose={step === "validating"}
       closeLabel="Đóng cửa sổ đặt giá"
@@ -330,30 +370,46 @@ function ManualBidModal({
           </>
         )}
         {step === "result" && (
-          <>
-            <p>
-              {outcome === "accepted"
-                ? `Mức giá ${formatMoney(amount)} đã được ghi nhận trong phiên mô phỏng.`
-                : "Giá hiện tại và dữ liệu bạn đã nhập vẫn được giữ."}
-            </p>
-            <div className="modal-actions">
-              <Button
-                variant="secondary"
-                onClick={() => setStep("entry")}
-              >
-                Chỉnh sửa mức giá
-              </Button>
-              <Button onClick={onClose}>
-                Đóng
-              </Button>
+          outcome === "accepted" ? (
+            <div className="bid-success-luxury" role="status" aria-live="polite">
+              <div className="bid-paddle-rays" aria-hidden="true" />
+              <div className="bid-paddle-board">
+                <span className="bid-success-eyebrow">GIÁ MỚI</span>
+                <strong className="bid-success-amount">
+                  {formatMoney(amount)}
+                </strong>
+                <div className="bid-success-bidder">
+                  <Gavel aria-hidden="true" />
+                  <span>
+                    <b>{currentUserBidderNumber}</b>
+                    Bạn vừa ra giá thành công
+                  </span>
+                </div>
+                <p>
+                  Đã ghi nhận thành công · Bạn đang dẫn đầu
+                </p>
+              </div>
+              <div className="bid-paddle-handle" aria-hidden="true">
+                <i />
+              </div>
             </div>
-          </>
+          ) : (
+            <>
+              <p>Giá hiện tại và dữ liệu bạn đã nhập vẫn được giữ.</p>
+              <div className="modal-actions">
+                <Button variant="secondary" onClick={() => setStep("entry")}>
+                  Chỉnh sửa mức giá
+                </Button>
+                <Button onClick={onClose}>Đóng</Button>
+              </div>
+            </>
+          )
         )}
     </Dialog>
   );
 }
 
-function DepositGateModal({
+export function DepositGateModal({
   action,
   auctionName,
   startPrice,
@@ -585,22 +641,30 @@ export function LiveAuctionRoomPage() {
   const [params, setParams] = useSearchParams();
   const now = useDemoClock();
   const auction = catalogAuctions.find((item) => item.id === auctionId);
+  const registration = useEligibilityWorkflowStore((store) =>
+    store.registrations.find((item) => item.auctionId === auctionId),
+  );
+  const { walletBalance, auctionDeposits, topUpWallet, payAuctionDeposit } =
+    useDemoStore();
+  const depositAmount = auction ? Math.ceil(auction.startPrice * 0.1) : 0;
+  const depositedAmount = auctionId ? (auctionDeposits[auctionId] ?? 0) : 0;
+  const hasPaidDeposit = depositedAmount > 0;
   const isPatek = auction?.id === "patek-nautilus";
   const initialLeaderboard = isPatek ? patekLeaderboard : defaultLeaderboard;
   const initialActivities = isPatek
     ? [
-        "10:05:12 · Bạn vừa đặt 3.250.000.000 ₫",
-        "10:04:50 · Mi***A vừa đặt 3.225.000.000 ₫",
-        "10:03:31 · Bạn vừa lên vị trí #1",
-        "10:02:05 · An***B vừa đặt 3.200.000.000 ₫",
-        "10:01:42 · Qu***C vừa đặt 3.175.000.000 ₫",
+        "10:05:12 · SBD 027 vừa đặt 3.250.000.000 ₫",
+        "10:04:50 · SBD 031 vừa đặt 3.225.000.000 ₫",
+        "10:03:31 · SBD 027 vừa lên vị trí #1",
+        "10:02:05 · SBD 044 vừa đặt 3.200.000.000 ₫",
+        "10:01:42 · SBD 052 vừa đặt 3.175.000.000 ₫",
         "10:00:12 · Phiên đấu giá được mở",
       ]
     : [
-        "10:05:12 · Bạn vừa đặt 450.000.000 ₫",
-        "10:04:50 · An***B vừa tham gia phiên",
-        "10:03:31 · Bạn vừa lên vị trí #1",
-        "10:01:42 · Qu***C vừa đặt 435.000.000 ₫",
+        "10:05:12 · SBD 027 vừa đặt 450.000.000 ₫",
+        "10:04:50 · SBD 031 vừa đặt 445.000.000 ₫",
+        "10:03:31 · SBD 027 vừa lên vị trí #1",
+        "10:01:42 · SBD 044 vừa đặt 440.000.000 ₫",
         "10:00:12 · Phiên đấu giá được mở",
       ];
   const [price, setPrice] = useState(() => auction?.currentPrice ?? 0);
@@ -609,47 +673,15 @@ export function LiveAuctionRoomPage() {
   );
   const [activityItems, setActivityItems] =
     useState<string[]>(initialActivities);
-  const [bidHistory, setBidHistory] = useState<UserBidRecord[]>(() =>
-    isPatek
-      ? [
-          {
-            id: "patek-user-bid-004",
-            amount: 3_250_000_000,
-            source: "manual",
-            result: "accepted",
-            createdAt: "2026-07-18T10:05:12+07:00",
-            officialPriceAfterBid: 3_250_000_000,
-          },
-          {
-            id: "patek-user-bid-003",
-            amount: 3_200_000_000,
-            source: "auto",
-            result: "accepted",
-            createdAt: "2026-07-18T10:02:38+07:00",
-            officialPriceAfterBid: 3_200_000_000,
-          },
-          {
-            id: "patek-user-bid-002",
-            amount: 3_150_000_000,
-            source: "manual",
-            result: "accepted",
-            createdAt: "2026-07-18T09:58:44+07:00",
-            officialPriceAfterBid: 3_150_000_000,
-          },
-          {
-            id: "patek-user-bid-001",
-            amount: 3_125_000_000,
-            source: "manual",
-            result: "rejected",
-            createdAt: "2026-07-18T09:55:16+07:00",
-            rejectionCode: "stale-price",
-            rejectionReason:
-              "Giá chính thức đã thay đổi trước khi bạn xác nhận.",
-          },
-        ]
-      : [],
-  );
+  const [bidHistory, setBidHistory] = useState<UserBidRecord[]>([]);
   const [accepted, setAccepted] = useState(false);
+  const [depositAction, setDepositAction] = useState<DepositAction | null>(
+    null,
+  );
+  const [isOutbid, setIsOutbid] = useState(false);
+  const [outbidNotice, setOutbidNotice] = useState<OutbidNotice | null>(null);
+  const [manualBidPrefill, setManualBidPrefill] = useState<number | null>(null);
+  const [manualBidRequestId, setManualBidRequestId] = useState(0);
   const [autoBidInstruction, setAutoBidInstruction] =
     useState<AutoBidInstruction>({
       status: "OFF",
@@ -657,11 +689,45 @@ export function LiveAuctionRoomPage() {
       createdAt: null,
       updatedAt: null,
     });
-  const [pendingDepositAction, setPendingDepositAction] =
-    useState<DepositAction | null>(null);
   const autoBidTriggerRef = useRef<HTMLButtonElement>(null);
-  const { walletBalance, auctionDeposits, topUpWallet, payAuctionDeposit } =
-    useDemoStore();
+  const competitorBidTimerRef = useRef<number | null>(null);
+  const lastOutbidIdRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (!outbidNotice) return;
+    const dismissTimer = window.setTimeout(
+      () => setOutbidNotice(null),
+      8_000,
+    );
+    return () => window.clearTimeout(dismissTimer);
+  }, [outbidNotice]);
+
+  useEffect(
+    () => () => {
+      if (competitorBidTimerRef.current !== null)
+        window.clearTimeout(competitorBidTimerRef.current);
+    },
+    [],
+  );
+
+  if (registration && !canEnterAuction(registration))
+    return (
+      <main className="live-room live-state">
+        <ShieldCheck />
+        <h1>Chưa thể vào phòng đấu giá</h1>
+        <p>
+          Đăng ký phải còn hiệu lực, Eligibility phải được duyệt và khoản bảo
+          đảm phải sẵn sàng. Trạng thái hiện tại: {registration.lifecycle} ·{" "}
+          {registration.eligibility}.
+        </p>
+        <Link
+          className="button primary"
+          to={`/auctions/${auctionId}/eligibility`}
+        >
+          Xem trạng thái đăng ký
+        </Link>
+      </main>
+    );
 
   if (!auction)
     return (
@@ -675,8 +741,6 @@ export function LiveAuctionRoomPage() {
 
   const minimum = price + auction.minimumIncrement;
   const remainingMs = Math.max(0, new Date(auction.endsAt).getTime() - now);
-  const depositAmount = Math.ceil(auction.startPrice * 0.1);
-  const hasAuctionDeposit = Boolean(auctionDeposits[auction.id]);
   const panel = params.get("panel");
   const activeTab = params.get("tab") === "my-bids" ? "my-bids" : "activity";
   const openPanel = (nextPanel: DepositAction) =>
@@ -685,22 +749,35 @@ export function LiveAuctionRoomPage() {
       next.set("panel", nextPanel);
       return next;
     });
-  const requireDeposit = (action: DepositAction) => {
-    if (hasAuctionDeposit) {
-      openPanel(action);
+  const showManualBid = () => {
+    setManualBidPrefill(null);
+    setManualBidRequestId((current) => current + 1);
+    openPanel("manual-bid");
+  };
+  const openManualBid = () => {
+    if (!hasPaidDeposit) {
+      setDepositAction("manual-bid");
       return;
     }
-    setPendingDepositAction(action);
+    showManualBid();
   };
-  const openManualBid = () => requireDeposit("manual-bid");
-  const openAutoBid = () => requireDeposit("autobid");
+  const showAutoBid = () => openPanel("autobid");
+  const openAutoBid = () => {
+    if (!hasPaidDeposit) {
+      setDepositAction("autobid");
+      return;
+    }
+    showAutoBid();
+  };
   const confirmDeposit = (topUpAmount: number) => {
     if (topUpAmount > 0) topUpWallet(topUpAmount);
     payAuctionDeposit(auction.id, depositAmount);
   };
   const continueAfterDeposit = () => {
-    if (pendingDepositAction) openPanel(pendingDepositAction);
-    setPendingDepositAction(null);
+    const requestedAction = depositAction;
+    setDepositAction(null);
+    if (requestedAction === "manual-bid") showManualBid();
+    if (requestedAction === "autobid") showAutoBid();
   };
   const closePanel = () =>
     setParams((current) => {
@@ -739,17 +816,41 @@ export function LiveAuctionRoomPage() {
       createdAt: null,
       updatedAt: new Date().toISOString(),
     });
+  const openOutbidResponse = () => {
+    setManualBidPrefill(outbidNotice?.nextMinimum ?? minimum);
+    setManualBidRequestId((current) => current + 1);
+    setOutbidNotice(null);
+    openPanel("manual-bid");
+  };
   const applyAcceptedBid = (amount: number, source: BidSource) => {
+    if (competitorBidTimerRef.current !== null)
+      window.clearTimeout(competitorBidTimerRef.current);
+    setIsOutbid(false);
+    setOutbidNotice(null);
+    setManualBidPrefill(null);
     setPrice(amount);
-    setLeaderboard((entries) =>
-      entries
-        .map((entry) =>
-          entry.isCurrentUser
-            ? { ...entry, amount, bids: entry.bids + 1 }
-            : entry,
-        )
-        .sort((first, second) => second.amount - first.amount),
-    );
+    setLeaderboard((entries) => {
+      const currentUser = entries.find((entry) => entry.isCurrentUser);
+      const updatedEntries = currentUser
+        ? entries.map((entry) =>
+            entry.isCurrentUser
+              ? { ...entry, amount, bids: entry.bids + 1 }
+              : entry,
+          )
+        : [
+            ...entries,
+            {
+              bidderNumber: currentUserBidderNumber,
+              amount,
+              bids: 1,
+              isCurrentUser: true,
+            },
+          ];
+
+      return updatedEntries.sort(
+        (first, second) => second.amount - first.amount,
+      );
+    });
     setActivityItems((items) =>
       [
         `10:06:00 · ${source === "manual" ? "Bạn vừa đặt" : "Auto-bid của bạn vừa đặt"} ${formatMoney(amount)}`,
@@ -781,6 +882,57 @@ export function LiveAuctionRoomPage() {
           }
         : current,
     );
+
+    competitorBidTimerRef.current = window.setTimeout(() => {
+      const competitorNumber = "SBD 031";
+      const competitorAmount = amount + auction.minimumIncrement;
+      const nextMinimum = competitorAmount + auction.minimumIncrement;
+      const noticeId = `${auction.id}:${competitorNumber}:${competitorAmount}`;
+
+      if (lastOutbidIdRef.current === noticeId) return;
+      lastOutbidIdRef.current = noticeId;
+      competitorBidTimerRef.current = null;
+
+      setPrice((current) => Math.max(current, competitorAmount));
+      setLeaderboard((entries) =>
+        entries
+          .map((entry) =>
+            entry.bidderNumber === competitorNumber
+              ? {
+                  ...entry,
+                  amount: competitorAmount,
+                  bids: entry.bids + 1,
+                }
+              : entry,
+          )
+          .sort((first, second) => second.amount - first.amount),
+      );
+      setActivityItems((items) =>
+        [
+          `Vừa xong · ${competitorNumber} vừa đặt ${formatMoney(competitorAmount)} · Bạn đã bị vượt giá`,
+          ...items,
+        ].slice(0, 6),
+      );
+      setAccepted(false);
+      setIsOutbid(true);
+      setOutbidNotice({
+        id: noticeId,
+        competitorNumber,
+        competitorAmount,
+        nextMinimum,
+      });
+      setAutoBidInstruction((current) =>
+        current.status === "ACTIVE" &&
+        current.maximumAmount !== null &&
+        current.maximumAmount < nextMinimum
+          ? {
+              ...current,
+              status: "LIMIT_REACHED",
+              updatedAt: new Date().toISOString(),
+            }
+          : current,
+      );
+    }, 3_200);
   };
   const autoBidLabel =
     autoBidInstruction.status === "ACTIVE"
@@ -811,6 +963,55 @@ export function LiveAuctionRoomPage() {
           <AuctionMetrics />
         </div>
       </header>
+      {outbidNotice && (
+        <aside
+          className="outbid-toast"
+          role="alert"
+          aria-live="assertive"
+          aria-atomic="true"
+          data-notice-id={outbidNotice.id}
+        >
+          <div className="outbid-toast__icon" aria-hidden="true">
+            <BellRing />
+          </div>
+          <div className="outbid-toast__content">
+            <span className="outbid-toast__eyebrow">
+              <Flame aria-hidden="true" /> Cập nhật trực tiếp
+            </span>
+            <strong>Bạn vừa bị vượt giá</strong>
+            <p>
+              {outbidNotice.competitorNumber} đã đặt{" "}
+              <b>{formatMoney(outbidNotice.competitorAmount)}</b>
+            </p>
+            <small>
+              Giá tối thiểu tiếp theo:{" "}
+              <b>{formatMoney(outbidNotice.nextMinimum)}</b>
+            </small>
+            <div className="outbid-toast__actions">
+              <button type="button" onClick={openOutbidResponse}>
+                <Gavel aria-hidden="true" />
+                Đặt lại ngay
+              </button>
+              <button
+                type="button"
+                className="outbid-toast__dismiss"
+                onClick={() => setOutbidNotice(null)}
+              >
+                Đóng
+              </button>
+            </div>
+          </div>
+          <button
+            type="button"
+            className="outbid-toast__close"
+            aria-label="Đóng thông báo vượt giá"
+            onClick={() => setOutbidNotice(null)}
+          >
+            <X aria-hidden="true" />
+          </button>
+          <span className="outbid-toast__timer" aria-hidden="true" />
+        </aside>
+      )}
       <div className="live-auction-stage">
         <section className="live-visual-column">
           <article className="asset-viewer">
@@ -844,6 +1045,8 @@ export function LiveAuctionRoomPage() {
               </span>
             </div>
           </section>
+        </section>
+
           <section className="tab-shell">
             <div
               className="live-tabs"
@@ -900,14 +1103,12 @@ export function LiveAuctionRoomPage() {
               </p>
             )}
           </section>
-        </section>
-
-        <AuctionCountdownDial
-          remainingMs={remainingMs}
-          endsAt={auction.endsAt}
-        />
 
         <section className="live-command-column">
+          <AuctionCountdownDial
+            remainingMs={remainingMs}
+            endsAt={auction.endsAt}
+          />
           <section className="composer">
             <h2>Đặt giá tiếp theo (tối thiểu)</h2>
             <p className="bid-amount">
@@ -916,18 +1117,36 @@ export function LiveAuctionRoomPage() {
             <p>
               Bước giá tối thiểu: {formatMoney(auction.minimumIncrement)}
             </p>
+            {isOutbid && (
+              <div className="outbid-inline" role="status">
+                <div className="outbid-inline__icon" aria-hidden="true">
+                  <Flame />
+                </div>
+                <div>
+                  <strong>Bạn đang không còn dẫn đầu</strong>
+                  <span>
+                    Đặt từ {formatMoney(minimum)} để quay lại vị trí số 1.
+                  </span>
+                </div>
+                <button type="button" onClick={openOutbidResponse}>
+                  Đặt lại ngay
+                </button>
+              </div>
+            )}
             <div
-              className={`deposit-inline-status ${hasAuctionDeposit ? "paid" : ""}`}
+              className={`deposit-inline-status ${hasPaidDeposit ? "paid" : ""}`}
             >
-              <ShieldCheck />
+              {hasPaidDeposit ? <ShieldCheck /> : <Wallet />}
               <div>
                 <strong>
-                  {hasAuctionDeposit ? "Đã đặt cọc" : "Yêu cầu đặt cọc"}
+                  {hasPaidDeposit
+                    ? "Đặt cọc đã được xác nhận"
+                    : "Chưa đặt cọc cho phiên này"}
                 </strong>
                 <span>
-                  {hasAuctionDeposit
-                    ? `Phiên này đã mở quyền đấu giá: ${formatMoney(auctionDeposits[auction.id])}`
-                    : `Cọc 10% giá khởi điểm: ${formatMoney(depositAmount)}`}
+                  {hasPaidDeposit
+                    ? `Đã ghi nhận ${formatMoney(depositedAmount)}. Quyền đặt giá đã được mở.`
+                    : `Cần đặt cọc ${formatMoney(depositAmount)} trước khi đặt giá.`}
                 </span>
               </div>
             </div>
@@ -937,7 +1156,9 @@ export function LiveAuctionRoomPage() {
               aria-label="Đặt giá thủ công"
               onClick={openManualBid}
             >
-              Đấu giá ngay
+              {isOutbid
+                ? `🔥 Đặt lại ${formatMoney(minimum)}`
+                : "Đấu giá ngay"}
             </Button>
             <button
               ref={autoBidTriggerRef}
@@ -976,26 +1197,29 @@ export function LiveAuctionRoomPage() {
         </section>
 
         <aside className="live-competition-column">
-          <LeaderboardPanel leaderboard={leaderboard} />
+          <LeaderboardPanel leaderboard={leaderboard} isOutbid={isOutbid} />
         </aside>
       </div>
-      {pendingDepositAction && (
+      {depositAction && (
         <DepositGateModal
-          action={pendingDepositAction}
+          key={`${auction.id}:${depositAction}`}
+          action={depositAction}
           auctionName={auction.assetName}
           startPrice={auction.startPrice}
           depositAmount={depositAmount}
           walletBalance={walletBalance}
-          onCancel={() => setPendingDepositAction(null)}
+          onCancel={() => setDepositAction(null)}
           onContinue={continueAfterDeposit}
           onConfirmDeposit={confirmDeposit}
         />
       )}
-      {panel === "manual-bid" && (
+      {hasPaidDeposit && panel === "manual-bid" && (
         <ManualBidModal
+          key={manualBidRequestId}
           price={price}
           minimum={minimum}
           increment={auction.minimumIncrement}
+          initialAmount={manualBidPrefill}
           outcome={outcome}
           onClose={closePanel}
           onAccepted={(amount) => applyAcceptedBid(amount, "manual")}
@@ -1017,7 +1241,7 @@ export function LiveAuctionRoomPage() {
           }
         />
       )}
-      {panel === "autobid" && (
+      {hasPaidDeposit && panel === "autobid" && (
         <AutoBidDrawer
           currentPrice={price}
           minimumNextBid={minimum}

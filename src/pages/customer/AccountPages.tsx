@@ -3,6 +3,7 @@ import {
   ArrowDownToLine,
   Bell,
   Building2,
+  CircleDollarSign,
   CheckCircle2,
   ClipboardCheck,
   CreditCard,
@@ -30,7 +31,16 @@ import { ButtonLink } from "../../components/common/Button";
 import { FormField } from "../../components/common/FormField";
 import { EmptyState } from "../../components/feedback/States";
 import { auctions, type Auction } from "../../services/mock/auctionService";
-import { type KycState, useDemoStore } from "../../store/demoStore";
+import {
+  type AuctionDepositReason,
+  type AuctionDepositStatus,
+  type KycState,
+  useDemoStore,
+} from "../../store/demoStore";
+import {
+  type PayoutStatus,
+  useFinanceFlowStore,
+} from "../../store/financeFlowStore";
 import { formatMoney } from "../../utils/format";
 
 const profile = {
@@ -725,11 +735,18 @@ export function MembershipPage() {
 
 export function WalletPage() {
   const {
+    userName,
     walletBalance,
     bankAccounts: linkedBankAccounts,
     addBankAccount,
     withdrawFromWallet,
   } = useDemoStore();
+  const payoutRequests = useFinanceFlowStore(
+    (state) => state.payoutRequests,
+  );
+  const createPayoutRequest = useFinanceFlowStore(
+    (state) => state.createPayoutRequest,
+  );
   const bankAccounts = linkedBankAccounts ?? [];
   const [showBankForm, setShowBankForm] = useState(false);
   const [withdrawAmount, setWithdrawAmount] = useState("");
@@ -782,13 +799,31 @@ export function WalletPage() {
 
   function confirmWithdraw() {
     if (!selectedBank || !canWithdraw) return;
+    const payout = createPayoutRequest({
+      userName,
+      bankName: selectedBank.bankName,
+      accountNumber: selectedBank.accountNumber,
+      accountHolder: selectedBank.accountHolder,
+      amount,
+    });
     withdrawFromWallet(amount);
     setConfirming(false);
     setMessage(
-      `Đã tạo yêu cầu rút ${formatMoney(amount)} về ${selectedBank.bankName}.`,
+      `Đã gửi ${payout.id} tới Finance. Số tiền ${formatMoney(amount)} đang được tạm giữ để kiểm tra.`,
     );
     setWithdrawAmount("");
   }
+
+  const userPayouts = payoutRequests.filter(
+    (item) => item.userCode === "USR-CURRENT" || item.userName === userName,
+  );
+  const payoutStatusLabels: Record<PayoutStatus, string> = {
+    PENDING_REVIEW: "Finance đang kiểm tra",
+    APPROVED: "Đã được duyệt",
+    PROCESSING: "Ngân hàng đang xử lý",
+    PAID: "Đã chuyển tiền",
+    REJECTED: "Đã từ chối",
+  };
 
   return (
     <AccountPage
@@ -913,6 +948,54 @@ export function WalletPage() {
         </div>
       </section>
 
+      <section className="panel wallet-payout-history">
+        <div className="panel-title">
+          <div>
+            <h2>
+              <ClipboardCheck />
+              Yêu cầu rút tiền gần đây
+            </h2>
+            <p>
+              Trạng thái được cập nhật trực tiếp sau khi Finance kiểm tra và
+              xử lý lệnh chi.
+            </p>
+          </div>
+          <span>{userPayouts.length} yêu cầu</span>
+        </div>
+        {userPayouts.length ? (
+          <div className="wallet-payout-list">
+            {userPayouts.map((payout) => (
+              <article key={payout.id}>
+                <span
+                  className={`wallet-payout-icon ${payout.status.toLowerCase()}`}
+                >
+                  <ArrowDownToLine aria-hidden="true" />
+                </span>
+                <div>
+                  <strong>{payout.id}</strong>
+                  <small>
+                    {payout.bankName} · {payout.accountNumber}
+                  </small>
+                  <time>
+                    {new Date(payout.createdAt).toLocaleString("vi-VN")}
+                  </time>
+                </div>
+                <strong>{formatMoney(payout.amount)}</strong>
+                <span
+                  className={`wallet-payout-status ${payout.status.toLowerCase()}`}
+                >
+                  {payoutStatusLabels[payout.status]}
+                </span>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <p className="wallet-payout-empty">
+            Bạn chưa có yêu cầu rút tiền nào được gửi tới Finance.
+          </p>
+        )}
+      </section>
+
       {confirming && selectedBank && (
         <div
           className="wallet-confirm-overlay"
@@ -955,6 +1038,302 @@ export function WalletPage() {
             </div>
           </section>
         </div>
+      )}
+    </AccountPage>
+  );
+}
+
+export function MyAuctionsPage() {
+  const records = [
+    {
+      auction: auctions.find((item) => item.id === "rolex-126610lv"),
+      status: "Đang diễn ra",
+      tone: "live",
+      detail: `Giá đã trả: ${formatMoney(450_000_000)}`,
+      meta: "SBD 018 · Đã đặt cọc",
+      to: "/auctions/rolex-126610lv/live",
+      action: "Vào phòng đấu giá",
+    },
+    {
+      auction: auctions.find((item) => item.id === "patek-nautilus"),
+      status: "Đã thắng",
+      tone: "success",
+      detail: `Giá trúng: ${formatMoney(3_250_000_000)}`,
+      meta: "Đang chờ hoàn tất thanh toán",
+      to: "/me/auctions/patek-nautilus/result",
+      action: "Xem kết quả",
+    },
+    {
+      auction: auctions.find((item) => item.id === "diamond-gia"),
+      status: "Đã đăng ký",
+      tone: "pending",
+      detail: "Hồ sơ tham gia đã được ghi nhận",
+      meta: "Chờ phiên đấu giá bắt đầu",
+      to: "/auctions/diamond-gia",
+      action: "Xem phiên",
+    },
+  ].filter((record) => record.auction);
+
+  return (
+    <AccountPage
+      eyebrow="HOẠT ĐỘNG ĐẤU GIÁ"
+      title="Phiên đấu giá của tôi"
+      intro="Theo dõi các phiên bạn đã đăng ký, đang tham gia hoặc đã có kết quả."
+    >
+      <div className="account-collection-stats">
+        <StatCard label="Tổng số phiên" value={String(records.length)} />
+        <StatCard label="Đang tham gia" value="1" />
+        <StatCard label="Đã thắng" value="1" />
+      </div>
+      <div className="account-record-list">
+        {records.map(({ auction, status, tone, detail, meta, to, action }) => (
+          <article className="account-record-card" key={auction!.id}>
+            <img src={auction!.image} alt={auction!.assetName} />
+            <div className="account-record-copy">
+              <div className="account-record-heading">
+                <div>
+                  <small>{auction!.code}</small>
+                  <h2>{auction!.assetName}</h2>
+                </div>
+                <span className={`account-record-status is-${tone}`}>
+                  {status}
+                </span>
+              </div>
+              <strong>{detail}</strong>
+              <p>{meta}</p>
+            </div>
+            <Link className="button secondary" to={to}>
+              {action}
+            </Link>
+          </article>
+        ))}
+      </div>
+    </AccountPage>
+  );
+}
+
+export function MyPaymentsPage() {
+  const patek = auctions.find((item) => item.id === "patek-nautilus");
+
+  return (
+    <AccountPage
+      eyebrow="TÀI CHÍNH CÁ NHÂN"
+      title="Thanh toán của tôi"
+      intro="Quản lý tiền cọc, khoản phải thanh toán và trạng thái đối soát của từng phiên."
+    >
+      <div className="account-collection-stats">
+        <StatCard label="Chờ thanh toán" value="1" />
+        <StatCard label="Đã hoàn tất" value="1" />
+        <StatCard label="Tổng tiền cọc" value={formatMoney(38_000_000)} />
+      </div>
+      <div className="account-record-list">
+        <article className="account-record-card account-record-card--compact">
+          <span className="account-record-icon">
+            <CreditCard aria-hidden="true" />
+          </span>
+          <div className="account-record-copy">
+            <div className="account-record-heading">
+              <div>
+                <small>SGD-260717-002</small>
+                <h2>{patek?.assetName ?? "Patek Philippe Nautilus 5711/1R"}</h2>
+              </div>
+              <span className="account-record-status is-pending">
+                Chờ thanh toán
+              </span>
+            </div>
+            <strong>{formatMoney(3_250_000_000)}</strong>
+            <p>Hạn thanh toán: 17:00, 20/07/2026</p>
+          </div>
+          <Link
+            className="button primary"
+            to="/me/auctions/patek-nautilus/payment"
+          >
+            Thanh toán ngay
+          </Link>
+        </article>
+        <article className="account-record-card account-record-card--compact">
+          <span className="account-record-icon">
+            <CircleDollarSign aria-hidden="true" />
+          </span>
+          <div className="account-record-copy">
+            <div className="account-record-heading">
+              <div>
+                <small>SGD-260717-001</small>
+                <h2>Tiền cọc phiên Rolex Submariner Date</h2>
+              </div>
+              <span className="account-record-status is-success">
+                Đã ghi nhận
+              </span>
+            </div>
+            <strong>{formatMoney(38_000_000)}</strong>
+            <p>Khoản cọc đang được giữ cho phiên đấu giá trực tiếp.</p>
+          </div>
+          <Link className="button secondary" to="/account/deposits">
+            Xem tiền cọc
+          </Link>
+        </article>
+      </div>
+    </AccountPage>
+  );
+}
+
+export function MyDeliveriesPage() {
+  const patek = auctions.find((item) => item.id === "patek-nautilus");
+
+  return (
+    <AccountPage
+      eyebrow="BÀN GIAO TÀI SẢN"
+      title="Bàn giao của tôi"
+      intro="Theo dõi lịch hẹn, quá trình vận chuyển và xác nhận nhận tài sản."
+    >
+      <div className="account-collection-stats">
+        <StatCard label="Đang xử lý" value="1" />
+        <StatCard label="Đang vận chuyển" value="0" />
+        <StatCard label="Đã hoàn tất" value="0" />
+      </div>
+      <div className="account-record-list">
+        <article className="account-record-card account-record-card--compact">
+          <span className="account-record-icon">
+            <PackageCheck aria-hidden="true" />
+          </span>
+          <div className="account-record-copy">
+            <div className="account-record-heading">
+              <div>
+                <small>Hồ sơ HO-5711R-2026</small>
+                <h2>{patek?.assetName ?? "Patek Philippe Nautilus 5711/1R"}</h2>
+              </div>
+              <span className="account-record-status is-live">
+                Đang chuẩn bị
+              </span>
+            </div>
+            <strong>Chờ xác nhận lịch bàn giao</strong>
+            <p>Địa điểm dự kiến: Trung tâm bàn giao SGDG, TP. Hồ Chí Minh</p>
+          </div>
+          <Link
+            className="button secondary"
+            to="/me/handover/HO-5711R-2026"
+          >
+            Theo dõi bàn giao
+          </Link>
+        </article>
+      </div>
+    </AccountPage>
+  );
+}
+
+const depositStatusLabels: Record<AuctionDepositStatus, string> = {
+  ACTIVE: "Đang được giữ",
+  ON_HOLD: "Tạm giữ để đối soát",
+  REFUND_PENDING: "Đang chờ Finance hoàn cọc",
+  REFUNDED: "Đã hoàn vào ví",
+  FORFEITED: "Đã thu cọc",
+  APPLIED_TO_PAYMENT: "Đã khấu trừ thanh toán",
+};
+
+const depositReasonLabels: Record<AuctionDepositReason, string> = {
+  NOT_WINNER: "Không trúng đấu giá",
+  AUCTION_CANCELLED: "Phiên đấu giá bị hủy",
+  AUCTION_FAILED: "Phiên không hình thành người thắng hợp lệ",
+  PAYMENT_AMBIGUOUS: "Đang đối soát nghĩa vụ thanh toán",
+  PAYMENT_DEFAULT: "Không hoàn tất thanh toán đúng hạn",
+  WINNER_PAYMENT: "Khấu trừ vào thanh toán trúng đấu giá",
+};
+
+export function DepositsPage() {
+  const records = useDemoStore((state) =>
+    Object.values(state.auctionDepositRecords).sort(
+      (first, second) =>
+        new Date(second.updatedAt).getTime() -
+        new Date(first.updatedAt).getTime(),
+    ),
+  );
+
+  return (
+    <AccountPage
+      eyebrow="TIỀN CỌC ĐẤU GIÁ"
+      title="Theo dõi tiền cọc"
+      intro="Xem khoản cọc đang giữ, lệnh hoàn tiền, khoản đã khấu trừ và các trường hợp bị thu do không hoàn tất nghĩa vụ."
+    >
+      <section className="deposit-policy-summary">
+        <CircleDollarSign aria-hidden="true" />
+        <div>
+          <h2>Nguyên tắc xử lý tiền cọc</h2>
+          <p>
+            Không trúng hoặc phiên thất bại sẽ được hoàn cọc; thanh toán thành
+            công sẽ khấu trừ cọc; quá hạn thanh toán có thể làm mất cọc.
+          </p>
+        </div>
+      </section>
+
+      {records.length ? (
+        <div className="deposit-record-list">
+          {records.map((record) => {
+            const auction = auctions.find(
+              (item) => item.id === record.auctionId,
+            );
+            const tone =
+              record.status === "REFUNDED" ||
+              record.status === "APPLIED_TO_PAYMENT"
+                ? "success"
+                : record.status === "FORFEITED"
+                  ? "danger"
+                  : record.status === "ON_HOLD" ||
+                      record.status === "REFUND_PENDING"
+                    ? "warning"
+                    : "info";
+            return (
+              <article
+                className={`deposit-record status-${record.status.toLowerCase()}`}
+                key={record.reference}
+              >
+                <header>
+                  <div>
+                    <small>{record.reference}</small>
+                    <h2>{auction?.assetName ?? record.auctionId}</h2>
+                    <p>{auction?.code ?? record.auctionId}</p>
+                  </div>
+                  <Badge tone={tone}>{depositStatusLabels[record.status]}</Badge>
+                </header>
+                <strong className="deposit-record-amount">
+                  {formatMoney(record.amount)}
+                </strong>
+                {record.reason && (
+                  <p className="deposit-record-reason">
+                    {depositReasonLabels[record.reason]}
+                  </p>
+                )}
+                <ol className="deposit-record-timeline">
+                  {record.timeline.map((event) => (
+                    <li key={event.id}>
+                      <CheckCircle2 aria-hidden="true" />
+                      <div>
+                        <strong>{event.label}</strong>
+                        {event.note && <span>{event.note}</span>}
+                        <time dateTime={event.at}>
+                          {new Date(event.at).toLocaleString("vi-VN")}
+                        </time>
+                      </div>
+                    </li>
+                  ))}
+                </ol>
+                {auction && (
+                  <ButtonLink
+                    variant="secondary"
+                    to={`/auctions/${auction.id}`}
+                  >
+                    Xem phiên đấu giá
+                  </ButtonLink>
+                )}
+              </article>
+            );
+          })}
+        </div>
+      ) : (
+        <EmptyState
+          title="Bạn chưa có khoản cọc nào"
+          description="Sau khi đặt cọc tham gia phiên, trạng thái xử lý sẽ được hiển thị tại đây."
+          primaryAction={<ButtonLink to="/auctions">Khám phá phiên đấu giá</ButtonLink>}
+        />
       )}
     </AccountPage>
   );

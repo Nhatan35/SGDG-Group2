@@ -291,6 +291,11 @@ export function FinancePackagePage() {
             </Link>
             <p>Payment: PAY-••••-5711R</p>
             <p>Final Winner: SGD-WIN-•••-5711R</p>
+            {role === "FINANCE" && (
+              <Link to="/finance/override-requests/new">
+                Tạo yêu cầu xử lý ngoại lệ có kiểm soát
+              </Link>
+            )}
           </section>
         </aside>
       </div>

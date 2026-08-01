@@ -62,6 +62,7 @@ export interface FinancialInvestigation {
   status: "REQUESTED" | "IN_PROGRESS" | "MORE_INFO_REQUIRED" | "SUBMITTED";
   requestedAt: string;
   findings?: string;
+  followUpNote?: string;
   financeStaff?: string;
   events: CaseEvent[];
 }
@@ -130,6 +131,8 @@ interface SupportState {
     type: FinancialInvestigation["type"],
     reference: string,
   ) => void;
+  startFinancialInvestigation: (id: string) => void;
+  requestMoreFinancialInformation: (id: string, note: string) => void;
   submitFinancialInvestigation: (id: string, findings: string) => void;
   acceptConversation: (id: string) => void;
   sendStaffMessage: (id: string, text: string) => void;
@@ -582,14 +585,56 @@ export const useSupportStore = create<SupportState>()(
             ],
           };
         }),
+      startFinancialInvestigation: (id) =>
+        set((s) => ({
+          investigations: s.investigations.map((x) =>
+            x.id === id && x.status === "REQUESTED"
+              ? {
+                  ...x,
+                  status: "IN_PROGRESS",
+                  financeStaff: "Finance Demo",
+                  events: [
+                    ...x.events,
+                    event(
+                      `EV-${Date.now()}`,
+                      "Finance bắt đầu kiểm tra giao dịch",
+                      "Finance Demo",
+                    ),
+                  ],
+                }
+              : x,
+          ),
+        })),
+      requestMoreFinancialInformation: (id, note) =>
+        set((s) => ({
+          investigations: s.investigations.map((x) =>
+            x.id === id && x.status !== "SUBMITTED" && note.trim()
+              ? {
+                  ...x,
+                  status: "MORE_INFO_REQUIRED",
+                  followUpNote: note.trim(),
+                  financeStaff: "Finance Demo",
+                  events: [
+                    ...x.events,
+                    event(
+                      `EV-${Date.now()}`,
+                      "Yêu cầu Customer Support bổ sung bằng chứng",
+                      "Finance Demo",
+                      note.trim(),
+                    ),
+                  ],
+                }
+              : x,
+          ),
+        })),
       submitFinancialInvestigation: (id, findings) =>
         set((s) => ({
           investigations: s.investigations.map((x) =>
-            x.id === id
+            x.id === id && x.status !== "SUBMITTED" && findings.trim()
               ? {
                   ...x,
                   status: "SUBMITTED",
-                  findings,
+                  findings: findings.trim(),
                   financeStaff: "Finance Demo",
                   events: [
                     ...x.events,
@@ -597,7 +642,7 @@ export const useSupportStore = create<SupportState>()(
                       `EV-${Date.now()}`,
                       "Investigation result submitted",
                       "Finance",
-                      findings,
+                      findings.trim(),
                     ),
                   ],
                 }

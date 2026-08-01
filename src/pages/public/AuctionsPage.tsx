@@ -3,12 +3,11 @@ import {
   Check,
   ChevronDown,
   Clock3,
-  Search,
   SlidersHorizontal,
   Tag,
   X,
 } from "lucide-react";
-import { FormEvent, Fragment, useMemo } from "react";
+import { Fragment, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import {
   AuctionCard,
@@ -33,15 +32,11 @@ const statusOptions = [
   ["upcoming", "Sắp diễn ra"],
   ["registration-open", "Đang mở đăng ký"],
   ["live", "Đang diễn ra"],
-  ["closed", "Đã kết thúc"],
-  ["cancelled", "Đã hủy"],
 ] as const;
 const statusValues: Record<string, Auction["status"][]> = {
   upcoming: ["PUBLISHED"],
   "registration-open": ["REGISTRATION_OPEN"],
   live: ["LIVE", "PAUSED"],
-  closed: ["CLOSED", "COMPLETED"],
-  cancelled: ["CANCELLED"],
 };
 const priceOptions = [
   ["under-500", "Dưới 500 triệu"],
@@ -89,7 +84,8 @@ function catalogPrice(auction: Auction) {
 export function AuctionsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const query = searchParams.get("q") ?? "";
-  const status = searchParams.get("status") ?? "";
+  const requestedStatus = searchParams.get("status") ?? "";
+  const status = statusValues[requestedStatus] ? requestedStatus : "";
   const category = searchParams.get("category") ?? "";
   const price = searchParams.get("price") ?? "";
   const sort = searchParams.get("sort") ?? "soonest";
@@ -131,6 +127,9 @@ export function AuctionsPage() {
     Object.entries(changes).forEach(([key, value]) =>
       value ? next.set(key, value) : next.delete(key),
     );
+    if (next.get("status") && !statusValues[next.get("status")!]) {
+      next.delete("status");
+    }
     if (resetPage) next.set("page", "1");
     if (next.get("page") === "1") next.delete("page");
     setSearchParams(next);
@@ -140,7 +139,7 @@ export function AuctionsPage() {
     const normalizedQuery = query.trim().toLocaleLowerCase("vi-VN");
     const result = availableAuctions.filter((auction) => {
       const haystack =
-        `${auction.assetName} ${auction.category} ${auction.code}`.toLocaleLowerCase(
+        `${auction.assetName} ${auction.category} ${auction.region} ${auction.code}`.toLocaleLowerCase(
           "vi-VN",
         );
       const matchesQuery =
@@ -196,13 +195,6 @@ export function AuctionsPage() {
     value: string;
     label: string;
   }>;
-  const submitSearch = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    updateParams({
-      q: new FormData(event.currentTarget).get("q")?.toString().trim() || null,
-    });
-  };
-
   return (
     <div className="auction-catalog-page">
       <section className="catalog-hero">
@@ -232,25 +224,6 @@ export function AuctionsPage() {
               </span>
             </div>
           </div>
-          <form
-            className="catalog-search"
-            role="search"
-            onSubmit={submitSearch}
-          >
-            <label className="sr-only" htmlFor="catalog-search">
-              Tìm kiếm phiên đấu giá
-            </label>
-            <Search aria-hidden="true" />
-            <input
-              id="catalog-search"
-              name="q"
-              defaultValue={query}
-              placeholder="Tìm tài sản, danh mục hoặc mã phiên"
-            />
-            <Button type="submit">
-              Tìm kiếm
-            </Button>
-          </form>
         </div>
       </section>
       <div

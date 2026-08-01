@@ -1,0 +1,73 @@
+.schedule-workspace {
+  display: grid;
+  gap: 1.25rem;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+.schedule-eyebrow {
+  color: var(--color-primary, #6f4e37);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+.schedule-disclaimer,
+.schedule-boundary {
+  border-left: 4px solid #b38b59;
+  background: #fff9ef;
+  padding: 0.9rem 1rem;
+}
+.schedule-evidence,
+.schedule-card {
+  border: 1px solid #ded8d0;
+  border-radius: 12px;
+  background: #fff;
+  padding: 1.25rem;
+}
+.schedule-evidence dl,
+.schedule-status-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+.schedule-evidence dl div,
+.schedule-status-row div {
+  display: grid;
+  gap: 0.2rem;
+}
+.schedule-evidence dt,
+.schedule-status-row span {
+  color: #6c655d;
+  font-size: 0.8rem;
+}
+.schedule-evidence dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.schedule-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin: 1.25rem 0;
+}
+.schedule-form label {
+  display: grid;
+  gap: 0.4rem;
+  font-weight: 600;
+}
+.schedule-form input {
+  min-height: 42px;
+  border: 1px solid #aaa198;
+  border-radius: 7px;
+  padding: 0.55rem 0.7rem;
+}
+.schedule-history,
+.schedule-findings {
+  margin-top: 1rem;
+}
+@media (max-width: 600px) {
+  .schedule-workspace { padding: 1rem; }
+  .schedule-evidence dl,
+  .schedule-status-row,
+  .schedule-form { grid-template-columns: 1fr; }
+}

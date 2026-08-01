@@ -702,40 +702,6 @@
   width: 1.15rem;
 }
 
-.leaderboard-live-state {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  color: #c8e8ce;
-  font-size: 0.66rem;
-}
-
-.leaderboard-live-state::before {
-  width: 0.38rem;
-  height: 0.38rem;
-  border-radius: 50%;
-  background: #38c965;
-  box-shadow: 0 0 0 3px rgba(56, 201, 101, 0.11);
-  content: "";
-}
-
-.live-room .leaderboard-controls {
-  padding: 0.65rem 1rem;
-  border-bottom: 1px solid rgba(255, 192, 108, 0.18);
-}
-
-.live-room .leaderboard-controls button {
-  border-color: rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.04);
-  color: rgba(255, 255, 255, 0.62);
-}
-
-.live-room .leaderboard-controls button.is-active {
-  border-color: rgba(255, 126, 34, 0.35);
-  background: rgba(239, 91, 18, 0.12);
-  color: #ffad61;
-}
-
 .live-room .leaderboard-row {
   display: grid;
   grid-template-columns: 34px minmax(0, 1fr) auto;
@@ -1013,6 +979,621 @@
   }
 }
 
+.live-room .auction-countdown-dial {
+  overflow: visible;
+}
+
+/* Warm, energetic color balance for the live room */
+.live-room {
+  background:
+    radial-gradient(circle at 78% 20%, rgba(255, 142, 70, 0.1), transparent 30rem),
+    linear-gradient(180deg, #fff5eb 0%, #fff0e3 52%, #fff6ed 100%) !important;
+}
+
+.live-room .live-header {
+  border-top: 1px solid rgba(255, 135, 58, 0.55);
+  border-bottom-color: rgba(255, 151, 84, 0.38);
+  background:
+    radial-gradient(circle at 82% 18%, rgba(255, 126, 43, 0.22), transparent 25rem),
+    radial-gradient(circle at 14% 0%, rgba(244, 116, 35, 0.2), transparent 23rem),
+    linear-gradient(115deg, #4a2012 0%, #35150c 48%, #24100a 100%);
+  box-shadow:
+    inset 0 -1px 0 rgba(255, 190, 141, 0.1),
+    0 10px 28px rgba(93, 35, 10, 0.13);
+}
+
+.live-room .live-header-copy > p {
+  color: #ff9a52;
+  text-shadow: 0 0 18px rgba(255, 128, 40, 0.32);
+}
+
+.live-room .live-header h1 {
+  color: #fffaf5;
+  text-shadow: 0 2px 16px rgba(21, 7, 2, 0.24);
+}
+
+.live-room .live-header .live-header-session-metrics {
+  border-color: rgba(255, 163, 102, 0.44);
+  background: linear-gradient(145deg, #fffdf9, #fff5ed);
+  box-shadow:
+    0 14px 32px rgba(31, 11, 4, 0.25),
+    inset 0 1px 0 #fff;
+}
+
+.live-room .live-header .live-header-session-metrics h2 {
+  padding-left: 0.35rem;
+  text-align: center;
+}
+
+.live-room .live-header .live-header-session-metrics .metric-grid {
+  width: calc(100% - 0.7rem);
+  margin-inline: auto;
+  transform: translateX(0.2rem);
+}
+
+.live-room .live-header .live-session-metric {
+  justify-items: center;
+  border-color: rgba(232, 113, 45, 0.12);
+  background: rgba(255, 247, 239, 0.92);
+  text-align: center;
+}
+
+.live-room .live-header .live-session-metric svg,
+.live-room .live-header .live-session-metric strong,
+.live-room .live-header .live-session-metric span {
+  justify-self: center;
+}
+
+.live-auction-stage {
+  position: relative;
+}
+
+.live-auction-stage::before {
+  display: none;
+}
+
+.live-auction-stage > * {
+  position: relative;
+  z-index: 1;
+}
+
+.live-room .asset-viewer,
+.live-room .composer,
+.live-room .tab-shell {
+  border-color: rgba(197, 93, 35, 0.16);
+  box-shadow:
+    0 14px 34px rgba(112, 47, 15, 0.09),
+    0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.live-room .asset-viewer > div {
+  background:
+    radial-gradient(circle at 90% 0%, rgba(220, 83, 20, 0.16), transparent 15rem),
+    linear-gradient(135deg, #39170d, #24100a);
+}
+
+.asset-trust-strip {
+  border-color: rgba(238, 113, 36, 0.22);
+  background:
+    radial-gradient(circle at 50% 0%, rgba(239, 91, 18, 0.12), transparent 16rem),
+    linear-gradient(135deg, #3b180d, #251009);
+  box-shadow: 0 12px 27px rgba(86, 32, 9, 0.11);
+}
+
+.live-room .composer {
+  background: linear-gradient(155deg, #fff 0%, #fffaf6 100%);
+}
+
+.live-room .auction-countdown-dial {
+  isolation: isolate;
+  gap: 0.75rem;
+  min-height: 178px;
+  border-color: rgba(255, 190, 140, 0.82);
+  background:
+    radial-gradient(circle at 82% 8%, rgba(255, 215, 177, 0.3), transparent 36%),
+    radial-gradient(circle at 8% 100%, rgba(173, 41, 0, 0.2), transparent 35%),
+    linear-gradient(125deg, #dd3e08 0%, #f0570d 48%, #ff7d2c 100%) !important;
+  box-shadow:
+    0 16px 34px rgba(204, 61, 6, 0.25),
+    0 5px 12px rgba(126, 39, 6, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.36);
+  transform: translateZ(0);
+  transform-origin: center bottom;
+  will-change: transform, box-shadow;
+  animation: countdown-card-float 3.8s ease-in-out infinite;
+}
+
+.live-room .auction-countdown-dial::before {
+  inset: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 11px;
+  background: linear-gradient(110deg, transparent 24%, rgba(255, 255, 255, 0.2) 48%, transparent 72%);
+  background-size: 240% 100%;
+  animation: countdown-surface-shine 4.8s ease-in-out infinite;
+}
+
+.live-room .auction-countdown-dial::after {
+  position: absolute;
+  z-index: -1;
+  display: block;
+  top: -55%;
+  right: -12%;
+  width: 58%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: rgba(255, 221, 189, 0.13);
+  box-shadow: 0 0 60px rgba(255, 209, 166, 0.15);
+  content: "";
+  pointer-events: none;
+}
+
+.countdown-compact-header {
+  width: max-content;
+  margin: 0 auto;
+  padding: 0.3rem 0.65rem;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  background: rgba(125, 32, 2, 0.13);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+.countdown-gavel-mark {
+  position: absolute;
+  z-index: 3;
+  top: 0.68rem;
+  left: 0.8rem;
+  display: grid;
+  width: 2.75rem;
+  height: 2.75rem;
+  place-items: center;
+  border: 1px solid rgba(255, 224, 188, 0.62);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 34% 27%, rgba(255, 255, 255, 0.24), transparent 27%),
+    linear-gradient(145deg, rgba(124, 28, 0, 0.34), rgba(255, 178, 96, 0.2));
+  box-shadow:
+    0 0 0 4px rgba(255, 221, 183, 0.09),
+    0 8px 18px rgba(92, 22, 0, 0.24),
+    inset 0 1px 0 rgba(255, 255, 255, 0.28);
+  color: #ffe0b9;
+}
+
+.countdown-gavel-mark::before {
+  position: absolute;
+  inset: -0.42rem;
+  border: 1px dashed rgba(255, 226, 194, 0.35);
+  border-radius: 50%;
+  content: "";
+  animation: countdown-seal-spin 14s linear infinite;
+}
+
+.countdown-gavel-mark::after {
+  position: absolute;
+  right: -0.28rem;
+  bottom: 0.18rem;
+  width: 0.5rem;
+  height: 0.5rem;
+  border: 2px solid #ffe5c4;
+  border-radius: 50%;
+  background: #ff8b37;
+  box-shadow:
+    0 0 0 3px rgba(255, 226, 194, 0.13),
+    0 0 12px rgba(255, 231, 204, 0.65);
+  content: "";
+}
+
+.countdown-gavel-mark svg {
+  width: 1.32rem;
+  height: 1.32rem;
+  filter: drop-shadow(0 2px 4px rgba(88, 20, 0, 0.3));
+  transform-origin: 72% 76%;
+  animation: countdown-gavel-tap 3.2s ease-in-out infinite;
+}
+
+.live-room .auction-countdown-dial .countdown-digits {
+  gap: 0.34rem;
+  width: min(100%, 380px);
+  font-size: clamp(2.05rem, 2.8vw, 2.85rem);
+  text-shadow:
+    0 2px 2px rgba(92, 22, 0, 0.24),
+    0 7px 16px rgba(103, 26, 0, 0.3);
+}
+
+.live-room .auction-countdown-dial .countdown-digits > span {
+  min-width: 0;
+  padding: 0.3rem 0.35rem 0.38rem;
+  border: 1px solid rgba(255, 255, 255, 0.17);
+  border-radius: 12px;
+  background:
+    linear-gradient(180deg, rgba(100, 24, 0, 0.16), rgba(120, 27, 0, 0.08)),
+    rgba(255, 255, 255, 0.04);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.13),
+    0 7px 14px rgba(111, 28, 0, 0.12),
+    0 0 18px rgba(255, 211, 177, 0.08);
+}
+
+.live-room .auction-countdown-dial .countdown-digits i {
+  color: #ffd0ad;
+  text-shadow: 0 3px 8px rgba(86, 20, 0, 0.22);
+  animation: countdown-colon-pulse 1s ease-in-out infinite;
+}
+
+.live-room .auction-countdown-dial .countdown-units {
+  width: min(100%, 380px);
+  color: rgba(255, 246, 238, 0.88);
+}
+
+.live-room .live-mock-leaderboard {
+  border-color: rgba(255, 133, 61, 0.62);
+  box-shadow:
+    0 18px 38px rgba(86, 28, 6, 0.2),
+    0 0 0 1px rgba(255, 178, 113, 0.08);
+}
+
+.live-room .live-mock-leaderboard header {
+  background: linear-gradient(90deg, rgba(255, 126, 43, 0.11), rgba(255, 145, 67, 0.03));
+}
+
+.live-room .leaderboard-row.is-current {
+  background: linear-gradient(90deg, rgba(255, 112, 33, 0.28), rgba(255, 137, 60, 0.1));
+  box-shadow:
+    inset 0 0 22px rgba(255, 137, 60, 0.13),
+    0 0 18px rgba(255, 112, 33, 0.11);
+}
+
+@keyframes countdown-card-float {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+
+  50% {
+    transform: translateY(-5px) scale(1.006);
+    box-shadow:
+      0 24px 44px rgba(204, 61, 6, 0.32),
+      0 10px 20px rgba(126, 39, 6, 0.17),
+      0 0 26px rgba(255, 113, 38, 0.15),
+      inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  }
+}
+
+@keyframes countdown-surface-shine {
+  0%,
+  35% {
+    background-position: 140% 0;
+  }
+
+  70%,
+  100% {
+    background-position: -100% 0;
+  }
+}
+
+@keyframes countdown-gavel-tap {
+  0%,
+  72%,
+  100% {
+    transform: rotate(0);
+  }
+
+  80% {
+    transform: rotate(-13deg);
+  }
+
+  86% {
+    transform: rotate(7deg);
+  }
+}
+
+@keyframes countdown-seal-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes countdown-colon-pulse {
+  50% {
+    opacity: 0.52;
+    transform: scale(0.88);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .live-room .auction-countdown-dial,
+  .live-room .auction-countdown-dial::before,
+  .countdown-gavel-mark,
+  .countdown-gavel-mark::before,
+  .countdown-gavel-mark svg,
+  .live-room .auction-countdown-dial .countdown-digits i {
+    animation: none !important;
+  }
+}
+
+/* Animated fire-energy perimeter for the countdown */
+.live-room .auction-countdown-dial {
+  overflow: visible;
+}
+
+.countdown-fire-aura {
+  position: absolute;
+  z-index: 0;
+  inset: -15px;
+  overflow: visible;
+  pointer-events: none;
+  animation: none;
+}
+
+.countdown-fire-aura::before,
+.countdown-fire-aura::after {
+  position: absolute;
+  inset: 8px;
+  border: 2px solid rgba(255, 172, 66, 0.72);
+  border-radius: 22px;
+  box-shadow:
+    0 0 10px rgba(255, 128, 18, 0.8),
+    0 0 24px rgba(255, 69, 0, 0.42);
+  content: "";
+}
+
+.countdown-fire-aura::before {
+  animation: countdown-flame-border 1.35s ease-in-out infinite;
+}
+
+.countdown-fire-aura::after {
+  inset: 4px;
+  border-color: rgba(255, 220, 132, 0.3);
+  filter: blur(5px);
+  animation: countdown-flame-border 1.8s ease-in-out infinite reverse;
+}
+
+.countdown-fire-aura i {
+  position: absolute;
+  display: block;
+  width: 25px;
+  height: 42px;
+  border-radius: 50% 50% 42% 42%;
+  background:
+    radial-gradient(circle at 50% 70%, #fff7ba 0 10%, transparent 28%),
+    linear-gradient(180deg, #ffe36e 0%, #ffad19 30%, #ff6500 66%, #e93600 100%);
+  box-shadow:
+    0 0 9px rgba(255, 164, 30, 0.86),
+    0 0 18px rgba(255, 67, 0, 0.55);
+  clip-path: polygon(50% 0, 67% 25%, 88% 47%, 100% 72%, 76% 100%, 24% 100%, 0 72%, 14% 42%, 35% 22%);
+  opacity: 0.92;
+  transform-origin: center bottom;
+  animation: countdown-flame-lick 1.05s ease-in-out infinite;
+}
+
+.countdown-fire-aura i:nth-child(1) {
+  top: -15px;
+  left: 8%;
+}
+
+.countdown-fire-aura i:nth-child(2) {
+  top: -20px;
+  left: 29%;
+  animation-delay: -0.35s;
+}
+
+.countdown-fire-aura i:nth-child(3) {
+  top: -16px;
+  right: 29%;
+  animation-delay: -0.72s;
+}
+
+.countdown-fire-aura i:nth-child(4) {
+  top: -21px;
+  right: 8%;
+  animation-delay: -0.18s;
+}
+
+.countdown-fire-aura i:nth-child(5),
+.countdown-fire-aura i:nth-child(6),
+.countdown-fire-aura i:nth-child(7),
+.countdown-fire-aura i:nth-child(8) {
+  bottom: -18px;
+  transform: rotate(180deg);
+  transform-origin: center center;
+}
+
+.countdown-fire-aura i:nth-child(5) {
+  left: 11%;
+  animation-delay: -0.58s;
+}
+
+.countdown-fire-aura i:nth-child(6) {
+  left: 35%;
+  animation-delay: -0.12s;
+}
+
+.countdown-fire-aura i:nth-child(7) {
+  right: 34%;
+  animation-delay: -0.82s;
+}
+
+.countdown-fire-aura i:nth-child(8) {
+  right: 10%;
+  animation-delay: -0.4s;
+}
+
+.countdown-fire-aura i:nth-child(9),
+.countdown-fire-aura i:nth-child(10) {
+  left: -17px;
+  transform: rotate(-90deg);
+}
+
+.countdown-fire-aura i:nth-child(9) {
+  top: 24%;
+  animation-delay: -0.25s;
+}
+
+.countdown-fire-aura i:nth-child(10) {
+  bottom: 20%;
+  animation-delay: -0.75s;
+}
+
+.countdown-fire-aura i:nth-child(11),
+.countdown-fire-aura i:nth-child(12) {
+  right: -17px;
+  transform: rotate(90deg);
+}
+
+.countdown-fire-aura i:nth-child(11) {
+  top: 23%;
+  animation-delay: -0.5s;
+}
+
+.countdown-fire-aura i:nth-child(12) {
+  bottom: 19%;
+  animation-delay: -0.95s;
+}
+
+.countdown-fire-aura {
+  z-index: 1;
+}
+
+.countdown-fire-aura svg {
+  position: absolute;
+  width: 34px;
+  height: 46px;
+  overflow: visible;
+  fill: #ffb51f;
+  fill-opacity: 0.96;
+  stroke: #fff0a3;
+  stroke-width: 1.6;
+  filter:
+    drop-shadow(0 0 5px rgba(255, 221, 109, 0.95))
+    drop-shadow(0 0 12px rgba(255, 72, 0, 0.82));
+  transform-origin: 50% 86%;
+  animation: countdown-real-flame 1.12s ease-in-out infinite;
+}
+
+.countdown-fire-aura svg:nth-of-type(1) {
+  top: 10px;
+  left: 20%;
+  animation-delay: -0.18s;
+}
+
+.countdown-fire-aura svg:nth-of-type(2) {
+  top: 6px;
+  left: 42%;
+  animation-delay: -0.66s;
+}
+
+.countdown-fire-aura svg:nth-of-type(3) {
+  top: 11px;
+  right: 28%;
+  animation-delay: -0.38s;
+}
+
+.countdown-fire-aura svg:nth-of-type(4) {
+  top: 7px;
+  right: 8%;
+  animation-delay: -0.88s;
+}
+
+.countdown-fire-aura svg:nth-of-type(5) {
+  bottom: 10px;
+  left: 12%;
+  animation-delay: -0.48s;
+}
+
+.countdown-fire-aura svg:nth-of-type(6) {
+  bottom: 6px;
+  left: 38%;
+  animation-delay: -0.92s;
+}
+
+.countdown-fire-aura svg:nth-of-type(7) {
+  right: 31%;
+  bottom: 11px;
+  animation-delay: -0.24s;
+}
+
+.countdown-fire-aura svg:nth-of-type(8) {
+  right: 7%;
+  bottom: 7px;
+  animation-delay: -0.72s;
+}
+
+.countdown-fire-aura svg:nth-of-type(9) {
+  top: 38%;
+  left: 9px;
+  rotate: -90deg;
+  animation-delay: -0.56s;
+}
+
+.countdown-fire-aura svg:nth-of-type(10) {
+  top: 34%;
+  right: 9px;
+  rotate: 90deg;
+  animation-delay: -0.84s;
+}
+
+@keyframes countdown-flame-border {
+  50% {
+    border-color: rgba(255, 220, 113, 0.92);
+    box-shadow:
+      0 0 14px rgba(255, 157, 24, 0.94),
+      0 0 32px rgba(255, 62, 0, 0.54);
+  }
+}
+
+@keyframes countdown-flame-lick {
+  0%,
+  100% {
+    opacity: 0.78;
+    scale: 0.82 0.88;
+  }
+
+  45% {
+    opacity: 1;
+    scale: 1.08 1.24;
+    translate: 0 -3px;
+    filter: brightness(1.18);
+  }
+}
+
+@keyframes countdown-real-flame {
+  0%,
+  100% {
+    translate: 0 1px;
+    scale: 0.9 0.92;
+    skew: 0deg;
+    opacity: 0.82;
+    filter:
+      drop-shadow(0 0 4px rgba(255, 221, 109, 0.88))
+      drop-shadow(0 0 10px rgba(255, 72, 0, 0.72));
+  }
+
+  35% {
+    translate: -2px -4px;
+    scale: 1.02 1.2;
+    skew: -3deg;
+    opacity: 1;
+  }
+
+  68% {
+    translate: 2px -2px;
+    scale: 0.96 1.08;
+    skew: 3deg;
+    filter:
+      drop-shadow(0 0 7px rgba(255, 231, 136, 1))
+      drop-shadow(0 0 16px rgba(255, 63, 0, 0.9));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .countdown-fire-aura,
+  .countdown-fire-aura::before,
+  .countdown-fire-aura::after,
+  .countdown-fire-aura i,
+  .countdown-fire-aura svg {
+    animation: none !important;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .live-room .asset-viewer > img,
   .countdown-progress,
@@ -1022,5 +1603,200 @@
   .auction-countdown-dial.is-urgent .countdown-orbit {
     animation: none !important;
     transition: none !important;
+  }
+}
+
+/* Three-column live auction overview */
+.live-auction-stage {
+  grid-template-areas:
+    "visual command competition"
+    "activity activity activity";
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  align-items: start;
+}
+
+.live-visual-column {
+  grid-area: visual;
+}
+
+.live-command-column {
+  grid-area: command;
+  gap: 0.75rem;
+}
+
+.live-competition-column {
+  grid-area: competition;
+}
+
+.live-auction-stage > .tab-shell {
+  grid-area: activity;
+  margin-top: 0.15rem;
+}
+
+.live-room .asset-viewer {
+  min-height: 330px;
+}
+
+.live-room .asset-viewer > img {
+  height: 330px;
+}
+
+.live-room .auction-countdown-dial {
+  position: relative;
+  display: grid;
+  grid-area: auto;
+  grid-template-columns: 1fr;
+  gap: 0.65rem;
+  min-height: 168px;
+  padding: 1rem 1.15rem 1.1rem;
+  overflow: visible;
+  border: 1px solid #ff9b62;
+  border-radius: 16px;
+  background:
+    radial-gradient(circle at 88% 0%, rgba(255, 190, 132, 0.34), transparent 45%),
+    linear-gradient(135deg, #e9490a 0%, #f45c11 58%, #ff7926 100%) !important;
+  box-shadow:
+    0 12px 28px rgba(199, 64, 9, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  color: #fff;
+}
+
+.live-room .auction-countdown-dial::before {
+  inset: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  border-radius: 11px;
+}
+
+.live-room .auction-countdown-dial::after {
+  display: none;
+}
+
+.countdown-compact-header {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.countdown-compact-header svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.live-room .auction-countdown-dial .countdown-digits {
+  position: relative;
+  z-index: 2;
+  width: min(100%, 350px);
+  margin: 0 auto;
+  color: #fff;
+  font-size: clamp(2.15rem, 3vw, 3rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  text-shadow: 0 4px 13px rgba(111, 28, 0, 0.28);
+}
+
+.live-room .auction-countdown-dial .countdown-digits i {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.live-room .auction-countdown-dial .countdown-units {
+  position: relative;
+  z-index: 2;
+  width: min(100%, 350px);
+  margin: 0 auto;
+  color: rgba(255, 255, 255, 0.84);
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.live-room .auction-countdown-dial .countdown-units span + span {
+  border-left-color: rgba(255, 255, 255, 0.28);
+}
+
+.live-room .auction-countdown-dial.is-urgent {
+  border-color: rgba(255, 255, 255, 0.52);
+  box-shadow:
+    0 12px 30px rgba(199, 64, 9, 0.28),
+    0 0 22px rgba(255, 91, 19, 0.18);
+}
+
+.live-room .composer {
+  order: initial;
+  width: 100%;
+  margin: 0;
+}
+
+@media (max-width: 1240px) {
+  .live-auction-stage {
+    grid-template-areas:
+      "visual command"
+      "competition competition"
+      "activity activity";
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .live-room .auction-countdown-dial {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 800px) {
+  .live-auction-stage {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .live-visual-column,
+  .live-command-column,
+  .live-competition-column {
+    display: grid;
+    width: 100%;
+  }
+
+  .live-visual-column {
+    order: 1;
+  }
+
+  .live-command-column {
+    order: 2;
+  }
+
+  .live-competition-column {
+    order: 3;
+  }
+
+  .live-auction-stage > .tab-shell {
+    order: 4;
+    width: 100%;
+  }
+
+  .live-room .auction-countdown-dial,
+  .live-room .composer,
+  .live-room .live-mock-leaderboard,
+  .live-room .asset-viewer,
+  .asset-trust-strip {
+    order: initial;
+    width: 100%;
+  }
+}
+
+@media (max-width: 520px) {
+  .live-room .asset-viewer,
+  .live-room .asset-viewer > img {
+    min-height: 290px;
+    height: 290px;
+  }
+
+  .live-room .auction-countdown-dial {
+    min-height: 150px;
+    padding: 0.9rem;
   }
 }

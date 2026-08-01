@@ -1,5 +1,5 @@
 ﻿import { AlertTriangle, CheckCircle2 } from "lucide-react";
-import { type ReactNode, useState } from "react";
+import { type ReactNode, useRef, useState } from "react";
 import {
   Link,
   Navigate,
@@ -8,19 +8,85 @@ import {
   useSearchParams,
 } from "react-router-dom";
 import {
-  auctionSession,
   getApprovalPackageFixture,
   getApprovalQueueFixture,
   getAuctionRuleFixture,
   getAuctionScheduleFixture,
   getAuctionSessionWorkspaceFixture,
-  getAuctionSessions,
   getOpeningRequestWorkspaceFixture,
   getOpeningRequests,
   getOperationsDashboardFixture,
 } from "../../services/mock/operationsService";
+import {
+  CONTENT_STAFF_ACTOR_ID,
+  openingRequestStatusLabel,
+  type OpeningRequestCommandResult,
+  useOpeningRequestStore,
+} from "../../store/openingRequestStore";
+import { Badge as CommonBadge } from "../../components/common/Badge";
+import { Button, ButtonLink } from "../../components/common/Button";
+import { Dialog } from "../../components/common/Dialog";
+import { useDemoStore } from "../../store/demoStore";
+import {
+  getAuctionSessionReadModel,
+  type CreateLinkedSessionResult,
+  type PersistedAuctionSession,
+  type PersistedSgdgManagedSession,
+  useAuctionSessionStore,
+} from "../../store/auctionSessionStore";
+import { useAuctionConfigurationStore } from "../../store/auctionConfigurationStore";
+import {
+  PROTOTYPE_CONTENT_POLICY,
+  useAuctionContentStore,
+} from "../../store/auctionContentStore";
+import {
+  CONTENT_REVIEW_BLOCKED_BY_CONFIGURATION,
+  SGDG_CONTENT_REVIEW_BLOCKER_MESSAGE,
+  getSessionPackageProjection,
+  useAuctionContentReviewStore,
+} from "../../store/auctionContentReviewStore";
+import {
+  APPROVAL_PACKAGE_BLOCKED_BY_CONFIGURATION,
+  SGDG_APPROVAL_PACKAGE_BLOCKER_MESSAGE,
+  getApprovalPackageEvidenceValidity,
+  useAuctionApprovalPackageStore,
+} from "../../store/auctionApprovalPackageStore";
+import {
+  APPROVAL_REVIEW_BLOCKED_BY_CONFIGURATION,
+  REVIEW_CONFIGURATION_BLOCKER_MESSAGE,
+  useAuctionApprovalReviewStore,
+} from "../../store/auctionApprovalReviewStore";
+import {
+  getApprovalDecisionQueue,
+  getSessionApprovalProjection,
+  useAuctionApprovalDecisionStore,
+} from "../../store/auctionApprovalDecisionStore";
+import { useAuctionScheduleDraftStore } from "../../store/auctionScheduleDraftStore";
+import { useAuctionConfirmedScheduleStore } from "../../store/auctionConfirmedScheduleStore";
+import { useAuctionRegistrationOpeningReadinessStore } from "../../store/auctionRegistrationOpeningReadinessStore";
+import { useAuctionRegistrationWindowStore } from "../../store/auctionRegistrationWindowStore";
+import { useAuctionCustomerRegistrationStore } from "../../store/auctionCustomerRegistrationStore";
+import { useAuctionRegistrationValidationStore } from "../../store/auctionRegistrationValidationStore";
+import { useAuctionRegistrationCorrectionDraftStore } from "../../store/auctionRegistrationCorrectionDraftStore";
+import { useAuctionRegistrationResubmissionStore } from "../../store/auctionRegistrationResubmissionStore";
+import { useAuctionRegistrationRevalidationStore } from "../../store/auctionRegistrationRevalidationStore";
+import { useAuctionMembershipCheckStore } from "../../store/auctionMembershipCheckStore";
+import { useAuctionDepositCheckStore } from "../../store/auctionDepositCheckStore";
+import {
+  AUCTION_ROOM_FEE_POLICY_DISCLAIMER,
+  SGDG_MANAGED_FEE_DECISION_MESSAGE,
+} from "../../services/roomValueTierPolicy";
+import {
+  configurationErrors,
+  saveConfiguration,
+  submitConfiguration,
+  type AuctionConfiguration,
+} from "../../services/auctionConfigurationCommands";
 import { NotFoundPage } from "../NotFoundPage";
 import "../../styles/operations-foundation.css";
+import "../../styles/auction-configuration.css";
+import "../../styles/opening-request-lifecycle.css";
+import { DynamicAuctionConfigurationPage } from "./DynamicAuctionConfigurationPage";
 type Context = { role: "CONTENT_STAFF" | "ADMIN" };
 function Shell({ title, children }: { title: string; children: ReactNode }) {
   return (
@@ -58,20 +124,36 @@ export function OperationsDashboardPage() {
   );
 }
 export function OpeningRequestQueuePage() {
+  const customerRequests = useOpeningRequestStore((state) => state.records);
+  const sharedIds = new Set(customerRequests.map((item) => item.requestId));
+  const rows = [
+    ...getOpeningRequests()
+      .filter((item) => !sharedIds.has(item.requestId))
+      .map((item) => ({
+        requestId: item.requestId,
+        assetName: item.assetName,
+        status: item.status,
+      })),
+    ...customerRequests
+      .filter((item) => item.status !== "DRAFT")
+      .map((item) => ({
+        requestId: item.requestId,
+        assetName: item.title || item.assetReference,
+        status: openingRequestStatusLabel[item.status],
+      })),
+  ];
   return (
     <Shell title="Yêu cầu mở phiên">
       <Table headers={["Yêu cầu", "Tài sản", "Trạng thái", "Thao tác"]}>
-        {getOpeningRequests().map((x) => (
+        {rows.map((x) => (
           <tr key={x.requestId}>
-            <td>{x.requestId}</td>
-            <td>{x.assetName}</td>
-            <td>
-              <Badge>{x.status}</Badge>
+            <td data-label="Yêu cầu">{x.requestId}</td>
+            <td data-label="Tài sản">{x.assetName}</td>
+            <td data-label="Trạng thái">
+              <CommonBadge tone="warning">{x.status}</CommonBadge>
             </td>
-            <td>
-              <Link
-                to={`/ops/opening-requests/${x.requestId}?scenario=request-under-review`}
-              >
+            <td data-label="Thao tác">
+              <Link to={`/ops/opening-requests/${x.requestId}`}>
                 Mở review
               </Link>
             </td>
@@ -84,15 +166,33 @@ export function OpeningRequestQueuePage() {
 export function OpeningRequestWorkspacePage() {
   const { requestId } = useParams();
   const [p, setP] = useSearchParams();
-  const [tab, setTab] = useState("evidence");
-  const [decision, setDecision] = useState<string>();
-  const f =
-    requestId &&
-    getOpeningRequestWorkspaceFixture(
-      requestId,
-      scenario(p, "request-under-review"),
-    );
-  if (!f) return <NotFoundPage />;
+  const record = useOpeningRequestStore((state) =>
+    state.records.find((item) => item.requestId === requestId),
+  );
+  const actorRole = useDemoStore((state) => state.actorRole);
+  const startReview = useOpeningRequestStore((state) => state.startReview);
+  const returnForCorrection = useOpeningRequestStore(
+    (state) => state.returnForCorrection,
+  );
+  const rejectOpeningRequest = useOpeningRequestStore(
+    (state) => state.rejectOpeningRequest,
+  );
+  const acceptForDraftPreparation = useOpeningRequestStore(
+    (state) => state.acceptForDraftPreparation,
+  );
+  const recordGovernanceConcern = useOpeningRequestStore(
+    (state) => state.recordGovernanceConcern,
+  );
+  const dynamicSessions = useAuctionSessionStore((state) => state.sessions);
+  const createLinkedSessionFromAcceptedRequest = useAuctionSessionStore(
+    (state) => state.createLinkedSessionFromAcceptedRequest,
+  );
+  const [decision, setDecision] = useState<ReviewDecision>();
+  const [createSessionOpen, setCreateSessionOpen] = useState(false);
+  const [createSessionVersion, setCreateSessionVersion] = useState<number>();
+  const [message, setMessage] = useState("");
+  const [commandError, setCommandError] = useState("");
+
   if (p.get("view") === "loading")
     return (
       <Shell title="Review yêu cầu mở phiên">
@@ -115,112 +215,618 @@ export function OpeningRequestWorkspacePage() {
         </p>
       </Shell>
     );
-  const content =
-    tab === "evidence" ? (
-      <ul>
-        {f.evidence.map((x) => (
-          <li key={x}>{x} · READY · Product Management Mock</li>
-        ))}
-      </ul>
-    ) : tab === "versions" ? (
-      <ol>
-        <li aria-current="step">
-          v{f.request.currentVersion} · Current request version
-        </li>
-      </ol>
-    ) : tab === "notes" ? (
-      <ol>
-        {f.notes.map((x) => (
-          <li key={x}>{x}</li>
-        ))}
-      </ol>
-    ) : (
-      <ol>
-        {f.audit.map((x) => (
-          <li key={x}>{x} · OPS-AUD-ROYAL-001</li>
-        ))}
-      </ol>
-    );
-  return (
-    <Shell title="Review yêu cầu mở phiên">
-      <div className="ops-workspace">
-        <section className="ops-panel">
-          <Badge>{f.request.status}</Badge>
+  const compatibilityScenario = p.get("scenario");
+  const compatibilityFixture =
+    requestId &&
+    compatibilityScenario &&
+    compatibilityScenario !== "request-under-review"
+      ? getOpeningRequestWorkspaceFixture(requestId, compatibilityScenario)
+      : undefined;
+  if (compatibilityFixture)
+    return (
+      <Shell title="Review yêu cầu mở phiên">
+        <section className="ops-panel opening-review-record">
+          <CommonBadge tone="warning">
+            {compatibilityFixture.request.status}
+          </CommonBadge>
           <h2>
-            {f.request.requestId} · {f.request.assetName}
+            {compatibilityFixture.request.requestId} ·{" "}
+            {compatibilityFixture.request.assetName}
           </h2>
           <p>
-            Customer {f.request.requesterMasked} · assignee{" "}
-            {f.request.assigneeId} · request v{f.request.currentVersion}
+            Scenario fixture tương thích chỉ đọc · phiên bản{" "}
+            {compatibilityFixture.request.currentVersion}
           </p>
-          {f.linkedSession ? (
-            <p>
-              Linked session:{" "}
-              <Link
-                to={`/ops/auctions/${f.linkedSession.sessionId}?scenario=session-draft`}
-              >
-                {f.linkedSession.sessionId}
-              </Link>
-            </p>
-          ) : (
-            <p>Chưa có linked session và chưa có Approval Package.</p>
-          )}
-          <nav className="ops-tabs" aria-label="Nội dung review">
-            {[
-              ["evidence", "Evidence"],
-              ["versions", "Version history"],
-              ["notes", "Internal notes"],
-              ["audit", "Audit"],
-            ].map(([id, label]) => (
-              <button
-                role="tab"
-                aria-selected={tab === id}
-                key={id}
-                onClick={() => setTab(id)}
-              >
-                {label}
-              </button>
-            ))}
-          </nav>
-          <div role="tabpanel">{content}</div>
+          <p>
+            Scenario URL được giữ để regression; mọi quyết định lifecycle mới
+            phải thực hiện trên shared Opening Request record.
+          </p>
         </section>
-        <aside className="ops-decision">
-          <h2>Quyết định review</h2>
-          {["return", "hold", "reject", "accept"].map((x) => (
-            <button
-              className={x === "accept" ? "button primary" : "button secondary"}
-              key={x}
-              disabled={f.request.status !== "UNDER_REVIEW"}
-              onClick={() => setDecision(x)}
+      </Shell>
+    );
+  if (!record) {
+    const fixture =
+      requestId &&
+      getOpeningRequestWorkspaceFixture(
+        requestId,
+        scenario(p, "request-under-review"),
+      );
+    if (!fixture) return <NotFoundPage />;
+    return (
+      <Shell title="Review yêu cầu mở phiên">
+        <section className="ops-panel">
+          <h2>{fixture.request.requestId}</h2>
+          <p>
+            Fixture tương thích chỉ đọc · {fixture.request.status} · phiên bản{" "}
+            {fixture.request.currentVersion}
+          </p>
+        </section>
+      </Shell>
+    );
+  }
+
+  const beginReview = () => {
+    const result = startReview({
+      requestId: record.requestId,
+      actorId: CONTENT_STAFF_ACTOR_ID,
+      actorRole,
+      expectedVersion: record.version,
+      commandId: `start-review-${record.requestId}-v${record.version}`,
+    });
+    if (!result.ok) {
+      setCommandError(result.message);
+      return;
+    }
+    setCommandError("");
+    setMessage(
+      `Đã bắt đầu review ${result.data.requestId} ở phiên bản ${result.data.version}.`,
+    );
+  };
+
+  const decide = (
+    kind: ReviewDecision,
+    reason: string,
+    affectedSections: string[],
+    evidenceReferenceIds: string[],
+  ) => {
+    const base = {
+      requestId: record.requestId,
+      actorId: CONTENT_STAFF_ACTOR_ID,
+      actorRole,
+      expectedVersion: record.version,
+      commandId: `${kind}-${record.requestId}-v${record.version}`,
+    };
+    const result =
+      kind === "return"
+        ? returnForCorrection({
+            ...base,
+            reason,
+            affectedSections,
+          })
+        : kind === "reject"
+          ? rejectOpeningRequest({ ...base, reason })
+          : kind === "accept"
+            ? acceptForDraftPreparation({ ...base, reason })
+            : recordGovernanceConcern({
+                ...base,
+                concernReason: reason,
+                evidenceReferenceIds,
+              });
+    if (!result.ok) return result;
+    setDecision(undefined);
+    setCommandError("");
+    setMessage(
+      kind === "accept"
+        ? "Đã tiếp nhận yêu cầu để chuẩn bị bản nháp. Chưa tạo Auction Session."
+        : kind === "governance"
+          ? "Đã chuyển yêu cầu sang xem xét quản trị và tạm dừng review thông thường."
+          : kind === "reject"
+            ? "Đã từ chối yêu cầu. Hồ sơ hiện chỉ đọc."
+            : "Đã trả yêu cầu cho Customer cập nhật.",
+    );
+    return result;
+  };
+
+  const reviewOpen = record.status === "UNDER_REVIEW";
+  const linkedSession = record.acceptedOpeningRequestVersion
+    ? dynamicSessions.find(
+        (session) =>
+          session.openingRequestId === record.requestId &&
+          session.openingRequestVersion ===
+            record.acceptedOpeningRequestVersion,
+      )
+    : undefined;
+  const createLinkedSession = (expectedRequestVersion: number) => {
+    const result = createLinkedSessionFromAcceptedRequest({
+      requestId: record.requestId,
+      actorId: CONTENT_STAFF_ACTOR_ID,
+      actorRole,
+      expectedRequestVersion,
+      commandId: `CREATE_LINKED_SESSION:${record.requestId}:${expectedRequestVersion}`,
+      ownerId: CONTENT_STAFF_ACTOR_ID,
+    });
+    if (result.ok) {
+      setCreateSessionOpen(false);
+      setCommandError("");
+      setMessage(
+        `Đã tạo bản nháp phiên ${result.session.sessionId}. Chưa phê duyệt, lập lịch hoặc xuất bản.`,
+      );
+    }
+    return result;
+  };
+  return (
+    <Shell title="Review yêu cầu mở phiên">
+      <div className="opening-review-layout">
+        <section className="ops-panel opening-review-record">
+          <div className="opening-review-identity">
+            <div>
+              <span>OPENING REQUEST</span>
+              <h2>{record.requestId}</h2>
+            </div>
+            <CommonBadge
+              tone={
+                record.status === "REJECTED"
+                  ? "danger"
+                  : record.status === "ACCEPTED_FOR_DRAFT"
+                    ? "success"
+                    : record.status === "GOVERNANCE_REVIEW"
+                      ? "info"
+                      : "warning"
+              }
             >
-              {x === "accept"
-                ? "Accept for Draft"
-                : x === "return"
-                  ? "Return for Update"
-                  : x === "hold"
-                    ? "Place Hold"
-                    : "Reject"}
-            </button>
-          ))}
+              {openingRequestStatusLabel[record.status]}
+            </CommonBadge>
+          </div>
+          <p>
+            Customer {record.ownerId} · Asset {record.assetReference} · phiên
+            bản {record.version}
+          </p>
+          <h3>Thông tin review</h3>
+          <dl>
+            <dt>Tên yêu cầu</dt>
+            <dd>{record.title}</dd>
+            <dt>Mục đích</dt>
+            <dd>{record.purpose}</dd>
+            <dt>Giá đề xuất</dt>
+            <dd>
+              {record.proposedStartPrice?.toLocaleString("vi-VN") ?? "—"} ₫
+            </dd>
+            <dt>Ghi chú Customer</dt>
+            <dd>{record.customerNotes || "—"}</dd>
+            <dt>Thời điểm gửi</dt>
+            <dd>{record.submittedAt ?? "—"}</dd>
+          </dl>
+          {record.status === "RETURNED_FOR_CORRECTION" && (
+            <div className="opening-review-context">
+              <strong>Đã trả để cập nhật</strong>
+              <p>{record.reviewerComment}</p>
+            </div>
+          )}
+          {record.status === "GOVERNANCE_REVIEW" && (
+            <div className="opening-review-context">
+              <strong>Review thông thường đang tạm dừng</strong>
+              <p>Hồ sơ đang chờ ADMIN xem xét trong ngữ cảnh quản trị.</p>
+            </div>
+          )}
+          {linkedSession ? (
+            <div className="opening-review-context linked-session-context">
+              <strong>Bản nháp phiên đã được tạo</strong>
+              <p>
+                {linkedSession.sessionId} · {linkedSession.auctionCode} · DRAFT
+              </p>
+              <p>Chưa phê duyệt, chưa lập lịch và chưa xuất bản.</p>
+            </div>
+          ) : (
+            <p className="opening-review-disclosure">
+              Tiếp nhận Opening Request không đồng nghĩa Auction Session đã
+              được tạo, phê duyệt, lên lịch hoặc xuất bản.
+            </p>
+          )}
+        </section>
+
+        <aside className="ops-decision opening-review-actions">
+          <h2>Hành động review</h2>
+          {record.status === "SUBMITTED" && (
+            <Button onClick={beginReview}>Bắt đầu review</Button>
+          )}
+          {reviewOpen && (
+            <>
+              <Button
+                variant="primary"
+                onClick={() => setDecision("accept")}
+              >
+                Accept for Draft
+              </Button>
+              <Button
+                variant="secondary"
+                onClick={() => setDecision("return")}
+              >
+                Return for Update
+              </Button>
+              <Button
+                variant="secondary"
+                onClick={() => setDecision("governance")}
+              >
+                Route to Governed Review
+              </Button>
+              <Button variant="danger" onClick={() => setDecision("reject")}>
+                Reject
+              </Button>
+            </>
+          )}
+          {record.status === "ACCEPTED_FOR_DRAFT" && !linkedSession && (
+            <Button
+              variant="primary"
+              onClick={() => {
+                setCreateSessionVersion(record.version);
+                setCreateSessionOpen(true);
+              }}
+            >
+              Tạo bản nháp phiên đấu giá
+            </Button>
+          )}
+          {linkedSession && (
+            <>
+              <p>
+                Session hiện có: <strong>{linkedSession.sessionId}</strong>
+              </p>
+              <ButtonLink
+                variant="primary"
+                to={`/ops/auctions/${linkedSession.sessionId}`}
+              >
+                Mở workspace phiên
+              </ButtonLink>
+            </>
+          )}
+          {!reviewOpen && record.status !== "SUBMITTED" && (
+            <p>
+              {record.status === "ACCEPTED_FOR_DRAFT"
+                ? "Opening Request giữ nguyên trạng thái đã tiếp nhận."
+                : "Không có hành động review thông thường cho trạng thái này."}
+            </p>
+          )}
+          {commandError && (
+            <p className="ops-conflict" role="alert">
+              {commandError}
+            </p>
+          )}
         </aside>
       </div>
+
+      {message && (
+        <p className="opening-review-success" aria-live="polite">
+          {message}
+        </p>
+      )}
+
+      <section className="ops-panel opening-review-history">
+        <h2>Lịch sử quyết định</h2>
+        {record.history.length ? (
+          <ol>
+            {record.history
+              .slice()
+              .reverse()
+              .map((entry) => (
+                <li key={entry.id}>
+                  <strong>{entry.action.replaceAll("_", " ")}</strong>
+                  <span>
+                    {entry.fromStatus} → {entry.toStatus} · v
+                    {entry.requestVersion}
+                  </span>
+                  <small>
+                    {entry.actorRole} · {entry.createdAt} · {entry.visibility}
+                  </small>
+                  {entry.reason && <p>{entry.reason}</p>}
+                </li>
+              ))}
+          </ol>
+        ) : (
+          <p>Chưa có sự kiện quyết định.</p>
+        )}
+      </section>
+
       {decision && (
-        <Decision
-          title="Xác nhận quyết định review"
+        <OpeningRequestDecisionDialog
+          decision={decision}
+          requestId={record.requestId}
+          version={record.version}
           onClose={() => setDecision(undefined)}
-          onConfirm={() => setDecision(undefined)}
-          link={
-            decision === "accept"
-              ? `/ops/auctions/${auctionSession.sessionId}?scenario=session-draft&role=content`
-              : undefined
+          onConfirm={(reason, sections, evidence) =>
+            decide(decision, reason, sections, evidence)
           }
+        />
+      )}
+      {createSessionOpen && (
+        <LinkedSessionCreationDialog
+          requestId={record.requestId}
+          acceptedVersion={createSessionVersion ?? record.version}
+          assetReference={record.assetReference}
+          onClose={() => setCreateSessionOpen(false)}
+          onConfirm={() =>
+            createLinkedSession(createSessionVersion ?? record.version)
+          }
+          onRefresh={() => setCreateSessionVersion(record.version)}
         />
       )}
     </Shell>
   );
 }
+
+type ReviewDecision = "return" | "reject" | "accept" | "governance";
+
+const decisionCopy: Record<
+  ReviewDecision,
+  { title: string; consequence: string; confirm: string }
+> = {
+  return: {
+    title: "Trả yêu cầu để cập nhật",
+    consequence:
+      "Customer sẽ thấy lý do và các phần cần cập nhật, sau đó có thể gửi lại cùng yêu cầu.",
+    confirm: "Xác nhận trả lại",
+  },
+  reject: {
+    title: "Từ chối Opening Request",
+    consequence:
+      "Yêu cầu sẽ trở thành kết quả chỉ đọc và không thể chỉnh sửa hoặc gửi lại.",
+    confirm: "Xác nhận từ chối",
+  },
+  accept: {
+    title: "Tiếp nhận để chuẩn bị bản nháp",
+    consequence:
+      "Chỉ ghi nhận ACCEPTED_FOR_DRAFT. Hành động này không tạo, phê duyệt, lên lịch hoặc xuất bản Auction Session.",
+    confirm: "Tiếp nhận để chuẩn bị",
+  },
+  governance: {
+    title: "Chuyển sang xem xét quản trị",
+    consequence:
+      "Review thông thường sẽ tạm dừng. ADMIN chỉ có ngữ cảnh đọc; chưa có quyết định Apply Governance Hold.",
+    confirm: "Chuyển xem xét quản trị",
+  },
+};
+
+function OpeningRequestDecisionDialog({
+  decision,
+  requestId,
+  version,
+  onClose,
+  onConfirm,
+}: {
+  decision: ReviewDecision;
+  requestId: string;
+  version: number;
+  onClose: () => void;
+  onConfirm: (
+    reason: string,
+    affectedSections: string[],
+    evidenceReferenceIds: string[],
+  ) => OpeningRequestCommandResult | undefined;
+}) {
+  const [reason, setReason] = useState("");
+  const [affectedSections, setAffectedSections] = useState<string[]>([]);
+  const [evidence, setEvidence] = useState("");
+  const [error, setError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const reasonRef = useRef<HTMLTextAreaElement>(null);
+  const copy = decisionCopy[decision];
+  const toggleSection = (section: string) =>
+    setAffectedSections((current) =>
+      current.includes(section)
+        ? current.filter((item) => item !== section)
+        : [...current, section],
+    );
+  const confirm = () => {
+    const result = onConfirm(
+      reason,
+      affectedSections,
+      evidence
+        .split(",")
+        .map((item) => item.trim())
+        .filter(Boolean),
+    );
+    if (result && !result.ok) {
+      setError(result.message);
+      setFieldErrors(result.fieldErrors ?? {});
+    }
+  };
+  return (
+    <Dialog
+      open
+      onOpenChange={(open) => {
+        if (!open) onClose();
+      }}
+      title={copy.title}
+      description={copy.consequence}
+      initialFocusRef={reasonRef}
+      footer={
+        <>
+          <Button variant="secondary" onClick={onClose}>
+            Hủy
+          </Button>
+          <Button
+            variant={decision === "reject" ? "danger" : "primary"}
+            onClick={confirm}
+          >
+            {copy.confirm}
+          </Button>
+        </>
+      }
+    >
+      <dl className="opening-review-dialog-reference">
+        <div>
+          <dt>Opening Request</dt>
+          <dd>{requestId}</dd>
+        </div>
+        <div>
+          <dt>Phiên bản hiện tại</dt>
+          <dd>{version}</dd>
+        </div>
+      </dl>
+      <label className="opening-review-field">
+        <span>
+          {decision === "governance"
+            ? "Mô tả quan ngại quản trị"
+            : decision === "accept"
+              ? "Căn cứ tiếp nhận"
+              : "Lý do"}
+        </span>
+        <textarea
+          ref={reasonRef}
+          value={reason}
+          onChange={(event) => setReason(event.target.value)}
+          aria-invalid={Boolean(
+            fieldErrors.reason || fieldErrors.concernReason,
+          )}
+        />
+        {(fieldErrors.reason || fieldErrors.concernReason) && (
+          <small className="field-error">
+            {fieldErrors.reason || fieldErrors.concernReason}
+          </small>
+        )}
+      </label>
+      {decision === "return" && (
+        <fieldset className="opening-review-sections">
+          <legend>Phần cần cập nhật</legend>
+          {["Tên yêu cầu", "Tham chiếu tài sản", "Mục đích đấu giá", "Giá đề xuất"].map(
+            (section) => (
+              <label key={section}>
+                <input
+                  type="checkbox"
+                  checked={affectedSections.includes(section)}
+                  onChange={() => toggleSection(section)}
+                />
+                <span>{section}</span>
+              </label>
+            ),
+          )}
+          {fieldErrors.affectedSections && (
+            <small className="field-error">
+              {fieldErrors.affectedSections}
+            </small>
+          )}
+        </fieldset>
+      )}
+      {decision === "governance" && (
+        <label className="opening-review-field">
+          <span>Tham chiếu bằng chứng nội bộ (phân tách bằng dấu phẩy)</span>
+          <input
+            value={evidence}
+            onChange={(event) => setEvidence(event.target.value)}
+          />
+        </label>
+      )}
+      {error && (
+        <p className="ops-conflict" role="alert">
+          {error}
+        </p>
+      )}
+    </Dialog>
+  );
+}
+
+function LinkedSessionCreationDialog({
+  requestId,
+  acceptedVersion,
+  assetReference,
+  onClose,
+  onConfirm,
+  onRefresh,
+}: {
+  requestId: string;
+  acceptedVersion: number;
+  assetReference: string;
+  onClose: () => void;
+  onConfirm: () => CreateLinkedSessionResult;
+  onRefresh: () => void;
+}) {
+  const [error, setError] = useState("");
+  const [creating, setCreating] = useState(false);
+  const confirm = () => {
+    if (creating) return;
+    setCreating(true);
+    const result = onConfirm();
+    if (!result.ok) {
+      setError(
+        result.code === "ALREADY_LINKED" && result.existingSessionId
+          ? `${result.message} Session: ${result.existingSessionId}.`
+          : result.message,
+      );
+      setCreating(false);
+    }
+  };
+  return (
+    <Dialog
+      open
+      onOpenChange={(open) => {
+        if (!open && !creating) onClose();
+      }}
+      title="Tạo bản nháp phiên đấu giá"
+      description="Auction System sẽ tạo đúng một Session DRAFT từ Opening Request đã được tiếp nhận."
+      preventClose={creating}
+      footer={
+        <>
+          <Button variant="secondary" onClick={onClose} disabled={creating}>
+            Hủy
+          </Button>
+          <Button
+            onClick={confirm}
+            loading={creating}
+            loadingText="Đang tạo bản nháp"
+          >
+            Xác nhận tạo bản nháp
+          </Button>
+        </>
+      }
+    >
+      <dl className="opening-review-dialog-reference">
+        <div>
+          <dt>Opening Request</dt>
+          <dd>{requestId}</dd>
+        </div>
+        <div>
+          <dt>Phiên bản đã tiếp nhận</dt>
+          <dd>{acceptedVersion}</dd>
+        </div>
+        <div>
+          <dt>Tham chiếu tài sản</dt>
+          <dd>{assetReference}</dd>
+        </div>
+        <div>
+          <dt>Trạng thái Session mới</dt>
+          <dd>DRAFT · NOT_READY</dd>
+        </div>
+      </dl>
+      <p className="opening-review-disclosure">
+        Hành động này không phê duyệt Session, không tạo Approval Package,
+        không lập lịch và không xuất bản.
+      </p>
+      {error && (
+        <div className="ops-conflict" role="alert">
+          <p>{error}</p>
+          <Button
+            variant="secondary"
+            onClick={() => {
+              onRefresh();
+              setError("");
+            }}
+          >
+            Tải lại phiên bản
+          </Button>
+        </div>
+      )}
+    </Dialog>
+  );
+}
 export function AuctionSessionListPage() {
   const { role } = useOutletContext<Context>();
+  const dynamicSessions = useAuctionSessionStore((state) => state.sessions);
+  const [params, setParams] = useSearchParams();
+  const query = params.get("q") ?? "";
+  const sessions = getAuctionSessionReadModel(dynamicSessions).filter(
+    (session) =>
+      `${session.sessionId} ${session.code} ${session.assetName} ${session.openingRequestId ?? ""}`
+        .toLocaleLowerCase("vi")
+        .includes(query.toLocaleLowerCase("vi")),
+  );
   return (
     <Shell title="Phiên đấu giá">
       {role === "CONTENT_STAFF" && (
@@ -228,29 +834,85 @@ export function AuctionSessionListPage() {
           Tạo phiên do SGDG quản lý
         </Link>
       )}
+      <label className="session-search-field">
+        <span>Tìm kiếm phiên</span>
+        <input
+          value={query}
+          placeholder="Mã phiên, tài sản hoặc Opening Request"
+          onChange={(event) =>
+            setParams((current) => {
+              const next = new URLSearchParams(current);
+              if (event.target.value) next.set("q", event.target.value);
+              else next.delete("q");
+              return next;
+            })
+          }
+        />
+      </label>
       <Table
-        headers={["Session", "Tài sản", "Nguồn", "Lifecycle", "Publication"]}
+        headers={[
+          "Session",
+          "Tài sản",
+          "Nguồn",
+          "Mode",
+          "Lifecycle",
+          "Publication",
+          "Lineage",
+          "Cập nhật",
+        ]}
       >
-        {getAuctionSessions().map((x) => (
+        {sessions.map((x) => {
+          const dynamicSession = dynamicSessions.find(
+            (session) => session.sessionId === x.sessionId,
+          );
+          const dynamic = Boolean(dynamicSession);
+          return (
           <tr key={x.sessionId}>
-            <td>
-              <Link to={`/ops/auctions/${x.sessionId}?scenario=session-draft`}>
+            <td data-label="Session">
+              <Link
+                to={
+                  dynamic
+                    ? `/ops/auctions/${x.sessionId}`
+                    : `/ops/auctions/${x.sessionId}?scenario=session-draft`
+                }
+              >
                 {x.code}
               </Link>
             </td>
-            <td>{x.assetName}</td>
-            <td>{x.creationSource}</td>
-            <td>{x.lifecycleStatus}</td>
-            <td>{x.publicationStatus}</td>
+            <td data-label="Tài sản">
+              {x.assetName} · {x.assetId}
+            </td>
+            <td data-label="Nguồn">{x.creationSource}</td>
+            <td data-label="Mode">{x.managementMode}</td>
+            <td data-label="Lifecycle">{x.lifecycleStatus}</td>
+            <td data-label="Publication">{x.publicationStatus}</td>
+            <td data-label="Lineage">
+              {dynamicSession?.recordKind ===
+              "DYNAMIC_SGDG_MANAGED_SESSION"
+                ? `SGDG-managed · Asset v${dynamicSession.evaluatedAssetVersion}`
+                : x.openingRequestId
+                ? `${x.openingRequestId} · v${x.openingRequestVersion}`
+                : "Direct SGDG"}
+            </td>
+            <td data-label="Cập nhật">{x.updatedAt}</td>
           </tr>
-        ))}
+          );
+        })}
       </Table>
+      {!sessions.length && (
+        <p className="ops-panel">Không có Session khớp điều kiện tìm kiếm.</p>
+      )}
     </Shell>
   );
 }
 export function AuctionSessionWorkspacePage() {
   const { sessionId } = useParams();
   const [p] = useSearchParams();
+  const dynamicSession = useAuctionSessionStore((state) =>
+    state.sessions.find((session) => session.sessionId === sessionId),
+  );
+  if (dynamicSession)
+    return <DynamicAuctionSessionWorkspace session={dynamicSession} />;
   const f =
     sessionId &&
     getAuctionSessionWorkspaceFixture(sessionId, scenario(p, "session-draft"));
@@ -310,55 +972,917 @@ export function AuctionSessionWorkspacePage() {
     </Shell>
   );
 }
+
+function DynamicAuctionSessionWorkspace({
+  session,
+}: {
+  session: PersistedAuctionSession;
+}) {
+  if (session.recordKind === "DYNAMIC_SGDG_MANAGED_SESSION")
+    return <DynamicSgdgManagedAuctionSessionWorkspace session={session} />;
+  return (
+    <Shell title="Workspace phiên đấu giá">
+      <div className="ops-workspace dynamic-session-workspace">
+        <section className="ops-panel">
+          <div className="opening-review-identity">
+            <div>
+              <span>BẢN NHÁP PHIÊN</span>
+              <h2>{session.auctionCode}</h2>
+              <p>{session.sessionId}</p>
+            </div>
+            <div className="dynamic-session-statuses">
+              <CommonBadge tone="neutral">
+                {session.lifecycleStatus}
+              </CommonBadge>
+              <CommonBadge tone="warning">
+                {session.publicationStatus}
+              </CommonBadge>
+            </div>
+          </div>
+          <h3>Thông tin nguồn</h3>
+          <dl>
+            <dt>Tài sản</dt>
+            <dd>
+              {session.assetName} · {session.assetId}
+            </dd>
+            <dt>Nguồn tạo</dt>
+            <dd>Được tạo từ Opening Request · {session.creationSource}</dd>
+            <dt>Management mode</dt>
+            <dd>{session.managementMode}</dd>
+            <dt>Opening Request</dt>
+            <dd>{session.openingRequestId}</dd>
+            <dt>Phiên bản đã tiếp nhận</dt>
+            <dd>{session.openingRequestVersion}</dd>
+            <dt>Owner</dt>
+            <dd>{session.ownerId}</dd>
+            <dt>Creator</dt>
+            <dd>{session.creatorId}</dd>
+            <dt>Session version</dt>
+            <dd>{session.currentVersion}</dd>
+          </dl>
+          <div className="opening-review-disclosure">
+            <strong>Chưa phê duyệt · Chưa lập lịch · Chưa xuất bản</strong>
+            <p>
+              Session đang ở DRAFT. Phase này không tạo Approval Package và
+              không mở đăng ký.
+            </p>
+          </div>
+        </section>
+        <aside className="ops-decision">
+          <h2>Bước chuẩn bị tiếp theo</h2>
+          <DynamicConfigurationProjection sessionId={session.sessionId} />
+          <DynamicAuctionContentProjection session={session} />
+          <DynamicContentReviewProjection session={session} />
+          <DynamicApprovalPackageProjection session={session} />
+          <small id="dynamic-session-next-step">
+            Package submission only enters ADMIN read-only review. Session
+            Approval, Schedule and Publication are not started.
+          </small>
+        </aside>
+      </div>
+      <section className="ops-panel opening-review-history">
+        <h2>Lịch sử Session</h2>
+        <ol>
+          {session.history.map((entry) => (
+            <li key={entry.id}>
+              <strong>LINKED SESSION CREATED</strong>
+              <span>
+                {entry.requestId} · accepted v{entry.acceptedRequestVersion} →{" "}
+                {entry.sessionId}
+              </span>
+              <small>
+                {entry.actorRole} · {entry.createdAt} · {entry.visibility}
+              </small>
+            </li>
+          ))}
+        </ol>
+      </section>
+    </Shell>
+  );
+}
+
+function DynamicSgdgManagedAuctionSessionWorkspace({
+  session,
+}: {
+  session: PersistedSgdgManagedSession;
+}) {
+  return (
+    <Shell title="Workspace phiên đấu giá">
+      <div className="ops-workspace dynamic-session-workspace">
+        <section className="ops-panel">
+          <div className="opening-review-identity">
+            <div>
+              <span>BẢN NHÁP PHIÊN · SGDG-MANAGED INITIATION</span>
+              <h2>{session.auctionCode}</h2>
+              <p>{session.sessionId}</p>
+            </div>
+            <div className="dynamic-session-statuses">
+              <CommonBadge tone="neutral">
+                {session.lifecycleStatus}
+              </CommonBadge>
+              <CommonBadge tone="warning">
+                {session.publicationStatus}
+              </CommonBadge>
+            </div>
+          </div>
+          <h3>SGDG-managed source và Asset lineage</h3>
+          <dl>
+            <dt>Session title</dt>
+            <dd>{session.assetName}</dd>
+            <dt>Asset reference</dt>
+            <dd>{session.assetId}</dd>
+            <dt>Creation source</dt>
+            <dd>SGDG-managed initiation · {session.creationSource}</dd>
+            <dt>Management mode</dt>
+            <dd>{session.managementMode}</dd>
+            <dt>Asset version đã đánh giá</dt>
+            <dd>v{session.evaluatedAssetVersion}</dd>
+            <dt>Readiness reference</dt>
+            <dd>{session.assetReadinessReferenceId}</dd>
+            <dt>Readiness observed</dt>
+            <dd>{session.readinessObservedAt}</dd>
+            <dt>Mục đích Draft</dt>
+            <dd>{session.draftPurpose}</dd>
+            <dt>Khu vực</dt>
+            <dd>{session.operatingRegion}</dd>
+            <dt>Owner</dt>
+            <dd>{session.ownerId}</dd>
+            <dt>Creator</dt>
+            <dd>{session.creatorId}</dd>
+            <dt>Session version</dt>
+            <dd>{session.currentVersion}</dd>
+          </dl>
+          <div className="opening-review-disclosure">
+            <strong>Chưa phê duyệt · Chưa lập lịch · Chưa xuất bản</strong>
+            <p>
+              Readiness reference tại thời điểm tạo không bảo đảm readiness
+              cho các phase sau. Session vẫn là DRAFT / NOT_READY.
+            </p>
+          </div>
+        </section>
+        <aside className="ops-decision">
+          <h2>Bước chuẩn bị tiếp theo</h2>
+          <DynamicConfigurationProjection sessionId={session.sessionId} />
+          <DynamicAuctionContentProjection session={session} />
+          <DynamicContentReviewProjection session={session} />
+          <DynamicApprovalPackageProjection session={session} />
+          <small id="sgdg-session-next-step">
+            Approval Package remains blocked. No ADMIN queue entry, Schedule
+            or Publication exists.
+          </small>
+        </aside>
+      </div>
+      <section className="ops-panel opening-review-history">
+        <h2>Lịch sử Session</h2>
+        <ol>
+          {session.history.map((entry) => (
+            <li key={entry.id}>
+              <strong>SGDG MANAGED SESSION CREATED</strong>
+              <span>
+                {entry.assetId} · readiness v
+                {entry.evaluatedAssetVersion} → {entry.sessionId}
+              </span>
+              <small>
+                {entry.actorRole} · {entry.createdAt} · {entry.visibility}
+              </small>
+            </li>
+          ))}
+        </ol>
+      </section>
+    </Shell>
+  );
+}
+
+function DynamicConfigurationProjection({
+  sessionId,
+}: {
+  sessionId: string;
+}) {
+  const proposal = useAuctionConfigurationStore((state) =>
+    state.proposals.find((item) => item.sessionId === sessionId),
+  );
+  const snapshot = useAuctionConfigurationStore((state) =>
+    state.snapshots.find((item) => item.sessionId === sessionId),
+  );
+  const legacySnapshot = useAuctionConfigurationStore((state) =>
+    state.legacySnapshots.find((item) => item.sessionId === sessionId),
+  );
+  const label =
+    proposal?.legacyPolicyState
+      ? proposal.legacyPolicyState === "LEGACY_SGDG_FEE_UNRESOLVED"
+        ? "Legacy Configuration evidence retained — SGDG-managed Listing Fee decision required. This is not a current CONFIRMED Configuration."
+        : "Legacy Configuration evidence retained — governed revalidation is required. This is not a current CONFIRMED Configuration."
+      : proposal?.status === "DRAFT"
+      ? proposal.overallConfigurationResolutionState === "READY"
+        ? "Configuration Draft: Auction Room and Member Listing Fee resolution is READY."
+        : proposal.overallConfigurationResolutionState ===
+            "BUSINESS_DECISION_REQUIRED"
+          ? "Configuration: BUSINESS DECISION REQUIRED."
+          : "Configuration: Auction Room and Member Listing Fee resolution required."
+      : proposal?.status === "SUBMITTED"
+        ? proposal.overallConfigurationResolutionState ===
+            "BUSINESS_DECISION_REQUIRED"
+          ? "SUBMITTED — BUSINESS DECISION REQUIRED. ADMIN confirmation is blocked."
+          : "Configuration đang chờ governed confirmation."
+        : proposal?.status === "RETURNED_FOR_CORRECTION"
+          ? "Configuration cần Content Staff chỉnh sửa."
+          : proposal?.status === "CONFIRMED" && snapshot
+            ? `Configuration đã xác nhận · ${snapshot.snapshotId} · proposal v${snapshot.proposalVersion}.`
+            : "Configuration chưa bắt đầu.";
+  return (
+    <div className="dynamic-configuration-projection">
+      <p>{label}</p>
+      {proposal?.roomResolution && (
+        <p>
+          Ordinary Auction Room: {proposal.priceBandResolution?.reference} →{" "}
+          {proposal.roomResolution.roomReference}
+        </p>
+      )}
+      {proposal?.overallConfigurationResolutionState ===
+        "BUSINESS_DECISION_REQUIRED" && (
+        <p role="alert">
+          Member Listing Fee: BUSINESS_DECISION_REQUIRED.{" "}
+          {SGDG_MANAGED_FEE_DECISION_MESSAGE}
+        </p>
+      )}
+      {legacySnapshot && (
+        <p>
+          Legacy evidence: {legacySnapshot.snapshotId} ·{" "}
+          {legacySnapshot.policyClassification}. No current Snapshot.
+        </p>
+      )}
+      {proposal?.status === "CONFIRMED" && snapshot && (
+        <>
+          <p>
+            Confirmed mode: {snapshot.managementMode} · {snapshot.confirmedAt}
+          </p>
+          <p>
+            Policy {snapshot.policyDecisionReference.decisionId} · v
+            {snapshot.policyDecisionReference.decisionVersion} ·{" "}
+            {snapshot.priceBandResolution.reference} →{" "}
+            {snapshot.roomResolution.roomReference} · fee{" "}
+            {snapshot.listingFeeResolution.applicability === "APPLICABLE"
+              ? snapshot.listingFeeResolution.fee.kind === "AMOUNT"
+                ? `${snapshot.listingFeeResolution.fee.amountVnd.toLocaleString(
+                    "vi-VN",
+                  )} VND`
+                : snapshot.listingFeeResolution.fee.sourceLabel
+              : snapshot.listingFeeResolution.applicability}
+          </p>
+          <p>{snapshot.policyDisclaimer}</p>
+          <p>{snapshot.normalizationDisclaimer}</p>
+        </>
+      )}
+      {proposal && !snapshot && (
+        <p>{AUCTION_ROOM_FEE_POLICY_DISCLAIMER}</p>
+      )}
+      <p>
+        Session remains DRAFT / NOT_READY. Configuration confirmation alone
+        does not approve or publish the Session.
+      </p>
+      <Link to={`/ops/auctions/${sessionId}/rules`}>
+        Mở Configuration workspace
+      </Link>
+    </div>
+  );
+}
+
+function DynamicAuctionContentProjection({
+  session,
+}: {
+  session: PersistedAuctionSession;
+}) {
+  const content = useAuctionContentStore((state) =>
+    state.contents.find((item) => item.sessionId === session.sessionId),
+  );
+  if (session.recordKind === "DYNAMIC_SGDG_MANAGED_SESSION")
+    return (
+      <div className="dynamic-auction-content-projection">
+        <strong>Auction Content</strong>
+        <p>Dynamic Content foundation deferred for this branch.</p>
+        <p>
+          Direct SGDG title, purpose và region vẫn ở Session hiện tại để tránh
+          tạo duplicate content authority.
+        </p>
+        <Link to={`/ops/auctions/${session.sessionId}/content`}>
+          Xem deferred content boundary
+        </Link>
+      </div>
+    );
+  return (
+    <div className="dynamic-auction-content-projection">
+      <strong>Auction Content</strong>
+      <p>
+        {content
+          ? content.status === "COMPLETE"
+            ? "CONTENT DRAFT COMPLETE"
+            : content.status
+          : "NOT INITIALIZED"}
+      </p>
+      {content && (
+        <>
+          <p>
+            Content version: v{content.contentVersion} · Title:{" "}
+            {content.workingContent.auctionTitle || "Chưa có"}
+          </p>
+          <p>
+            Summary:{" "}
+            {content.workingContent.auctionSummary
+              ? "Đã có"
+              : "Chưa hoàn chỉnh"}
+          </p>
+          <p>
+            Source: {content.sourceLineage.openingRequestId} · v
+            {content.sourceLineage.openingRequestVersion}
+          </p>
+        </>
+      )}
+      <small>{PROTOTYPE_CONTENT_POLICY.classification}</small>
+      <ButtonLink
+        variant={content ? "secondary" : "primary"}
+        to={`/ops/auctions/${session.sessionId}/content`}
+      >
+        {content ? "Mở Auction Content" : "Khởi tạo hoặc mở Content workspace"}
+      </ButtonLink>
+    </div>
+  );
+}
+
+function DynamicContentReviewProjection({
+  session,
+}: {
+  session: PersistedAuctionSession;
+}) {
+  const review = useAuctionContentReviewStore((state) =>
+    state.reviews.find((item) => item.sessionId === session.sessionId),
+  );
+  const completionRecord = useAuctionContentReviewStore((state) =>
+    state.completionRecords.find((item) => item.reviewId === review?.reviewId),
+  );
+  const projection = getSessionPackageProjection(session.sessionId);
+  if (session.recordKind === "DYNAMIC_SGDG_MANAGED_SESSION")
+    return (
+      <div className="dynamic-content-review-projection">
+        <strong>Content Review</strong>
+        <p role="alert">
+          {CONTENT_REVIEW_BLOCKED_BY_CONFIGURATION}:{" "}
+          {SGDG_CONTENT_REVIEW_BLOCKER_MESSAGE}
+        </p>
+        <p>Session Package: NOT READY · Completion record: NONE.</p>
+        <p>{PROTOTYPE_CONTENT_POLICY.classification}</p>
+        <ButtonLink
+          variant="secondary"
+          to={`/ops/auctions/${session.sessionId}/content-review`}
+        >
+          Xem Configuration blocker
+        </ButtonLink>
+      </div>
+    );
+  return (
+    <div className="dynamic-content-review-projection">
+      <strong>Content Review</strong>
+      <p>{review?.status ?? "NOT STARTED"}</p>
+      <p>
+        Session Package:{" "}
+        {projection === "READY_FOR_APPROVAL_PACKAGE_PREPARATION"
+          ? "Ready for Approval Package preparation"
+          : projection}
+      </p>
+      <p>
+        Completion record:{" "}
+        {completionRecord?.completionRecordId ?? "NOT CREATED"}
+      </p>
+      <p>
+        Session: {session.lifecycleStatus} · Publication:{" "}
+        {session.publicationStatus}
+      </p>
+      <small>{PROTOTYPE_CONTENT_POLICY.classification}</small>
+      <ButtonLink
+        variant={review ? "secondary" : "primary"}
+        to={`/ops/auctions/${session.sessionId}/content-review`}
+      >
+        {review ? "Mở Content Review" : "Chuẩn bị Content Review"}
+      </ButtonLink>
+    </div>
+  );
+}
+
+function DynamicApprovalPackageProjection({
+  session,
+}: {
+  session: PersistedAuctionSession;
+}) {
+  const review = useAuctionContentReviewStore((state) =>
+    state.reviews.find((item) => item.sessionId === session.sessionId),
+  );
+  const completionRecord = useAuctionContentReviewStore((state) =>
+    state.completionRecords.find((item) => item.reviewId === review?.reviewId),
+  );
+  const packageValue = useAuctionApprovalPackageStore((state) =>
+    state.packages.find((item) => item.sessionId === session.sessionId),
+  );
+  const submissionRecord = useAuctionApprovalPackageStore((state) =>
+    state.submissionRecords.find(
+      (item) => item.packageId === packageValue?.packageId,
+    ),
+  );
+  const approvalReview = useAuctionApprovalReviewStore((state) =>
+    state.reviews.find((item) => item.packageId === packageValue?.packageId),
+  );
+  const approvalDecision = useAuctionApprovalDecisionStore((state) =>
+    state.decisions.find((item) => item.packageId === packageValue?.packageId),
+  );
+  const scheduleDraft = useAuctionScheduleDraftStore((state) =>
+    state.drafts.find((item) => item.sessionId === session.sessionId),
+  );
+  const confirmedSchedule = useAuctionConfirmedScheduleStore((state) =>
+    state.confirmedSchedules.find(
+      (item) => item.sessionId === session.sessionId,
+    ),
+  );
+  const registrationReadiness =
+    useAuctionRegistrationOpeningReadinessStore((state) =>
+      state.assessments.find(
+        (item) => item.sessionId === session.sessionId,
+      ),
+    );
+  const registrationWindow = useAuctionRegistrationWindowStore((state) =>
+    state.registrationWindows.find(
+      (item) => item.sessionId === session.sessionId,
+    ),
+  );
+  const allCustomerRegistrations = useAuctionCustomerRegistrationStore(
+    (state) => state.registrations,
+  );
+  const customerRegistrations = allCustomerRegistrations.filter(
+    (item) => item.sessionId === session.sessionId,
+  );
+  const registrationValidations = useAuctionRegistrationValidationStore(
+    (state) => state.validations,
+  );
+  const registrationCorrectionDrafts =
+    useAuctionRegistrationCorrectionDraftStore(
+      (state) => state.correctionDrafts,
+    );
+  const registrationResubmissions =
+    useAuctionRegistrationResubmissionStore(
+      (state) => state.resubmissions,
+    );
+  const registrationRevalidations =
+    useAuctionRegistrationRevalidationStore(
+      (state) => state.revalidations,
+    );
+  const membershipChecks = useAuctionMembershipCheckStore(
+    (state) => state.membershipChecks,
+  );
+  const depositChecks = useAuctionDepositCheckStore(
+    (state) => state.depositChecks,
+  );
+  const queueItem = packageValue
+    ? getApprovalDecisionQueue().find(
+        (item) => item.packageId === packageValue.packageId,
+      )
+    : undefined;
+  if (session.recordKind === "DYNAMIC_SGDG_MANAGED_SESSION")
+    return (
+      <div className="dynamic-content-review-projection">
+        <strong>Approval Package</strong>
+        <p role="alert">
+          {APPROVAL_PACKAGE_BLOCKED_BY_CONFIGURATION}:{" "}
+          {SGDG_APPROVAL_PACKAGE_BLOCKER_MESSAGE}
+        </p>
+        <p>Approval Package chưa được tạo.</p>
+        <p>Approval Package: BLOCKED BY CONFIGURATION.</p>
+        <p>
+          {APPROVAL_REVIEW_BLOCKED_BY_CONFIGURATION}:{" "}
+          {REVIEW_CONFIGURATION_BLOCKER_MESSAGE}
+        </p>
+        <p>Approval Review: BLOCKED BY CONFIGURATION.</p>
+        <p>Approval Decision: BLOCKED BY CONFIGURATION.</p>
+        <p>Schedule: BLOCKED BY CONFIGURATION.</p>
+        <p>Schedule Confirmation: BLOCKED BY CONFIGURATION.</p>
+        <p>Registration Readiness: BLOCKED BY CONFIGURATION.</p>
+        <p>Registration: BLOCKED BY CONFIGURATION.</p>
+        <p>Queue: NONE · Session Approval: NOT STARTED.</p>
+        <small>{PROTOTYPE_CONTENT_POLICY.classification}</small>
+        <ButtonLink
+          variant="secondary"
+          to={`/ops/auctions/${session.sessionId}/approval-package`}
+        >
+          Xem Package blocker
+        </ButtonLink>
+      </div>
+    );
+  const packageLabel =
+    !completionRecord || review?.status !== "COMPLETED"
+      ? "NOT AVAILABLE"
+      : !packageValue
+        ? "NOT CREATED"
+        : packageValue.status === "READY_TO_SUBMIT"
+          ? "READY TO SUBMIT"
+          : packageValue.status;
+  return (
+    <div className="dynamic-content-review-projection">
+      <strong>Approval Package</strong>
+      <p>Approval Package: {packageLabel}</p>
+      {!completionRecord && (
+        <>
+          <p>Approval Package chưa được tạo.</p>
+          <p>Reason: Content Review is not complete.</p>
+        </>
+      )}
+      {completionRecord && !packageValue && (
+        <p>
+          Session Package: READY_FOR_APPROVAL_PACKAGE_PREPARATION.
+        </p>
+      )}
+      {packageValue && (
+        <p>
+          {packageValue.packageId} · package v{packageValue.packageVersion}
+        </p>
+      )}
+      {packageValue?.status === "SUBMITTED" && (
+        <>
+          <p>
+            ADMIN Queue:{" "}
+            {queueItem?.queueState ??
+              submissionRecord?.queueState ??
+              "INVALID"}{" "}
+            · Evidence:{" "}
+            {getApprovalPackageEvidenceValidity(packageValue)}
+          </p>
+          <p>
+            Approval Review:{" "}
+            {approvalDecision
+              ? "DECISION RECORDED"
+              : approvalReview
+              ? approvalReview.status === "STALE"
+                ? "IN_REVIEW — EVIDENCE STALE"
+                : approvalReview.status
+              : "NOT STARTED"}
+          </p>
+          <p>
+            Approval Decision:{" "}
+            {approvalDecision?.outcome ?? "NOT MADE"}.
+          </p>
+          <p>
+            Session Approval:{" "}
+            {getSessionApprovalProjection(session.sessionId)}.
+          </p>
+          {approvalDecision && (
+            <>
+              <p>Schedule: {scheduleDraft ? "DRAFT" : "NOT CREATED"}.</p>
+              {scheduleDraft && (
+                <p>
+                  Schedule completeness:{" "}
+                  {scheduleDraft.completeness.complete
+                    ? "COMPLETE"
+                    : "INCOMPLETE"}.
+                </p>
+              )}
+              <p>
+                Schedule Confirmation:{" "}
+                {confirmedSchedule ? "CONFIRMED" : "NOT STARTED"}.
+              </p>
+              {confirmedSchedule && (
+                <>
+                  <p>Schedule Draft: COMPLETE.</p>
+                  <p>Confirmed Schedule: CONFIRMED.</p>
+                  <p>
+                    Registration Readiness:{" "}
+                    {registrationReadiness
+                      ? registrationReadiness.status
+                          .replaceAll("_", " ")
+                          .replace("READY TO OPEN REGISTRATION", "READY TO OPEN")
+                      : "NOT ASSESSED"}.
+                  </p>
+                  <p>
+                    Next step: Registration-opening preparation in a later
+                    task.
+                  </p>
+                </>
+              )}
+              {registrationWindow ? (
+                <>
+                  <p>Registration Window: OPEN.</p>
+                  {customerRegistrations.length === 0 ? (
+                    <p>Customer Registrations: NONE.</p>
+                  ) : (
+                    customerRegistrations.map((registration) => {
+                      const validation = registrationValidations.find(
+                        (item) =>
+                          item.registrationId === registration.registrationId,
+                      );
+                      const correctionDraft =
+                        registrationCorrectionDrafts.find(
+                          (item) =>
+                            item.registrationId ===
+                            registration.registrationId,
+                        );
+                      const resubmission =
+                        registrationResubmissions.find(
+                          (item) =>
+                            item.registrationId ===
+                            registration.registrationId,
+                        );
+                      const revalidation =
+                        registrationRevalidations.find(
+                          (item) =>
+                            item.resubmissionId ===
+                            resubmission?.resubmissionId,
+                        );
+                      const membershipCheck = membershipChecks.find(
+                        (item) =>
+                          item.registrationId ===
+                          registration.registrationId,
+                      );
+                      const depositCheck = depositChecks.find(
+                        (item) =>
+                          item.registrationId ===
+                          registration.registrationId,
+                      );
+                      const validationLabel = !validation
+                        ? "NOT STARTED"
+                        : validation.outcome === "VALID"
+                          ? "VALID"
+                          : validation.correctability === "CORRECTABLE"
+                            ? "INVALID — CORRECTABLE"
+                            : "INVALID — BLOCKING";
+                      const nextStep = depositCheck
+                        ? depositCheck.nextStep
+                        : membershipCheck
+                        ? membershipCheck.nextStep
+                        : revalidation
+                        ? revalidation.nextStep
+                        : resubmission
+                        ? resubmission.nextStep
+                        : !validation
+                        ? "NOT STARTED"
+                        : validation.nextStep ===
+                            "READY_FOR_MEMBERSHIP_CHECK"
+                          ? "READY FOR MEMBERSHIP CHECK"
+                          : validation.nextStep === "CORRECTION_REQUIRED"
+                            ? "CORRECTION REQUIRED"
+                            : "STOPPED";
+                      return (
+                        <div key={registration.registrationId}>
+                          <p>
+                            Customer Registration: {registration.status}.
+                          </p>
+                          <p>
+                            Registration Validation: {validationLabel}.
+                          </p>
+                          <p>Next Step: {nextStep}.</p>
+                          <p>
+                            Membership Check:{" "}
+                            {membershipCheck
+                              ? `${membershipCheck.outcome} / ${membershipCheck.nextStep}`
+                              : "NOT CHECKED"}
+                            .
+                          </p>
+                          <p>
+                            Deposit Check:{" "}
+                            {depositCheck
+                              ? `${depositCheck.outcome} / ${depositCheck.nextStep}`
+                              : "NOT CHECKED"}
+                            .
+                          </p>
+                          {validation?.nextStep ===
+                            "CORRECTION_REQUIRED" && (
+                            <>
+                              <p>
+                                Original Registration:{" "}
+                                {registration.status}.
+                              </p>
+                              <p>
+                                Previous Validation:{" "}
+                                {validation.nextStep}.
+                              </p>
+                              <p>
+                                Correction Draft:{" "}
+                                {correctionDraft?.status ??
+                                  "NOT STARTED"}.
+                              </p>
+                              <p>
+                                Corrected Resubmission:{" "}
+                                {resubmission?.status ??
+                                  "NOT STARTED"}.
+                              </p>
+                              <p>
+                                Revalidation:{" "}
+                                {revalidation
+                                  ? `${revalidation.outcome} / ${revalidation.correctability}`
+                                  : "NOT STARTED"}
+                                .
+                              </p>
+                              <p>
+                                Session: {session.lifecycleStatus} /{" "}
+                                {session.publicationStatus}.
+                              </p>
+                              <p>Publication: NOT STARTED.</p>
+                            </>
+                          )}
+                        </div>
+                      );
+                    })
+                  )}
+                  <p>
+                    Membership:{" "}
+                    {membershipChecks.some((item) =>
+                      customerRegistrations.some(
+                        (registration) =>
+                          registration.registrationId ===
+                          item.registrationId,
+                      ),
+                    )
+                      ? "CHECKED"
+                      : "NOT CHECKED"}
+                    .
+                  </p>
+                  <p>
+                    Deposit:{" "}
+                    {depositChecks.some((item) =>
+                      customerRegistrations.some(
+                        (registration) =>
+                          registration.registrationId ===
+                          item.registrationId,
+                      ),
+                    )
+                      ? "CHECKED"
+                      : "NOT CHECKED"}
+                    .
+                  </p>
+                  <p>Eligibility: NOT EVALUATED.</p>
+                </>
+              ) : (
+                <p>Registration: NOT OPEN.</p>
+              )}
+              {!confirmedSchedule && <p>Next step: Schedule preparation.</p>}
+            </>
+          )}
+        </>
+      )}
+      {packageValue && (
+        <p>
+          Session: {session.lifecycleStatus} · Publication:{" "}
+          {session.publicationStatus}
+        </p>
+      )}
+      <small>{PROTOTYPE_CONTENT_POLICY.classification}</small>
+      {completionRecord && (
+        <ButtonLink
+          variant={packageValue ? "secondary" : "primary"}
+          to={`/ops/auctions/${session.sessionId}/approval-package`}
+        >
+          {packageValue
+            ? "Mở Approval Package"
+            : "Chuẩn bị Approval Package"}
+        </ButtonLink>
+      )}
+      {approvalDecision && (
+        <ButtonLink
+          variant={scheduleDraft ? "secondary" : "primary"}
+          to={`/ops/auctions/${session.sessionId}/schedule`}
+        >
+          {scheduleDraft ? "Mở Schedule Draft" : "Chuẩn bị Schedule"}
+        </ButtonLink>
+      )}
+    </div>
+  );
+}
+
 export function RuleConfigurationPage() {
   const { sessionId } = useParams();
+  const { role } = useOutletContext<Context>();
+  const dynamicSession = useAuctionSessionStore((state) =>
+    state.sessions.find((session) => session.sessionId === sessionId),
+  );
+  if (dynamicSession)
+    return (
+      <DynamicAuctionConfigurationPage
+        session={dynamicSession}
+        role={role}
+      />
+    );
+  return <FixtureRuleConfigurationPage />;
+}
+
+function FixtureRuleConfigurationPage() {
+  const { sessionId } = useParams();
   const [p] = useSearchParams();
-  const f = sessionId && getAuctionRuleFixture(sessionId, scenario(p, "draft"));
+  const { role } = useOutletContext<Context>();
+  const currentScenario = scenario(p, "draft");
+  const f = sessionId && getAuctionRuleFixture(sessionId, currentScenario);
   const [price, setPrice] = useState(2900000000);
+  const [increment, setIncrement] = useState(25000000);
+  const [notice, setNotice] = useState("");
+  if (currentScenario === "loading")
+    return <Shell title="Cấu hình phiên đấu giá"><p>Đang tải cấu hình…</p></Shell>;
+  if (currentScenario === "error")
+    return <Shell title="Cấu hình phiên đấu giá"><p className="ops-conflict">Không thể tải cấu hình. Vui lòng thử lại.</p></Shell>;
   if (!f) return <NotFoundPage />;
   if (f.sensitiveChange)
     return (
-      <Shell title="Rule & configuration">
-        <p className="ops-conflict">
-          Sensitive change cần governance review.{" "}
-          <Link to="/governance/changes/CHG-ROYAL-OAK-001">Mở GOV-006</Link>
-        </p>
+      <Shell title="Cấu hình phiên đấu giá">
+        <section className="ops-panel">
+          <h2>Yêu cầu thay đổi nhạy cảm đang chờ duyệt</h2>
+          <p className="ops-conflict">
+            Snapshot đã duyệt vẫn giữ nguyên; đề xuất mới không ghi đè trực tiếp.
+          </p>
+          <div className="ops-definition">
+            <div><dt>Giá trị cũ</dt><dd>2.900.000.000 ₫</dd></div>
+            <div><dt>Giá trị đề xuất</dt><dd>3.000.000.000 ₫</dd></div>
+            <div><dt>Expected version</dt><dd>v{f.version}</dd></div>
+          </div>
+          <Link className="button primary" to="/governance/changes/CHG-ROYAL-OAK-001">
+            Mở hồ sơ governance
+          </Link>
+        </section>
       </Shell>
     );
+  const configuration: AuctionConfiguration = {
+    ruleVersionId: f.ruleVersionId,
+    version: f.version,
+    status: f.status as AuctionConfiguration["status"],
+    startingPrice: price,
+    minimumIncrement: increment,
+    depositPolicyReference: f.depositPolicyReference,
+    eligibilityPolicyReference: f.eligibilityPolicyReference,
+    extensionPolicyReference: f.extensionPolicyReference,
+    fallbackPolicyReference: f.fallbackPolicyReference,
+  };
+  const errors = configurationErrors(configuration);
+  const editable = !f.immutableSnapshot && role === "CONTENT_STAFF";
+  const runCommand = (kind: "save" | "submit") => {
+    const command = kind === "save" ? saveConfiguration : submitConfiguration;
+    const result = command(configuration, role, f.version);
+    setNotice(
+      result.ok
+        ? kind === "save"
+          ? "Đã lưu đề xuất. Lịch và publication không thay đổi."
+          : "Đã gửi đề xuất để duyệt; cấu hình chưa được phê duyệt."
+        : `Không thể thực hiện: ${result.reason}.`,
+    );
+  };
   return (
-    <Shell title="Rule & configuration">
-      <section className="ops-panel">
-        <h2>
-          Rule version {f.version} · {f.status}
-        </h2>
-        <label>
-          Giá khởi điểm
-          <input
-            type="number"
-            disabled={f.immutableSnapshot}
-            value={price}
-            onChange={(e) => setPrice(Number(e.target.value))}
-          />
+    <Shell title="Cấu hình phiên đấu giá">
+      <div className="ops-workspace">
+        <section className="ops-panel">
+          <h2>{f.auctionCode} · {f.status}</h2>
+          <div className="ops-definition">
+            <div><dt>Session</dt><dd>{f.sessionId}</dd></div>
+            <div><dt>Tài sản</dt><dd>{f.assetId}</dd></div>
+            <div><dt>Lifecycle</dt><dd>{f.lifecycleStatus}</dd></div>
+            <div><dt>Phiên bản</dt><dd>v{f.version}</dd></div>
+            <div><dt>Cập nhật</dt><dd>{new Date(f.updatedAt).toLocaleString("vi-VN")}</dd></div>
+          </div>
+          <h3>Phạm vi quản lý</h3>
+          <p><strong>{f.managementMode}</strong> — nguồn yêu cầu từ khách hàng không chuyển quyền cấu hình nội bộ ra khỏi SGDG.</p>
+        </section>
+        <aside className="ops-panel">
+          <h2>{errors.length ? "Chưa sẵn sàng" : "Sẵn sàng gửi duyệt"}</h2>
+          {errors.length ? errors.map((error) => <p className="ops-conflict" key={error}>{error}</p>) : <p>Mọi kiểm tra cấu hình đã đạt.</p>}
+          <p>Readiness không đồng nghĩa đã duyệt, đã lên lịch hoặc đã công bố.</p>
+          <p>
+            <strong>Legacy fixture Configuration.</strong> This fixture is not
+            governed by the current dynamic Auction Room and Member Listing Fee
+            policy.
+          </p>
+        </aside>
+      </div>
+      <section className="ops-panel ops-config-form">
+        <h2>{f.immutableSnapshot ? "Snapshot cấu hình" : "Đề xuất quy tắc"}</h2>
+        <label>Giá khởi điểm
+          <input type="number" disabled={!editable} value={price} onChange={(e) => setPrice(Number(e.target.value))} />
         </label>
-        <label>
-          Bước giá
-          <input
-            type="number"
-            disabled={f.immutableSnapshot}
-            defaultValue={f.minimumIncrement}
-          />
+        <label>Bước giá
+          <input type="number" disabled={!editable} value={increment} onChange={(e) => setIncrement(Number(e.target.value))} />
         </label>
-        <p>
-          Deposit {f.depositPolicyReference} · Eligibility{" "}
-          {f.eligibilityPolicyReference} · Extension{" "}
-          {f.extensionPolicyReference}
-        </p>
-        {f.immutableSnapshot ? (
-          <p>Approved snapshot là chỉ đọc, không thể overwrite.</p>
+        <div className="ops-definition">
+          <div><dt>Deposit</dt><dd>{f.depositPolicyReference || "Thiếu tham chiếu"}</dd></div>
+          <div><dt>Eligibility</dt><dd>{f.eligibilityPolicyReference}</dd></div>
+          <div><dt>Extension</dt><dd>{f.extensionPolicyReference}</dd></div>
+          <div><dt>Fallback</dt><dd>{f.fallbackPolicyReference}</dd></div>
+        </div>
+        {notice && <p role="status">{notice}</p>}
+        {f.status === "APPROVED_SNAPSHOT" ? (
+          <>
+            <p className="ops-conflict">Snapshot đã duyệt là bất biến. Thay đổi nhạy cảm phải tạo hồ sơ governance mới.</p>
+            {role === "CONTENT_STAFF" && (
+              <Link className="button primary" to="?scenario=sensitive-change-pending">
+                Tạo yêu cầu thay đổi nhạy cảm
+              </Link>
+            )}
+          </>
+        ) : f.status === "PENDING_REVIEW" ? (
+          <p>Đề xuất đang chờ duyệt và chỉ đọc.</p>
+        ) : editable ? (
+          <div className="ops-actions">
+            <button className="button secondary" onClick={() => runCommand("save")}>Lưu đề xuất cấu hình</button>
+            <button className="button primary" disabled={errors.length > 0} onClick={() => runCommand("submit")}>Gửi phê duyệt</button>
+          </div>
         ) : (
-          <button className="button primary" disabled={price <= 0}>
-            Lưu Rule Proposal
-          </button>
+          <p className="ops-conflict">Vai trò hiện tại không được phép commit cấu hình.</p>
         )}
       </section>
     </Shell>
@@ -430,6 +1954,13 @@ export function ApprovalQueuePage() {
   const rows = getApprovalQueueFixture(scenario(p, "session-pending-approval"));
   return (
     <Shell title="Hàng đợi phê duyệt">
+      <section className="ops-panel">
+        <strong>Fixture-only compatibility evidence.</strong>
+        <p>
+          This legacy queue is separate from dynamic submitted Approval
+          Packages.
+        </p>
+      </section>
       <Table headers={["Package", "Session", "Maker", "Readiness", "Action"]}>
         {rows.map((x) => (
           <tr key={x.approvalId}>
@@ -467,6 +1998,13 @@ export function ApprovalPackagePage() {
   const blocked = f.stale || !f.canApprove;
   return (
     <Shell title="Approval package">
+      <section className="ops-panel">
+        <strong>Fixture-only compatibility evidence.</strong>
+        <p>
+          These fixture decision controls are not authority for dynamic
+          Approval Packages.
+        </p>
+      </section>
       <div className="ops-workspace">
         <section className="ops-panel">
           <Badge>{f.item.status}</Badge>

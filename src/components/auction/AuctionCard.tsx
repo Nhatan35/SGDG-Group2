@@ -16,6 +16,7 @@ export interface AuctionCardProps {
   action?: AuctionCardAction | null;
   showCategory?: boolean;
   detailLink?: boolean;
+  segmentedCountdown?: boolean;
 }
 
 export function AuctionCard({
@@ -23,8 +24,10 @@ export function AuctionCard({
   action,
   showCategory = false,
   detailLink = true,
+  segmentedCountdown = false,
 }: AuctionCardProps) {
   const live = auction.status === "LIVE";
+  const showSegmentedCountdown = segmentedCountdown && live;
   const completed =
     auction.status === "COMPLETED" || auction.status === "CLOSED";
   const priceLabel = live
@@ -67,8 +70,17 @@ export function AuctionCard({
           <h3>{auction.assetName}</h3>
           <span className="price-caption">{priceLabel}</span>
           <strong className="auction-price">{formatMoney(price)}</strong>
-          <div className="auction-time">
-            <AuctionStatus auction={auction} catalog={showCategory} />
+          <div
+            className={`auction-time ${showSegmentedCountdown ? "auction-time--segmented" : ""}`}
+          >
+            {showSegmentedCountdown && (
+              <span className="auction-time__label">Kết thúc sau</span>
+            )}
+            <AuctionStatus
+              auction={auction}
+              catalog={showCategory}
+              segmented={showSegmentedCountdown}
+            />
           </div>
           {auction.cancellationNotice && (
             <p className="auction-notice">{auction.cancellationNotice}</p>

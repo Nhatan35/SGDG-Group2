@@ -1,0 +1,236 @@
+.approval-package-page {
+  display: grid;
+  gap: var(--space-5);
+  width: min(100%, 1440px);
+  margin: 0 auto;
+  padding: clamp(1rem, 2vw, 2rem);
+  color: var(--color-text);
+}
+
+.approval-package-heading {
+  display: grid;
+  gap: var(--space-2);
+  max-width: 74rem;
+}
+
+.approval-package-heading > span,
+.approval-package-eyebrow {
+  color: var(--color-primary);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.approval-package-heading h1,
+.approval-package-card h2,
+.approval-package-card h3,
+.approval-package-card p,
+.approval-package-card dd,
+.approval-package-card dt,
+.approval-package-card li,
+.approval-package-heading p,
+.approval-package-alert,
+.approval-package-success {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.approval-package-heading h1 {
+  margin: 0;
+  font-size: clamp(1.8rem, 4vw, 3rem);
+}
+
+.approval-package-card {
+  min-width: 0;
+  padding: clamp(1rem, 2vw, 1.5rem);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.approval-package-card h2,
+.approval-package-card h3 {
+  margin-top: 0;
+}
+
+.approval-package-card dl,
+.approval-package-dialog dl {
+  display: grid;
+  grid-template-columns: minmax(8rem, 0.42fr) minmax(0, 1fr);
+  gap: 0.65rem 1rem;
+  margin: 1rem 0 0;
+}
+
+.approval-package-card dt,
+.approval-package-dialog dt {
+  color: var(--color-text-muted);
+  font-weight: 700;
+}
+
+.approval-package-card dd,
+.approval-package-dialog dd {
+  min-width: 0;
+  margin: 0;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.approval-package-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+
+.approval-package-identity,
+.approval-package-queue-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.approval-package-identity dl {
+  flex-basis: 100%;
+}
+
+.approval-package-badges,
+.approval-package-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.approval-package-alert,
+.approval-package-success {
+  padding: 1rem;
+  border-radius: var(--radius-md);
+}
+
+.approval-package-alert {
+  border: 1px solid color-mix(in srgb, var(--color-danger) 55%, transparent);
+  background: color-mix(in srgb, var(--color-danger) 9%, var(--color-surface));
+}
+
+.approval-package-success {
+  border: 1px solid color-mix(in srgb, var(--color-success) 55%, transparent);
+  background: color-mix(in srgb, var(--color-success) 9%, var(--color-surface));
+  font-weight: 700;
+}
+
+.approval-package-findings {
+  display: grid;
+  gap: 1rem;
+}
+
+.approval-package-findings section {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.approval-package-findings article {
+  display: grid;
+  gap: 0.35rem;
+  padding: 1rem;
+  border-inline-start: 4px solid var(--color-danger);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-subtle);
+}
+
+.approval-package-findings article > span,
+.approval-package-findings article > small {
+  color: var(--color-text-muted);
+}
+
+.approval-package-boundary {
+  border-color: color-mix(in srgb, var(--color-primary) 50%, var(--color-border));
+}
+
+.approval-package-history ol {
+  display: grid;
+  gap: 0.75rem;
+  padding-inline-start: 1.25rem;
+}
+
+.approval-package-history li {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.approval-package-history small {
+  color: var(--color-text-muted);
+}
+
+.approval-package-dialog {
+  max-height: min(90vh, 56rem);
+  overflow: auto;
+}
+
+.approval-package-dialog-statements {
+  display: grid;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  background: var(--color-surface-subtle);
+}
+
+.approval-package-dialog-statements p {
+  margin: 0;
+}
+
+.approval-package-queue {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.approval-package-queue-card {
+  display: grid;
+  gap: 1rem;
+}
+
+.approval-package-queue-card .button {
+  justify-self: start;
+}
+
+.approval-package-page :is(button, a):focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 3px;
+}
+
+@media (max-width: 800px) {
+  .approval-package-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .approval-package-card dl,
+  .approval-package-dialog dl {
+    grid-template-columns: 1fr;
+    gap: 0.2rem;
+  }
+
+  .approval-package-card dd,
+  .approval-package-dialog dd {
+    margin-bottom: 0.65rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .approval-package-page {
+    padding: 0.75rem;
+  }
+
+  .approval-package-card {
+    padding: 0.9rem;
+    border-radius: var(--radius-md);
+  }
+
+  .approval-package-actions,
+  .approval-package-actions .button,
+  .approval-package-queue-card .button {
+    width: 100%;
+  }
+}

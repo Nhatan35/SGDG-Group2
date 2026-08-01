@@ -1,1 +1,181 @@
-.create-session-page{max-width:1180px}.create-disclosure{display:flex;gap:8px;align-items:center;padding:12px 14px;background:var(--sgdg-sage-100);border:1px solid var(--sgdg-sage-300);border-radius:10px}.create-grid{display:grid;grid-template-columns:minmax(0,2fr) minmax(260px,1fr);gap:20px;margin-top:20px}.create-main,.create-rail{background:var(--sgdg-white);border:1px solid var(--sgdg-border);border-radius:14px;padding:22px}.asset-choice,.create-summary{display:grid;gap:6px;padding:16px;margin:10px 0 22px;border:1px solid var(--sgdg-border);border-radius:10px;background:var(--sgdg-cream)}.asset-choice small,.create-summary dt,.create-field small{color:var(--sgdg-text-secondary)}.create-field{display:grid;gap:6px;margin:12px 0;font-weight:700}.create-field input{min-height:44px;border:1px solid var(--sgdg-border);border-radius:8px;padding:10px;background:white}.create-summary{grid-template-columns:repeat(2,1fr)}.create-summary div{display:grid;gap:3px}.create-rail p{display:flex;align-items:flex-start;gap:8px;font-size:14px}.create-rail svg{width:17px;color:var(--sgdg-sage-700)}@media(max-width:800px){.create-grid{grid-template-columns:1fr}.create-summary{grid-template-columns:1fr}}
+.create-session-page {
+  max-width: 1180px;
+}
+
+.create-disclosure {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  padding: 0.75rem 0.875rem;
+  background: var(--sgdg-sage-100);
+  border: 1px solid var(--sgdg-sage-300);
+  border-radius: 10px;
+}
+
+.create-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(260px, 1fr);
+  gap: 1.25rem;
+  margin-top: 1.25rem;
+}
+
+.create-main,
+.create-rail,
+.asset-readiness-reference,
+.readiness-findings {
+  background: var(--sgdg-white);
+  border: 1px solid var(--sgdg-border);
+  border-radius: 14px;
+}
+
+.create-main,
+.create-rail {
+  padding: 1.375rem;
+}
+
+.create-section-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+  margin-top: 1.25rem;
+}
+
+.create-section-heading:first-child {
+  margin-top: 0;
+}
+
+.create-section-heading h2,
+.create-section-heading span {
+  margin: 0;
+}
+
+.create-section-heading > div > span {
+  color: var(--sgdg-text-secondary);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.create-field {
+  display: grid;
+  gap: 0.4rem;
+  margin: 0.75rem 0;
+  font-weight: 700;
+}
+
+.create-field input,
+.create-field select,
+.create-field textarea {
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid var(--sgdg-border);
+  border-radius: 8px;
+  padding: 0.625rem;
+  background: white;
+}
+
+.create-field textarea {
+  min-height: 7rem;
+  resize: vertical;
+}
+
+.asset-readiness-reference {
+  margin: 1rem 0 1.5rem;
+  padding: 1rem;
+  background: var(--sgdg-cream);
+}
+
+.asset-readiness-reference dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.asset-readiness-reference dl > div {
+  display: grid;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.asset-readiness-reference dt {
+  color: var(--sgdg-text-secondary);
+  font-weight: 700;
+}
+
+.asset-readiness-reference dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.readiness-findings {
+  margin: 1rem 0;
+  padding: 1rem;
+  border-color: var(--sgdg-warning-400, #dc9c35);
+  background: #fffaf0;
+}
+
+.readiness-findings ul {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.readiness-findings li {
+  display: flex;
+  gap: 0.65rem;
+  align-items: flex-start;
+}
+
+.readiness-findings li > div {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.readiness-findings svg,
+.create-rail svg {
+  width: 17px;
+  flex: 0 0 17px;
+  color: var(--sgdg-orange-600, #d8661f);
+}
+
+.create-primary-action {
+  display: grid;
+  justify-items: start;
+  gap: 0.35rem;
+  margin-top: 1.25rem;
+}
+
+.create-primary-action small {
+  color: var(--sgdg-text-secondary);
+}
+
+.create-rail p {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+}
+
+@media (max-width: 800px) {
+  .create-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .create-section-heading {
+    flex-direction: column;
+  }
+
+  .asset-readiness-reference dl {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 420px) {
+  .create-main,
+  .create-rail {
+    padding: 1rem;
+  }
+}

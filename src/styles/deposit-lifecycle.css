@@ -1,0 +1,204 @@
+.deposit-policy-summary {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 18px;
+  padding: 20px;
+  border: 1px solid #f0c9ac;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #fff8f1, #fffdf9);
+}
+
+.deposit-policy-summary > svg {
+  width: 42px;
+  height: 42px;
+  flex: 0 0 auto;
+  color: var(--sgdg-orange-600);
+}
+
+.deposit-policy-summary h2,
+.deposit-policy-summary p {
+  margin: 0;
+}
+
+.deposit-policy-summary p {
+  margin-top: 5px;
+  color: var(--sgdg-text-secondary);
+  line-height: 1.55;
+}
+
+.deposit-record-list {
+  display: grid;
+  gap: 16px;
+}
+
+.deposit-record {
+  padding: 22px;
+  border: 1px solid var(--sgdg-border);
+  border-left: 5px solid var(--sgdg-orange-500);
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: var(--shadow-sm);
+}
+
+.deposit-record.status-refunded,
+.deposit-record.status-applied_to_payment {
+  border-left-color: var(--sgdg-success);
+}
+
+.deposit-record.status-forfeited {
+  border-left-color: var(--sgdg-danger);
+}
+
+.deposit-record.status-on_hold,
+.deposit-record.status-refund_pending {
+  border-left-color: var(--sgdg-warning);
+}
+
+.deposit-record > header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.deposit-record h2,
+.deposit-record p {
+  margin: 0;
+}
+
+.deposit-record header small,
+.deposit-record header p {
+  color: var(--sgdg-text-secondary);
+}
+
+.deposit-record header h2 {
+  margin: 5px 0 3px;
+  font-size: 19px;
+}
+
+.deposit-record-amount {
+  display: block;
+  margin-top: 18px;
+  color: var(--sgdg-orange-700);
+  font-size: 28px;
+}
+
+.deposit-record-reason {
+  margin-top: 5px !important;
+  color: var(--sgdg-text-secondary);
+}
+
+.deposit-record-timeline {
+  display: grid;
+  gap: 12px;
+  margin: 20px 0;
+  padding: 0;
+  list-style: none;
+}
+
+.deposit-record-timeline li {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 10px;
+  padding-top: 12px;
+  border-top: 1px solid var(--sgdg-border);
+}
+
+.deposit-record-timeline svg {
+  width: 18px;
+  color: var(--sgdg-success);
+}
+
+.deposit-record-timeline strong,
+.deposit-record-timeline span,
+.deposit-record-timeline time {
+  display: block;
+}
+
+.deposit-record-timeline span,
+.deposit-record-timeline time {
+  margin-top: 3px;
+  color: var(--sgdg-text-secondary);
+  font-size: 12px;
+}
+
+.result-deposit-card {
+  padding: 20px;
+  border: 1px solid #f0c9ac;
+  border-radius: 18px;
+  background: #fffdf9;
+  box-shadow: 0 18px 42px #5a2b171f;
+}
+
+.result-deposit-card > svg {
+  width: 34px;
+  height: 34px;
+  color: var(--sgdg-orange-600);
+}
+
+.result-deposit-card span {
+  color: var(--sgdg-orange-700);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
+
+.result-deposit-card h2 {
+  margin: 5px 0;
+  font-size: 18px;
+}
+
+.result-deposit-card > strong {
+  display: block;
+  margin: 12px 0;
+  color: var(--sgdg-orange-700);
+  font-size: 25px;
+}
+
+.result-deposit-card p {
+  color: var(--sgdg-text-secondary);
+  line-height: 1.55;
+}
+
+.payment-deposit-offset dd {
+  color: var(--sgdg-success) !important;
+}
+
+.payment-deposit-consequence {
+  display: flex;
+  gap: 10px;
+  margin: 16px 0;
+  padding: 13px;
+  border-radius: 12px;
+  background: var(--sgdg-sage-100);
+  color: var(--sgdg-success);
+}
+
+.payment-deposit-consequence.forfeited {
+  background: #fff0eb;
+  color: var(--sgdg-danger);
+}
+
+.payment-deposit-consequence svg {
+  flex: 0 0 auto;
+}
+
+.payment-deposit-consequence strong,
+.payment-deposit-consequence span {
+  display: block;
+}
+
+.payment-deposit-consequence span {
+  margin-top: 3px;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+@media (max-width: 640px) {
+  .deposit-policy-summary,
+  .deposit-record > header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

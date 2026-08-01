@@ -1,0 +1,772 @@
+.vneid-login-choice {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 12px;
+  min-height: 64px;
+  padding: 10px 14px;
+  border: 1px solid #e5c48f;
+  border-radius: 10px;
+  background: linear-gradient(90deg, rgb(246 189 58 / 10%), transparent 42%),
+    #fff;
+  color: #3d2c24;
+  text-decoration: none;
+  transition: 0.18s ease;
+}
+.vneid-login-choice:hover {
+  transform: translateY(-2px);
+  border-color: #c99927;
+  box-shadow: 0 12px 24px rgb(98 63 13 / 14%);
+}
+.vneid-login-choice-mark,
+.vneid-mark > span {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border: 3px solid #efbd31;
+  border-radius: 50%;
+  background: #145c35;
+  color: #f9df42;
+  box-shadow: inset 0 0 0 3px rgb(255 255 255 / 15%);
+}
+.vneid-login-choice-mark svg,
+.vneid-mark > span svg {
+  width: 22px;
+  height: 22px;
+}
+.vneid-login-choice > span:nth-child(2),
+.vneid-mark > div {
+  display: grid;
+  gap: 2px;
+}
+.vneid-login-choice strong {
+  font-size: 13px;
+}
+.vneid-login-choice small,
+.vneid-mark small {
+  color: #806657;
+  font-size: 10px;
+}
+.vneid-login-choice > svg {
+  width: 20px;
+  color: #26724b;
+}
+.auth-divider-secondary {
+  margin-block: 11px 9px;
+  font-size: 10px;
+}
+
+.vneid-page {
+  min-height: 100vh;
+  max-width: 100%;
+  overflow-x: clip;
+  background:
+    radial-gradient(circle at 16% 12%, rgb(244 190 52 / 15%), transparent 25rem),
+    radial-gradient(circle at 90% 80%, rgb(211 33 40 / 8%), transparent 28rem),
+    #f7f4eb;
+  color: #302825;
+}
+
+html:has(.vneid-page),
+body:has(.vneid-page) {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+.vneid-topbar {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  min-height: 72px;
+  padding: 10px max(22px, calc((100vw - 980px) / 2));
+  border-bottom: 1px solid #e8dfce;
+  background: rgb(255 255 255 / 88%);
+  backdrop-filter: blur(14px);
+}
+.vneid-topbar > a:first-child {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border-radius: 50%;
+  color: #443a35;
+}
+.vneid-topbar > a:first-child:hover {
+  background: #f3ede3;
+}
+.vneid-topbar svg {
+  width: 22px;
+}
+.vneid-sgdg-brand img {
+  width: 132px;
+}
+.vneid-country {
+  display: flex;
+  justify-self: end;
+  align-items: center;
+  gap: 7px;
+  color: #7c6254;
+  font-size: 12px;
+  font-weight: 800;
+}
+.vneid-country > span {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  border-radius: 50%;
+  background: #d71920;
+  color: #ffe14a;
+}
+.vneid-flow-shell {
+  width: min(calc(100% - 28px), 760px);
+  margin: 34px auto;
+}
+.vneid-flow-intro {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 22px;
+}
+.vneid-mark {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 10px;
+}
+.vneid-mark > span {
+  width: 62px;
+  height: 62px;
+}
+.vneid-mark > span svg {
+  width: 31px;
+  height: 31px;
+}
+.vneid-mark strong {
+  color: #b51f28;
+  font-size: 19px;
+}
+.vneid-flow-intro > div:last-child > span {
+  color: #ad252a;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.vneid-flow-intro h1 {
+  margin: 4px 0;
+  font-size: clamp(25px, 4vw, 35px);
+  line-height: 1.08;
+}
+.vneid-flow-intro p {
+  margin: 0;
+  color: #72645c;
+  font-size: 13px;
+}
+.vneid-progress {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-bottom: 18px;
+}
+.vneid-progress > div {
+  position: relative;
+  display: grid;
+  place-items: center;
+  gap: 5px;
+  color: #a79b91;
+}
+.vneid-progress > div:not(:last-child)::after {
+  position: absolute;
+  z-index: 0;
+  top: 17px;
+  left: calc(50% + 22px);
+  width: calc(100% - 44px);
+  height: 2px;
+  background: #ddd4c8;
+  content: "";
+}
+.vneid-progress > div.is-active:not(:last-child)::after {
+  background: #d4a72c;
+}
+.vneid-progress span {
+  z-index: 1;
+  display: grid;
+  width: 35px;
+  height: 35px;
+  place-items: center;
+  border: 2px solid #ddd4c8;
+  border-radius: 50%;
+  background: #f7f4eb;
+  font-size: 12px;
+  font-weight: 900;
+}
+.vneid-progress svg {
+  width: 18px;
+}
+.vneid-progress small {
+  font-size: 10px;
+  font-weight: 800;
+}
+.vneid-progress .is-active {
+  color: #9d2528;
+}
+.vneid-progress .is-active span {
+  border-color: #d2a126;
+  background: #fff8dc;
+}
+.vneid-panel {
+  padding: clamp(22px, 5vw, 38px);
+  border: 1px solid #e4d8c7;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 24px 70px rgb(76 55 34 / 12%);
+}
+.vneid-panel-heading {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  margin-bottom: 24px;
+}
+.vneid-panel-heading > svg {
+  width: 38px;
+  height: 38px;
+  padding: 8px;
+  border-radius: 10px;
+  background: #fff2d2;
+  color: #9f2429;
+}
+.vneid-panel h2 {
+  margin: 0;
+  font-size: 21px;
+}
+.vneid-panel-heading p,
+.vneid-result > p {
+  margin: 4px 0 0;
+  color: #776a63;
+  font-size: 12px;
+}
+.vneid-credentials {
+  display: grid;
+  gap: 16px;
+}
+.vneid-credentials > label {
+  display: grid;
+  gap: 7px;
+  font-size: 13px;
+  font-weight: 800;
+}
+.vneid-input {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  min-height: 54px;
+  padding-inline: 14px;
+  border: 1px solid #ded7cf;
+  border-radius: 11px;
+}
+.vneid-input:focus-within {
+  border-color: #ba2b31;
+  box-shadow: 0 0 0 3px rgb(186 43 49 / 10%);
+}
+.vneid-input > svg {
+  width: 19px;
+  color: #8d837d;
+}
+.vneid-input input {
+  width: 100%;
+  border: 0;
+  outline: 0;
+  padding: 12px;
+  background: transparent;
+  font: inherit;
+  font-weight: 600;
+}
+.vneid-input button {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: #766b65;
+  cursor: pointer;
+}
+.vneid-form-links {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  color: #8b7c73;
+  font-size: 10px;
+}
+.vneid-form-links a {
+  color: #b22229;
+  font-weight: 850;
+}
+.vneid-primary,
+.vneid-secondary,
+.vneid-text-button {
+  display: flex;
+  min-height: 50px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 900;
+  text-decoration: none;
+  cursor: pointer;
+}
+.vneid-primary {
+  border: 1px solid #bd1e26;
+  background: linear-gradient(135deg, #d61f27, #b71820);
+  color: #fff;
+  box-shadow: 0 10px 22px rgb(183 24 32 / 18%);
+}
+.vneid-primary:disabled {
+  border-color: #d8d0ca;
+  background: #e3ded9;
+  color: #958d87;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+.vneid-secondary {
+  border: 1px solid #efcdd0;
+  background: #fff3f3;
+  color: #b31d25;
+}
+.vneid-text-button {
+  min-height: 34px;
+  border: 0;
+  background: transparent;
+  color: #71645c;
+  font-size: 11px;
+}
+.vneid-partner-flow {
+  display: grid;
+  grid-template-columns: 84px 1fr 118px;
+  align-items: center;
+  gap: 12px;
+  max-width: 520px;
+  margin: 0 auto 12px;
+}
+.vneid-mark.is-compact {
+  justify-content: center;
+}
+.vneid-mark.is-compact > span {
+  width: 72px;
+  height: 72px;
+}
+.vneid-secure-transfer {
+  display: flex;
+  align-items: center;
+  color: #2c955c;
+}
+.vneid-secure-transfer i {
+  order: -1;
+  width: 100%;
+  border-top: 2px dashed #dfb431;
+}
+.vneid-secure-transfer svg {
+  flex: 0 0 auto;
+  width: 30px;
+  padding: 4px;
+  background: #fff;
+}
+.vneid-partner-logo {
+  display: grid;
+  min-height: 82px;
+  place-items: center;
+  border: 3px solid #e7ba31;
+  border-radius: 50%;
+}
+.vneid-partner-logo img {
+  width: 82px;
+}
+.vneid-consent > h2 {
+  margin-bottom: 12px;
+  text-align: center;
+}
+.vneid-expiry {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  margin: 0 auto 18px;
+  color: #71645d;
+  font-size: 12px;
+}
+.vneid-expiry svg {
+  width: 18px;
+  color: #c62027;
+}
+.vneid-expiry strong {
+  color: #cf2028;
+  font-size: 15px;
+}
+.vneid-sharing-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 13px 0;
+  border-top: 1px solid #eee5da;
+}
+.vneid-sharing-heading > div {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: #b31e26;
+  font-size: 13px;
+  font-weight: 850;
+}
+.vneid-sharing-heading svg {
+  flex: 0 0 auto;
+  width: 20px;
+}
+.vneid-sharing-heading > button {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 5px;
+  border: 0;
+  background: transparent;
+  color: #695c55;
+  font-size: 10px;
+  font-weight: 800;
+  cursor: pointer;
+}
+.vneid-data-list {
+  margin: 0;
+}
+.vneid-data-list > div {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 18px;
+  padding: 13px 0;
+  border-bottom: 1px solid #eeeae5;
+}
+.vneid-data-list dt,
+.vneid-data-list dd {
+  font-size: 12px;
+  font-weight: 750;
+}
+.vneid-data-list dd {
+  margin: 0;
+  font-weight: 850;
+  text-align: right;
+}
+.vneid-purpose {
+  margin-top: 18px;
+  padding: 15px;
+  border-left: 4px solid #c52329;
+  border-radius: 8px;
+  background: #fff8f1;
+}
+.vneid-purpose strong {
+  color: #b21c24;
+  font-size: 13px;
+}
+.vneid-purpose p {
+  margin: 6px 0 0;
+  color: #645852;
+  font-size: 11px;
+  line-height: 1.55;
+}
+.vneid-consent-check {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 11px;
+  margin: 16px 0;
+  padding: 14px;
+  border-radius: 10px;
+  background: #f4f1ed;
+  font-size: 11px;
+  font-weight: 650;
+  line-height: 1.5;
+  cursor: pointer;
+}
+.vneid-consent-check input {
+  width: 19px;
+  height: 19px;
+  margin-top: 1px;
+  accent-color: #c51f26;
+}
+.vneid-consent-actions {
+  display: grid;
+  gap: 10px;
+}
+.vneid-face-panel {
+  display: grid;
+  gap: 18px;
+}
+
+.vneid-face-camera {
+  position: relative;
+  min-height: 330px;
+  overflow: hidden;
+  border: 1px solid #d9d2bd;
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at 50% 34%, rgba(255, 255, 255, 0.95), transparent 32%),
+    linear-gradient(145deg, #e8efe9, #c8d8ce);
+  display: grid;
+  place-items: center;
+}
+
+.vneid-face-grid {
+  position: absolute;
+  inset: 0;
+  opacity: 0.24;
+  background-image:
+    linear-gradient(rgba(24, 74, 52, 0.16) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(24, 74, 52, 0.16) 1px, transparent 1px);
+  background-size: 36px 36px;
+}
+
+.vneid-face-oval {
+  position: relative;
+  width: 174px;
+  height: 226px;
+  border: 3px solid #1b754e;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: #1b754e;
+  box-shadow: 0 0 0 12px rgba(255, 255, 255, 0.5);
+}
+
+.vneid-face-oval svg {
+  width: 78px;
+  height: 78px;
+  stroke-width: 1.25;
+}
+
+.vneid-face-camera.is-scanning .vneid-face-oval {
+  animation: vneid-face-pulse 1.1s ease-in-out infinite alternate;
+}
+
+.vneid-face-camera.is-failed .vneid-face-oval {
+  color: #b52b2f;
+  border-color: #b52b2f;
+}
+
+.vneid-scan-line {
+  position: absolute;
+  left: calc(50% - 105px);
+  width: 210px;
+  height: 2px;
+  top: 22%;
+  background: #efb51b;
+  box-shadow: 0 0 14px #efb51b;
+  animation: vneid-face-scan 1.5s ease-in-out infinite;
+}
+
+.vneid-camera-status {
+  position: absolute;
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: calc(100% - 28px);
+  padding: 9px 14px;
+  border-radius: 999px;
+  background: rgba(19, 44, 33, 0.86);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.vneid-camera-status svg {
+  width: 17px;
+  height: 17px;
+}
+
+.vneid-face-camera.is-scanning .vneid-camera-status svg {
+  animation: vneid-spin 0.9s linear infinite;
+}
+
+.vneid-face-camera.is-failed .vneid-camera-status {
+  background: rgba(133, 25, 30, 0.9);
+}
+
+.vneid-face-copy {
+  text-align: center;
+}
+
+.vneid-face-copy h2 {
+  margin-bottom: 6px;
+}
+
+.vneid-face-copy p {
+  margin: 0;
+  color: #625e55;
+  line-height: 1.55;
+}
+
+.vneid-face-guidance {
+  list-style: none;
+  margin: 0;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: #f7f4eb;
+  display: grid;
+  gap: 9px;
+  color: #3f493f;
+  font-size: 0.86rem;
+}
+
+.vneid-face-guidance li {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.vneid-face-guidance svg {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+  color: #1b754e;
+}
+
+@keyframes vneid-face-scan {
+  0%,
+  100% {
+    top: 24%;
+  }
+  50% {
+    top: 66%;
+  }
+}
+
+@keyframes vneid-face-pulse {
+  to {
+    box-shadow: 0 0 0 18px rgba(27, 117, 78, 0.14);
+  }
+}
+
+@keyframes vneid-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.vneid-result {
+  position: relative;
+  display: grid;
+  place-items: center;
+  gap: 12px;
+  overflow: hidden;
+  text-align: center;
+}
+.vneid-result-icon {
+  display: grid;
+  width: 74px;
+  height: 74px;
+  place-items: center;
+  border-radius: 50%;
+  background: #fff0f0;
+  color: #bf242a;
+}
+.vneid-result.is-success .vneid-result-icon {
+  background: #e9f8ee;
+  color: #20804b;
+}
+.vneid-result-icon svg {
+  width: 38px;
+  height: 38px;
+}
+.vneid-result-badge {
+  position: absolute;
+  top: 30px;
+  left: calc(50% + 24px);
+  width: 24px;
+  color: #d5a822;
+  fill: #fff;
+}
+.vneid-result .vneid-primary,
+.vneid-result .vneid-secondary {
+  width: min(100%, 360px);
+}
+.vneid-assurance,
+.vneid-demo-note {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  color: #5f7165;
+  font-size: 10px;
+}
+.vneid-assurance svg,
+.vneid-demo-note svg {
+  flex: 0 0 auto;
+  width: 17px;
+}
+.vneid-demo-note {
+  margin: 16px auto 0;
+  color: #7d716a;
+  text-align: center;
+}
+
+@media (max-width: 620px) {
+  .vneid-face-camera {
+    min-height: 290px;
+  }
+
+  .vneid-topbar {
+    min-height: 62px;
+    padding-inline: 14px;
+  }
+  .vneid-sgdg-brand img {
+    width: 110px;
+  }
+  .vneid-flow-shell {
+    margin-block: 22px;
+  }
+  .vneid-flow-intro {
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .vneid-flow-intro .vneid-mark > span {
+    width: 48px;
+    height: 48px;
+  }
+  .vneid-flow-intro .vneid-mark > div {
+    display: none;
+  }
+  .vneid-partner-flow {
+    grid-template-columns: 64px 1fr 92px;
+  }
+  .vneid-mark.is-compact > span {
+    width: 58px;
+    height: 58px;
+  }
+  .vneid-partner-logo {
+    min-height: 68px;
+  }
+  .vneid-partner-logo img {
+    width: 66px;
+  }
+  .vneid-sharing-heading {
+    align-items: flex-start;
+  }
+  .vneid-sharing-heading > div {
+    align-items: flex-start;
+  }
+  .vneid-sharing-heading > button {
+    width: 32px;
+    height: 32px;
+    justify-content: center;
+    border-radius: 50%;
+    background: #f4f1ed;
+    font-size: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vneid-login-choice {
+    transition: none;
+  }
+}

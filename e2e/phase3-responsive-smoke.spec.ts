@@ -22,7 +22,7 @@ const screens = [
   {
     name: "Landing",
     route: "/",
-    price: ".auction-spotlight .spotlight-summary > strong",
+    price: ".hero-auction-card__price",
     primaryAction: ".home-redesign-hero .button.primary",
   },
 ] as const;

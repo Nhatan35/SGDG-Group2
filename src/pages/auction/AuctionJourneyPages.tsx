@@ -408,26 +408,26 @@ export function ParticipantsPage() {
 export function MyBidsPage() {
   return (
     <JourneyPage
-      title="Bid của tôi & Auto Bid"
-      subtitle="Lịch sử lệnh theo server timestamp; mức Auto Bid tối đa chỉ bạn nhìn thấy."
+      title="Lượt trả giá của tôi"
+      subtitle="Theo dõi lịch sử trả giá theo thời gian hệ thống và mức trả giá tự động của bạn."
     >
       <div className="journey-card auto-summary">
         <div>
-          <Badge tone="success">AUTO BID ACTIVE</Badge>
+          <Badge tone="success">TRẢ GIÁ TỰ ĐỘNG ĐANG HOẠT ĐỘNG</Badge>
           <h2>Rolex Submariner Date</h2>
           <p>
             Mức tối đa của bạn: <strong>{formatMoney(500000000)}</strong>
           </p>
         </div>
         <Link className="button secondary" to="/auctions/rolex-126610lv/live">
-          Quản lý Auto Bid
+          Quản lý trả giá tự động
         </Link>
       </div>
       <div className="table-wrap">
         <table>
           <thead>
             <tr>
-              <th>Thời gian server</th>
+              <th>Thời gian hệ thống</th>
               <th>Phiên</th>
               <th>Hình thức</th>
               <th>Mức giá</th>
@@ -437,7 +437,7 @@ export function MyBidsPage() {
           <tbody>
             {[
               ["10:42:18", "SGD-260717-001", "Thủ công", 450000000, "ACCEPTED"],
-              ["10:39:02", "SGD-260717-001", "Auto Bid", 440000000, "OUTBID"],
+              ["10:39:02", "SGD-260717-001", "Tự động", 440000000, "OUTBID"],
               ["10:34:46", "SGD-260717-001", "Thủ công", 420000000, "ACCEPTED"],
               [
                 "09:12:11",
@@ -462,7 +462,11 @@ export function MyBidsPage() {
                           : "danger"
                     }
                   >
-                    {x[4]}
+                    {x[4] === "ACCEPTED"
+                      ? "Đã ghi nhận"
+                      : x[4] === "OUTBID"
+                        ? "Đã bị vượt"
+                        : "Bị từ chối"}
                   </Badge>
                 </td>
               </tr>
@@ -486,7 +490,7 @@ function JourneyPage({
   return (
     <div className="container page-shell">
       <div className="page-heading">
-        <span className="eyebrow">AUCTION JOURNEY</span>
+        <span className="eyebrow">HÀNH TRÌNH ĐẤU GIÁ</span>
         <h1>{title}</h1>
         <p>{subtitle}</p>
       </div>
