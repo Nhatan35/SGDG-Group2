@@ -2,6 +2,8 @@
 import { persist } from "zustand/middleware";
 import type { ActorRole } from "../types/domain";
 
+const INITIAL_WALLET_BALANCE = 125_000_000;
+
 export type KycState =
   | "NOT_STARTED"
   | "IN_PROGRESS"
@@ -47,7 +49,7 @@ export const useDemoStore = create<DemoState>()(
       adminAuthenticated: false,
       actorRole: "CUSTOMER",
       userName: "Nguyễn Minh Anh",
-      walletBalance: 125000000,
+      walletBalance: INITIAL_WALLET_BALANCE,
       auctionDeposits: {},
       bankAccounts: [
         {
@@ -67,7 +69,7 @@ export const useDemoStore = create<DemoState>()(
           authenticated: true,
           actorRole: "CUSTOMER",
           userName: name || state.userName,
-          walletBalance: state.walletBalance || 125000000,
+          walletBalance: state.walletBalance || INITIAL_WALLET_BALANCE,
         })),
       logout: () => set({ authenticated: false }),
       topUpWallet: (amount) =>
@@ -121,6 +123,20 @@ export const useDemoStore = create<DemoState>()(
         })),
       markAllRead: () => set({ unreadNotifications: 0 }),
     }),
-    { name: "sgdg-demo-state" },
+    {
+      name: "sgdg-demo-state",
+      version: 1,
+      migrate: (persistedState) => {
+        const persisted =
+          typeof persistedState === "object" && persistedState !== null
+            ? (persistedState as Partial<DemoState>)
+            : {};
+        return {
+          ...persisted,
+          walletBalance: INITIAL_WALLET_BALANCE,
+          auctionDeposits: {},
+        } as DemoState;
+      },
+    },
   ),
 );

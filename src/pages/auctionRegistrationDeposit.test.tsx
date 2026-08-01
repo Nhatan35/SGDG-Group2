@@ -116,19 +116,42 @@ describe("customer registration deposit step", () => {
     ).toBeEnabled();
   });
 
-  it("opens bidding directly without showing the former deposit gate", async () => {
+  it("starts live auctions unpaid and resumes bidding after the deposit", async () => {
     const user = userEvent.setup();
     renderLiveRoom();
+
+    expect(
+      screen.getByText("Chưa đặt cọc cho phiên này"),
+    ).toBeInTheDocument();
 
     await user.click(
       screen.getByRole("button", { name: "Đặt giá thủ công" }),
     );
 
     expect(
+      screen.getByRole("heading", {
+        name: "Xác nhận đặt cọc để tham gia đấu giá",
+      }),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Tiền cọc 10%")).toBeInTheDocument();
+    expect(screen.getByText("38.000.000 ₫")).toBeInTheDocument();
+
+    await user.click(
+      screen.getByRole("button", { name: "Đồng ý đặt cọc" }),
+    );
+    expect(
+      screen.getByRole("heading", {
+        name: "Bạn đã đủ điều kiện tham gia đấu giá",
+      }),
+    ).toBeInTheDocument();
+    expect(useDemoStore.getState().auctionDeposits["rolex-126610lv"]).toBe(
+      38_000_000,
+    );
+    expect(useDemoStore.getState().walletBalance).toBe(87_000_000);
+
+    await user.click(screen.getByRole("button", { name: "Vào đấu giá" }));
+    expect(
       screen.getByRole("heading", { name: "Nhập mức giá của bạn" }),
     ).toBeInTheDocument();
-    expect(
-      screen.queryByRole("button", { name: "Đồng ý đặt cọc" }),
-    ).not.toBeInTheDocument();
   });
 });

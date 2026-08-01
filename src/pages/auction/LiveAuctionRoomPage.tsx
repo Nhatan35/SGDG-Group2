@@ -33,6 +33,7 @@ import {
   canEnterAuction,
   useEligibilityWorkflowStore,
 } from "../../store/eligibilityWorkflowStore";
+import { useDemoStore } from "../../store/demoStore";
 import { formatMoney } from "../../utils/format";
 import { useDemoClock } from "../../hooks/useDemoClock";
 import "../../styles/live-auction-room.css";
@@ -615,6 +616,11 @@ export function LiveAuctionRoomPage() {
   const registration = useEligibilityWorkflowStore((store) =>
     store.registrations.find((item) => item.auctionId === auctionId),
   );
+  const { walletBalance, auctionDeposits, topUpWallet, payAuctionDeposit } =
+    useDemoStore();
+  const depositAmount = auction ? Math.ceil(auction.startPrice * 0.1) : 0;
+  const depositedAmount = auctionId ? (auctionDeposits[auctionId] ?? 0) : 0;
+  const hasPaidDeposit = depositedAmount > 0;
   const isPatek = auction?.id === "patek-nautilus";
   const initialLeaderboard = isPatek ? patekLeaderboard : defaultLeaderboard;
   const initialActivities = isPatek
@@ -680,6 +686,9 @@ export function LiveAuctionRoomPage() {
       : [],
   );
   const [accepted, setAccepted] = useState(false);
+  const [depositAction, setDepositAction] = useState<DepositAction | null>(
+    null,
+  );
   const [isOutbid, setIsOutbid] = useState(false);
   const [outbidNotice, setOutbidNotice] = useState<OutbidNotice | null>(null);
   const [manualBidPrefill, setManualBidPrefill] = useState<number | null>(null);
@@ -751,12 +760,36 @@ export function LiveAuctionRoomPage() {
       next.set("panel", nextPanel);
       return next;
     });
-  const openManualBid = () => {
+  const showManualBid = () => {
     setManualBidPrefill(null);
     setManualBidRequestId((current) => current + 1);
     openPanel("manual-bid");
   };
-  const openAutoBid = () => openPanel("autobid");
+  const openManualBid = () => {
+    if (!hasPaidDeposit) {
+      setDepositAction("manual-bid");
+      return;
+    }
+    showManualBid();
+  };
+  const showAutoBid = () => openPanel("autobid");
+  const openAutoBid = () => {
+    if (!hasPaidDeposit) {
+      setDepositAction("autobid");
+      return;
+    }
+    showAutoBid();
+  };
+  const confirmDeposit = (topUpAmount: number) => {
+    if (topUpAmount > 0) topUpWallet(topUpAmount);
+    payAuctionDeposit(auction.id, depositAmount);
+  };
+  const continueAfterDeposit = () => {
+    const requestedAction = depositAction;
+    setDepositAction(null);
+    if (requestedAction === "manual-bid") showManualBid();
+    if (requestedAction === "autobid") showAutoBid();
+  };
   const closePanel = () =>
     setParams((current) => {
       const next = new URLSearchParams(current);
@@ -1098,11 +1131,21 @@ export function LiveAuctionRoomPage() {
                 </button>
               </div>
             )}
-            <div className="deposit-inline-status paid">
-              <ShieldCheck />
+            <div
+              className={`deposit-inline-status ${hasPaidDeposit ? "paid" : ""}`}
+            >
+              {hasPaidDeposit ? <ShieldCheck /> : <Wallet />}
               <div>
-                <strong>Đặt cọc đã được xác nhận khi đăng ký</strong>
-                <span>Quyền đặt giá của bạn đã được mở cho phiên này.</span>
+                <strong>
+                  {hasPaidDeposit
+                    ? "Đặt cọc đã được xác nhận"
+                    : "Chưa đặt cọc cho phiên này"}
+                </strong>
+                <span>
+                  {hasPaidDeposit
+                    ? `Đã ghi nhận ${formatMoney(depositedAmount)}. Quyền đặt giá đã được mở.`
+                    : `Cần đặt cọc ${formatMoney(depositAmount)} trước khi đặt giá.`}
+                </span>
               </div>
             </div>
             <Button
@@ -1155,7 +1198,20 @@ export function LiveAuctionRoomPage() {
           <LeaderboardPanel leaderboard={leaderboard} isOutbid={isOutbid} />
         </aside>
       </div>
-      {panel === "manual-bid" && (
+      {depositAction && (
+        <DepositGateModal
+          key={`${auction.id}:${depositAction}`}
+          action={depositAction}
+          auctionName={auction.assetName}
+          startPrice={auction.startPrice}
+          depositAmount={depositAmount}
+          walletBalance={walletBalance}
+          onCancel={() => setDepositAction(null)}
+          onContinue={continueAfterDeposit}
+          onConfirmDeposit={confirmDeposit}
+        />
+      )}
+      {hasPaidDeposit && panel === "manual-bid" && (
         <ManualBidModal
           key={manualBidRequestId}
           price={price}
@@ -1183,7 +1239,7 @@ export function LiveAuctionRoomPage() {
           }
         />
       )}
-      {panel === "autobid" && (
+      {hasPaidDeposit && panel === "autobid" && (
         <AutoBidDrawer
           currentPrice={price}
           minimumNextBid={minimum}
