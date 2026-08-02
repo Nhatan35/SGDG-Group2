@@ -87,6 +87,20 @@ const auctionRoomDisplayImages: Record<
   },
 };
 
+// Các phiên có asset trưng bày nền trong suốt được ưu tiên cho kịch bản demo
+// phòng đấu giá. Chỉ những phiên này được chuyển sang trạng thái đang diễn ra.
+const transparentDemoAuctionIds = new Set([
+  "watch-07",
+  "jewelry-07",
+  "antique-07",
+  "fashion-07",
+  "collectible-07",
+  "phone-13",
+  "vehicle-13",
+  "watch-18",
+  "jewelry-18",
+]);
+
 const statusPattern: AuctionStatus[] = [
   "LIVE",
   "LIVE",
@@ -464,8 +478,13 @@ function createAuction(
   itemIndex: number,
   categoryIndex: number,
 ): Auction {
+  const auctionId =
+    product.id ?? `${config.slug}-${String(itemIndex + 1).padStart(2, "0")}`;
   const status =
-    product.status ?? statusPattern[itemIndex % statusPattern.length];
+    product.status ??
+    (transparentDemoAuctionIds.has(auctionId)
+      ? "LIVE"
+      : statusPattern[itemIndex % statusPattern.length]);
   const startPrice =
     product.startPrice ??
     roundMoney(
@@ -485,9 +504,6 @@ function createAuction(
   const acceptedBidCount = isSettledOrLive(status)
     ? Math.max(8, Math.round(participantCount * 0.36))
     : 0;
-  const auctionId =
-    product.id ?? `${config.slug}-${String(itemIndex + 1).padStart(2, "0")}`;
-
   return {
     id: auctionId,
     code: codeFor(categoryIndex, itemIndex),
@@ -510,7 +526,7 @@ function createAuction(
     endsAt: schedule.endsAt,
     registrationDeadline: schedule.registrationDeadline,
     eligible: itemIndex % 3 !== 1,
-    autoBid: itemIndex % 4 !== 0,
+    autoBid: true,
     postedBy:
       itemIndex % 5 === 0
         ? {

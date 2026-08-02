@@ -1167,7 +1167,8 @@
   }
 
   .auction-catalog-page .catalog-intro {
-    grid-template-columns: minmax(0, 590px) minmax(420px, 1fr);
+    grid-template-columns: minmax(0, 590px);
+    justify-content: start;
   }
 }
 
@@ -1870,10 +1871,26 @@
 
 /* Fixed podium anchors: product placement is independent from information height. */
 @media (min-width: 821px) {
+  .auction-catalog-page .catalog-filter-bar,
+  .auction-catalog-page .catalog-sort-bar,
+  .auction-catalog-page .catalog-toolbar {
+    position: relative;
+    z-index: 4;
+    transform: translateY(106px);
+  }
+
+  .auction-catalog-page .catalog-discovery {
+    margin-top: 42px;
+  }
+
   .auction-catalog-page .catalog-stage-products {
     position: relative;
     display: block;
     padding: 0;
+  }
+
+  .auction-catalog-page .catalog-stage {
+    min-height: 513px;
   }
 
   .auction-catalog-page .catalog-stage-products .stage-auction-card,
@@ -1889,7 +1906,7 @@
   }
 
   .auction-catalog-page .catalog-stage-products .stage-auction-card-left {
-    left: 21%;
+    left: calc(21% - 114px);
     transform: translateX(-50%);
   }
 
@@ -1899,7 +1916,7 @@
   }
 
   .auction-catalog-page .catalog-stage-products .stage-auction-card-right {
-    left: 79%;
+    left: calc(79% + 114px);
     transform: translateX(-50%);
   }
 
@@ -1920,19 +1937,21 @@
     align-items: flex-end;
     justify-content: center;
     pointer-events: none;
+    transform: translateY(-38px);
   }
 
   /* Align the three featured cut-outs with their physical podium surfaces. */
   .auction-catalog-page .stage-auction-card-left .product-anchor {
-    bottom: calc(46% + 42px);
+    bottom: 21%;
+    transform: translate(11px, -38px);
   }
 
   .auction-catalog-page .stage-auction-card-center .product-anchor {
-    bottom: calc(46% + 46px);
+    bottom: 21%;
   }
 
   .auction-catalog-page .stage-auction-card-right .product-anchor {
-    bottom: calc(46% + 42px);
+    bottom: 21%;
   }
 
   .auction-catalog-page .product-anchor .stage-product {
@@ -1950,6 +1969,8 @@
     height: 100%;
     align-items: flex-end;
     justify-content: center;
+    transform: scale(1.05);
+    transform-origin: center bottom;
   }
 
   .auction-catalog-page .stage-display-cutout .stage-product-frame,
@@ -1960,8 +1981,8 @@
   }
 
   .auction-catalog-page .stage-display-media-frame .stage-product-frame {
-    width: 250px;
-    height: 188px;
+    width: 220px;
+    height: 215px;
     overflow: hidden;
     padding: 5px;
     border: 1px solid rgba(224, 174, 118, 0.48);
@@ -2005,7 +2026,7 @@
   }
 
   .auction-catalog-page .stage-scale-object .stage-product-frame {
-    width: 210px;
+    width: 220px;
     height: 215px;
   }
 
@@ -2033,7 +2054,7 @@
   .auction-catalog-page .product-information {
     position: absolute;
     right: 11px;
-    bottom: 0;
+    bottom: -77px;
     left: 11px;
     width: auto;
     margin: 0;

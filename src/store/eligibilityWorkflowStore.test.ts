@@ -25,6 +25,25 @@ describe("registration and eligibility workflow", () => {
     expect(canEnterAuction(result.value)).toBe(false);
   });
 
+  it("allows the current customer into Patek while retaining a separate manual-review case", () => {
+    const state = useEligibilityWorkflowStore.getState();
+    const currentCustomerRegistration = state.registrations.find(
+      (item) =>
+        item.auctionId === "patek-nautilus" &&
+        item.customerId === "CUS-NMA-001",
+    );
+    const reviewRegistration = state.registrations.find(
+      (item) => item.registrationId === state.reviews[0].registrationId,
+    );
+
+    expect(canEnterAuction(currentCustomerRegistration)).toBe(true);
+    expect(reviewRegistration).toMatchObject({
+      customerId: "CUS-REVIEW-002",
+      eligibility: "MANUAL_REVIEW",
+    });
+    expect(canEnterAuction(reviewRegistration)).toBe(false);
+  });
+
   it("enforces customer authority, optimistic version and immutable withdrawal", () => {
     const record = useEligibilityWorkflowStore.getState().registrations[1];
     expect(

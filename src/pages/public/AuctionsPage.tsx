@@ -5,13 +5,12 @@ import {
   ChevronLeft,
   ChevronRight,
   Clock3,
-  Search,
   SlidersHorizontal,
   Tag,
   Users,
   X,
 } from "lucide-react";
-import { FormEvent, Fragment, useMemo, useRef } from "react";
+import { Fragment, useMemo, useRef } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import type { AuctionCardAction } from "../../components/auction/AuctionCard";
 import { AuctionStatus } from "../../components/auction/AuctionStatus";
@@ -85,6 +84,15 @@ function catalogPrice(auction: Auction) {
     auction.status === "COMPLETED"
     ? auction.currentPrice
     : auction.startPrice;
+}
+
+function catalogLifecyclePriority(status: Auction["status"]) {
+  if (status === "LIVE") return 0;
+  if (status === "PAUSED") return 1;
+  if (status === "REGISTRATION_OPEN") return 2;
+  if (status === "PUBLISHED") return 3;
+  if (status === "CLOSED" || status === "COMPLETED") return 4;
+  return 5;
 }
 
 function StageAuctionCard({
@@ -267,7 +275,13 @@ export function AuctionsPage() {
           ? catalogPrice(right) - catalogPrice(left)
           : sort === "newest"
             ? Date.parse(right.startsAt) - Date.parse(left.startsAt)
-            : Date.parse(left.startsAt) - Date.parse(right.startsAt),
+            : catalogLifecyclePriority(left.status) -
+                  catalogLifecyclePriority(right.status) ||
+                Number(resolveStagePresentation(right).mode === "cutout") -
+                  Number(resolveStagePresentation(left).mode === "cutout") ||
+                (left.status === "LIVE" || left.status === "PAUSED"
+                  ? Date.parse(left.endsAt) - Date.parse(right.endsAt)
+                  : Date.parse(left.startsAt) - Date.parse(right.startsAt)),
     );
   }, [availableAuctions, category, price, query, sort, status]);
   const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
@@ -315,13 +329,6 @@ export function AuctionsPage() {
     value: string;
     label: string;
   }>;
-  const submitSearch = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    updateParams({
-      q: new FormData(event.currentTarget).get("q")?.toString().trim() || null,
-    });
-  };
-
   return (
     <div className="auction-catalog-page">
       <section className="catalog-hero">
@@ -351,25 +358,6 @@ export function AuctionsPage() {
               </span>
             </div>
           </div>
-          <form
-            className="catalog-search"
-            role="search"
-            onSubmit={submitSearch}
-          >
-            <label className="sr-only" htmlFor="catalog-search">
-              Tìm kiếm phiên đấu giá
-            </label>
-            <Search aria-hidden="true" />
-            <input
-              id="catalog-search"
-              name="q"
-              defaultValue={query}
-              placeholder="Tìm tài sản, danh mục hoặc mã phiên"
-            />
-            <Button type="submit">
-              Tìm kiếm
-            </Button>
-          </form>
         </div>
       </section>
       <div

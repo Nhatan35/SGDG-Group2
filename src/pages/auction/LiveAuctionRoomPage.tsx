@@ -60,20 +60,20 @@ type DepositAction = "manual-bid" | "autobid";
 type DepositStep = "confirm" | "need-topup" | "gateway" | "success";
 
 const rule = "QD-2026.07";
-const defaultLeaderboard = [
-  { alias: "Bạn", amount: 450_000_000, bids: 18, isCurrentUser: true },
-  { alias: "Mi***A", amount: 445_000_000, bids: 16 },
-  { alias: "An***B", amount: 440_000_000, bids: 12 },
-  { alias: "Qu***C", amount: 435_000_000, bids: 9 },
-  { alias: "Ha***D", amount: 430_000_000, bids: 7 },
-] satisfies LeaderboardEntry[];
-const patekLeaderboard = [
-  { alias: "Bạn", amount: 3_250_000_000, bids: 18, isCurrentUser: true },
-  { alias: "Mi***A", amount: 3_225_000_000, bids: 16 },
-  { alias: "An***B", amount: 3_200_000_000, bids: 12 },
-  { alias: "Qu***C", amount: 3_175_000_000, bids: 9 },
-  { alias: "Ha***D", amount: 3_150_000_000, bids: 7 },
-] satisfies LeaderboardEntry[];
+function createLeaderboard(
+  currentPrice: number,
+  minimumIncrement: number,
+): LeaderboardEntry[] {
+  const aliases = ["Bạn", "Mi***A", "An***B", "Qu***C", "Ha***D"];
+  const bidCounts = [18, 16, 12, 9, 7];
+
+  return aliases.map((alias, index) => ({
+    alias,
+    amount: Math.max(0, currentPrice - minimumIncrement * index),
+    bids: bidCounts[index],
+    isCurrentUser: index === 0,
+  }));
+}
 
 function AuctionMetrics() {
   const metrics = [
@@ -615,32 +615,27 @@ export function LiveAuctionRoomPage() {
   const registration = useEligibilityWorkflowStore((store) =>
     store.registrations.find((item) => item.auctionId === auctionId),
   );
-  const isPatek = auction?.id === "patek-nautilus";
-  const initialLeaderboard = isPatek ? patekLeaderboard : defaultLeaderboard;
-  const initialActivities = isPatek
-    ? [
-        "10:05:12 · Bạn vừa đặt 3.250.000.000 ₫",
-        "10:04:50 · Mi***A vừa đặt 3.225.000.000 ₫",
-        "10:03:31 · Bạn vừa lên vị trí #1",
-        "10:02:05 · An***B vừa đặt 3.200.000.000 ₫",
-        "10:01:42 · Qu***C vừa đặt 3.175.000.000 ₫",
-        "10:00:12 · Phiên đấu giá được mở",
-      ]
-    : [
-        "10:05:12 · Bạn vừa đặt 450.000.000 ₫",
-        "10:04:50 · An***B vừa tham gia phiên",
-        "10:03:31 · Bạn vừa lên vị trí #1",
-        "10:01:42 · Qu***C vừa đặt 435.000.000 ₫",
-        "10:00:12 · Phiên đấu giá được mở",
-      ];
-  const [price, setPrice] = useState(() => auction?.currentPrice ?? 0);
+  const initialPrice = auction?.currentPrice ?? 0;
+  const initialIncrement = auction?.minimumIncrement ?? 0;
+  const initialLeaderboard = createLeaderboard(
+    initialPrice,
+    initialIncrement,
+  );
+  const initialActivities = [
+    `10:05:12 · Bạn vừa đặt ${formatMoney(initialPrice)}`,
+    `10:04:50 · Mi***A vừa đặt ${formatMoney(Math.max(0, initialPrice - initialIncrement))}`,
+    "10:03:31 · Bạn vừa lên vị trí #1",
+    `10:02:05 · An***B vừa đặt ${formatMoney(Math.max(0, initialPrice - initialIncrement * 2))}`,
+    "10:00:12 · Phiên đấu giá được mở",
+  ];
+  const [price, setPrice] = useState(initialPrice);
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>(() =>
     initialLeaderboard.map((entry) => ({ ...entry })),
   );
   const [activityItems, setActivityItems] =
     useState<string[]>(initialActivities);
   const [bidHistory, setBidHistory] = useState<UserBidRecord[]>(() =>
-    isPatek
+    auction?.id === "patek-nautilus"
       ? [
           {
             id: "patek-user-bid-004",

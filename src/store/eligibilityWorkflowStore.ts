@@ -92,13 +92,13 @@ const seedRegistrations: RegistrationWorkflowRecord[] = [
     auctionId: "patek-nautilus",
     customerId: "CUS-NMA-001",
     lifecycle: "REGISTERED",
-    eligibility: "MANUAL_REVIEW",
+    eligibility: "ELIGIBLE",
     depositReferenceStatus: "READY",
     withdrawalDeadline: "2026-07-28T10:00:00.000Z",
     activeAuthoritativeBid: false,
     version: 1,
     updatedAt: now,
-    history: [{ at: now, actor: "SYSTEM", action: "MANUAL_REVIEW_CREATED" }],
+    history: [{ at: now, actor: "SYSTEM", action: "REGISTRATION_ACCEPTED" }],
   },
   {
     registrationId: "REG-ROLEX-1048",
@@ -113,12 +113,25 @@ const seedRegistrations: RegistrationWorkflowRecord[] = [
     updatedAt: now,
     history: [{ at: now, actor: "SYSTEM", action: "REGISTRATION_ACCEPTED" }],
   },
+  {
+    registrationId: "REG-PATEK-REVIEW-2049",
+    auctionId: "patek-nautilus",
+    customerId: "CUS-REVIEW-002",
+    lifecycle: "REGISTERED",
+    eligibility: "MANUAL_REVIEW",
+    depositReferenceStatus: "READY",
+    withdrawalDeadline: "2026-07-28T10:00:00.000Z",
+    activeAuthoritativeBid: false,
+    version: 1,
+    updatedAt: now,
+    history: [{ at: now, actor: "SYSTEM", action: "MANUAL_REVIEW_CREATED" }],
+  },
 ];
 const seedReviews: EligibilityReviewCase[] = [
   {
     reviewId: "ELR-2026-001",
-    registrationId: "REG-PATEK-1048",
-    customerId: "CUS-NMA-001",
+    registrationId: "REG-PATEK-REVIEW-2049",
+    customerId: "CUS-REVIEW-002",
     auctionId: "patek-nautilus",
     kycReference: "KYC-2817",
     restrictionReference: "RST-NONE-1048",
@@ -234,7 +247,7 @@ export const useEligibilityWorkflowStore = create<WorkflowState>()(
     }),
     {
       name: "sgdg-eligibility-workflow-v1",
-      version: 1,
+      version: 2,
       partialize: (state) => ({
         registrations: state.registrations,
         reviews: state.reviews,
