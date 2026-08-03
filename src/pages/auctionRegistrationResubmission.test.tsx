@@ -44,11 +44,11 @@ describe("Corrected Registration Resubmission Customer UI", () => {
     renderCorrection(prepared.session.sessionId);
     expect(
       screen.getByRole("button", {
-        name: "Resubmit Corrected Registration",
+        name: "Gửi lại đăng ký",
       }),
     ).toBeInTheDocument();
-    expect(screen.getByText("Correction Draft: DRAFT")).toBeInTheDocument();
-    expect(screen.getByText("Resubmission: NOT STARTED")).toBeInTheDocument();
+    expect(screen.getByText("Bản nháp chỉnh sửa: DRAFT")).toBeInTheDocument();
+    expect(screen.getByText("Gửi lại: CHƯA BẮT ĐẦU")).toBeInTheDocument();
   });
 
   it("shows evidence, prototype policy, and required boundaries in confirmation", async () => {
@@ -57,11 +57,11 @@ describe("Corrected Registration Resubmission Customer UI", () => {
     renderCorrection(prepared.session.sessionId);
     await user.click(
       screen.getByRole("button", {
-        name: "Resubmit Corrected Registration",
+        name: "Gửi lại đăng ký",
       }),
     );
     const dialog = screen.getByRole("dialog", {
-      name: "Confirm Corrected Registration Resubmission",
+      name: "Xác nhận gửi lại đăng ký đã chỉnh sửa",
     });
     expect(dialog).toHaveTextContent(prepared.registration.registrationId);
     expect(dialog).toHaveTextContent(prepared.validation.validationId);
@@ -72,13 +72,13 @@ describe("Corrected Registration Resubmission Customer UI", () => {
     expect(dialog).toHaveTextContent(CURRENT_CUSTOMER_ID);
     expect(dialog).toHaveTextContent("Requires stakeholder confirmation");
     expect(dialog).toHaveTextContent(
-      "This creates a corrected Resubmission Record.",
+      "Thao tác này tạo bản ghi gửi lại đăng ký đã chỉnh sửa.",
     );
     expect(dialog).toHaveTextContent(
-      "The original Registration and previous Validation remain unchanged.",
+      "Đăng ký gốc và kết quả kiểm tra trước đó vẫn được giữ nguyên.",
     );
     expect(dialog).toHaveTextContent(
-      "Membership, Deposit, and Eligibility checks do not start.",
+      "Thao tác này chưa khởi chạy kiểm tra hạng thành viên, tiền cọc và điều kiện tham gia.",
     );
   });
 
@@ -100,16 +100,16 @@ describe("Corrected Registration Resubmission Customer UI", () => {
     renderCorrection(prepared.session.sessionId);
     await user.click(
       screen.getByRole("button", {
-        name: "Resubmit Corrected Registration",
+        name: "Gửi lại đăng ký",
       }),
     );
     await user.click(
       within(screen.getByRole("dialog")).getByRole("button", {
-        name: "Confirm Resubmission",
+        name: "Xác nhận gửi lại",
       }),
     );
     const outcome = screen
-      .getByRole("heading", { name: "Resubmission outcome" })
+      .getByRole("heading", { name: "Kết quả gửi lại đăng ký" })
       .closest("section");
     expect(outcome).not.toBeNull();
     expect(within(outcome!).getAllByText("SUBMITTED")).toHaveLength(2);

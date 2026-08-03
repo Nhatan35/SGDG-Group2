@@ -13,7 +13,8 @@
   ShieldCheck,
   TrendingUp,
 } from "lucide-react";
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
+import { Link } from "react-router-dom";
 
 const workspaceData = {
   support: {
@@ -28,9 +29,9 @@ const workspaceData = {
       ["Chờ phản hồi", "11"],
     ],
     queue: [
-      "CS-2407 · Không nhận được thông báo kết quả",
-      "CS-2404 · Yêu cầu kiểm tra hoàn tiền",
-      "DSP-091 · Khiếu nại bằng chứng bàn giao",
+      ["CS-2407 · Không nhận được thông báo kết quả", "/support/tickets"],
+      ["CS-2404 · Yêu cầu kiểm tra hoàn tiền", "/support/tickets"],
+      ["DSP-091 · Khiếu nại bằng chứng bàn giao", "/support/disputes"],
     ],
   },
   finance: {
@@ -45,9 +46,9 @@ const workspaceData = {
       ["Chờ quyết toán", "4"],
     ],
     queue: [
-      "PAY-1028 · Xác minh giao dịch ứng viên",
-      "REF-0214 · Duyệt hoàn tiền",
-      "REC-0718 · Sai lệch cổng thanh toán",
+      ["PAY-1028 · Xác minh giao dịch ứng viên", "/finance/payments"],
+      ["REF-0214 · Duyệt hoàn tiền", "/finance/refunds"],
+      ["REC-0718 · Sai lệch cổng thanh toán", "/finance/reconciliation"],
     ],
   },
 } as const;
@@ -139,6 +140,9 @@ export function SettlementsPage() {
   );
 }
 export function FinanceReportsPage() {
+  const [period, setPeriod] = useState("05/2026");
+  const [activeTab, setActiveTab] = useState("Tổng quan");
+  const [exported, setExported] = useState(false);
   const kpis = [
     ["Doanh thu (VND)", "126.450.000.000", "+18,4%", CreditCard],
     ["Lợi nhuận (VND)", "18.750.000.000", "+16,2%", TrendingUp],
@@ -172,24 +176,19 @@ export function FinanceReportsPage() {
         <div className="finance-report-actions">
           <label>
             <CalendarDays aria-hidden="true" />
-            <select aria-label="Khoảng thời gian báo cáo" defaultValue="05/2026">
+            <select aria-label="Khoảng thời gian báo cáo" value={period} onChange={(event) => setPeriod(event.target.value)}>
               <option value="05/2026">01/05/2026 - 30/05/2026</option>
               <option value="04/2026">01/04/2026 - 30/04/2026</option>
             </select>
           </label>
-          <button type="button" className="button secondary">
-            <Download aria-hidden="true" /> Xuất báo cáo
+          <button type="button" className="button secondary" onClick={() => setExported(true)}>
+            <Download aria-hidden="true" /> {exported ? "Đã tạo bản xuất demo" : "Xuất báo cáo"}
           </button>
         </div>
       </header>
       <main className="finance-analytics">
         <nav className="finance-report-tabs" aria-label="Loại báo cáo">
-          <span className="active">Tổng quan</span>
-          <span>Doanh thu</span>
-          <span>Người dùng</span>
-          <span>Tài sản</span>
-          <span>Phiên đấu giá</span>
-          <span>Thanh toán</span>
+          {["Tổng quan", "Doanh thu", "Người dùng", "Tài sản", "Phiên đấu giá", "Thanh toán"].map((tab) => <button type="button" key={tab} className={activeTab === tab ? "active" : ""} aria-pressed={activeTab === tab} onClick={() => setActiveTab(tab)}>{tab}</button>)}
         </nav>
 
         <section className="finance-report-kpis" aria-label="Chỉ số tài chính">
@@ -212,7 +211,7 @@ export function FinanceReportsPage() {
                 <h2>Doanh thu theo thời gian</h2>
                 <p>Đơn vị: tỷ VND</p>
               </div>
-              <span>Tháng 05/2026</span>
+              <span>Tháng {period}</span>
             </header>
             <div className="finance-bar-chart" aria-label="Biểu đồ doanh thu tháng 5">
               <div className="finance-chart-axis" aria-hidden="true">
@@ -273,7 +272,7 @@ export function FinanceReportsPage() {
           </article>
         </section>
         <p className="finance-report-source">
-          <ShieldCheck aria-hidden="true" /> Dữ liệu đồng bộ từ Financial Management lúc 09:30, 21/07/2026.
+          <ShieldCheck aria-hidden="true" /> Dữ liệu mô phỏng cho tab {activeTab}, kỳ {period}; đồng bộ từ Financial Management lúc 09:30, 21/07/2026.
         </p>
       </main>
     </>
@@ -322,11 +321,13 @@ function Workspace({ kind }: { kind: keyof typeof workspaceData }) {
       </div>
       <section className="admin-panel">
         <h2>Hàng đợi ưu tiên</h2>
-        {d.queue.map((x) => (
-          <div className="queue-row" key={x}>
+        {d.queue.map(([label, route]) => (
+          <div className="queue-row" key={label}>
             <Clock3 />
-            <strong>{x}</strong>
-            <button className="button ghost">Mở</button>
+            <strong>{label}</strong>
+            <Link className="button ghost" to={route}>
+              Mở
+            </Link>
           </div>
         ))}
       </section>
@@ -342,6 +343,11 @@ function ListPage({
   intro: string;
   items: string[];
 }) {
+  const [query, setQuery] = useState("");
+  const [selected, setSelected] = useState<string | null>(null);
+  const filtered = items.filter((item) =>
+    item.toLowerCase().includes(query.trim().toLowerCase()),
+  );
   return (
     <>
       <header className="admin-heading">
@@ -353,17 +359,48 @@ function ListPage({
       </header>
       <div className="filter-bar">
         <Search />
-        <input aria-label="Tìm kiếm" placeholder="Tìm theo mã hoặc nội dung" />
+        <input
+          aria-label="Tìm kiếm"
+          placeholder="Tìm theo mã hoặc nội dung"
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+        />
       </div>
       <section className="admin-panel">
-        {items.map((x, i) => (
+        {filtered.map((x, i) => (
           <div className="queue-row" key={x}>
             {iconFor(i)}
             <strong>{x}</strong>
-            <button className="button ghost">Xem</button>
+            <button
+              type="button"
+              className="button ghost"
+              onClick={() => setSelected(x)}
+            >
+              Xem chi tiết
+            </button>
           </div>
         ))}
+        {!filtered.length && <p>Không có dữ liệu phù hợp với từ khóa.</p>}
       </section>
+      {selected && (
+        <div className="modal-backdrop">
+          <section className="audit-dialog" role="dialog" aria-modal="true">
+            <ReceiptText />
+            <h2>Chi tiết nghiệp vụ</h2>
+            <p>{selected}</p>
+            <p>
+              Đây là dữ liệu mô phỏng. Mọi thay đổi tài chính phải được thực
+              hiện tại workspace có thẩm quyền và được ghi nhận audit.
+            </p>
+            <button
+              className="button primary"
+              onClick={() => setSelected(null)}
+            >
+              Đóng
+            </button>
+          </section>
+        </div>
+      )}
     </>
   );
 }

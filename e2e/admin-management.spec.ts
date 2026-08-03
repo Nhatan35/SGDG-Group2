@@ -55,15 +55,17 @@ test("user and eKYC management supports account filters and audited actions", as
   await page.goto("/admin/users");
 
   await expect(
-    page.getByRole("heading", { name: "Quản lý người dùng & eKYC" }),
+    page.getByRole("heading", { name: "Tài khoản Customer & ngoại lệ eKYC" }),
   ).toBeVisible();
-  await expect(page.locator(".account-management-table tbody tr")).toHaveCount(5);
+  await expect(page.locator(".account-management-table tbody tr")).toHaveCount(4);
 
-  await page.getByLabel("Lọc trạng thái người dùng").selectOption("PENDING");
+  await page.getByLabel("Lọc tài khoản và eKYC").selectOption("EXCEPTION_REVIEW");
   const pendingRow = page.locator(".account-management-table tbody tr");
   await expect(pendingRow).toHaveCount(1);
-  await expect(pendingRow).toContainText("Trần Thị B");
+  await expect(pendingRow).toContainText("Trần Quốc Huy");
 
-  await page.getByRole("button", { name: "Duyệt eKYC Trần Thị B" }).click();
+  await page
+    .getByRole("button", { name: "Thẩm định ngoại lệ Trần Quốc Huy" })
+    .click();
   await expect(page.getByRole("dialog")).toBeVisible();
 });

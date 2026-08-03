@@ -46,8 +46,10 @@ describe("public catalog navigation and filters", () => {
         `/auctions?status=${removedStatus}`,
       );
 
+      // Khu vực sân khấu luôn trưng bày ba phiên nổi bật; các phiên còn lại
+      // được hiển thị trong thanh "Khám phá thêm".
       expect(container.querySelectorAll(".catalog-auction-grid .auction-card"))
-        .toHaveLength(6);
+        .toHaveLength(3);
       expect(
         screen.queryByRole("button", {
           name: removedStatus === "closed" ? "Đã kết thúc" : "Đã hủy",

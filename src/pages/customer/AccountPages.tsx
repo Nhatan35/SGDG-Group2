@@ -1240,12 +1240,17 @@ const depositReasonLabels: Record<AuctionDepositReason, string> = {
 };
 
 export function DepositsPage() {
-  const records = useDemoStore((state) =>
-    Object.values(state.auctionDepositRecords).sort(
+  const depositRecords = useDemoStore(
+    (state) => state.auctionDepositRecords,
+  );
+  const records = useMemo(
+    () =>
+      Object.values(depositRecords ?? {}).sort(
       (first, second) =>
         new Date(second.updatedAt).getTime() -
         new Date(first.updatedAt).getTime(),
-    ),
+      ),
+    [depositRecords],
   );
 
   return (

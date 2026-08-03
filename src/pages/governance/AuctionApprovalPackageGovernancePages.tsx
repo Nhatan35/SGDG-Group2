@@ -44,37 +44,40 @@ export function AuctionApprovalPackageGovernanceQueuePage() {
     return (
       <main className="approval-package-page">
         <header className="approval-package-heading">
-          <span>ADMIN GOVERNANCE</span>
-          <h1>Submitted Approval Packages</h1>
+          <span>QUẢN TRỊ PHÊ DUYỆT</span>
+          <h1>Phê duyệt hồ sơ đấu giá</h1>
         </header>
         <BlockedState
           title="Không có quyền truy cập"
-          description="Chỉ ADMIN được xem dynamic submitted Package queue."
+          description="Chỉ Admin được xem hàng đợi hồ sơ đấu giá đã gửi."
         />
       </main>
     );
   return (
     <main className="approval-package-page">
       <header className="approval-package-heading">
-        <span>ADMIN GOVERNANCE · READ-ONLY QUEUE</span>
-        <h1>Submitted Approval Packages</h1>
+        <span>QUẢN TRỊ PHÊ DUYỆT · HÀNG ĐỢI CHỈ ĐỌC</span>
+          <h1>Phê duyệt hồ sơ đấu giá</h1>
         <p>{PROTOTYPE_CONTENT_POLICY.classification}</p>
         <p>
-          Submitted for ADMIN review. This queue contains no approval decision
-          controls.
+          Hồ sơ do Nhân viên nội dung gửi để Admin kiểm tra tính đầy đủ trước
+          khi bắt đầu quyết định phê duyệt.
         </p>
       </header>
       <section className="approval-package-card">
-        <h2>Derived Approval Review queue</h2>
+        <h2>Hàng đợi hồ sơ hợp lệ</h2>
         <p>
-          Only valid submitted dynamic packages are derived into this queue.
-          Draft, blocked, fixture and malformed packages are excluded.
+          Chỉ hồ sơ động đã gửi, đúng phiên bản và đủ bằng chứng mới xuất hiện.
+          Bản nháp, hồ sơ bị chặn và dữ liệu mẫu cũ được loại khỏi hàng đợi.
         </p>
       </section>
       {queue.length === 0 ? (
         <section className="approval-package-card">
-          <h2>Không có Package đang chờ xem xét</h2>
-          <p>No dynamic submitted Approval Package is available.</p>
+          <h2>Không có hồ sơ đang chờ xem xét</h2>
+          <p>
+            Nhân viên nội dung cần hoàn tất cấu hình, nội dung và kiểm tra sẵn
+            sàng, sau đó chọn “Gửi hồ sơ phê duyệt”.
+          </p>
         </section>
       ) : (
         <div className="approval-package-queue" role="list">
@@ -97,34 +100,34 @@ export function AuctionApprovalPackageGovernanceQueuePage() {
                 </div>
               </div>
               <dl>
-                <dt>Source / mode</dt>
+                <dt>Nguồn / chế độ</dt>
                 <dd>
                   {item.creationSource} / {item.managementMode}
                 </dd>
-                <dt>Submitted Package</dt>
+                <dt>Phiên bản hồ sơ đã gửi</dt>
                 <dd>v{item.submittedPackageVersion}</dd>
                 <dt>Content version</dt>
                 <dd>v{item.contentVersion}</dd>
-                <dt>Configuration Snapshot</dt>
+                <dt>Bản chụp cấu hình</dt>
                 <dd>{item.configurationSnapshotId}</dd>
                 <dt>Completion Record</dt>
                 <dd>{item.completionRecordId}</dd>
-                <dt>Submitted by/at</dt>
+                <dt>Người gửi / thời điểm</dt>
                 <dd>
                   {item.submittedBy} · {item.submittedAt}
                 </dd>
               </dl>
               {item.evidenceValidity === "STALE_AFTER_SUBMISSION" && (
                 <p className="approval-package-alert" role="alert">
-                  SUBMITTED_PACKAGE_EVIDENCE_STALE. Submitted evidence remains
-                  immutable; no governed correction phase exists here.
+                  Bằng chứng nguồn đã thay đổi sau khi gửi. Hồ sơ đã gửi vẫn
+                  được giữ nguyên; cần tạo vòng chỉnh sửa mới tại nghiệp vụ nguồn.
                 </p>
               )}
               <Link
                 className="button secondary"
                 to={`/governance/auction-approval-packages/${item.packageId}`}
               >
-                Xem immutable package evidence
+                Xem bằng chứng hồ sơ
               </Link>
             </article>
           ))}
@@ -159,12 +162,12 @@ export function AuctionApprovalPackageGovernanceDetailPage() {
     return (
       <main className="approval-package-page">
         <header className="approval-package-heading">
-          <span>ADMIN GOVERNANCE</span>
-          <h1>Approval Package Detail</h1>
+          <span>QUẢN TRỊ PHÊ DUYỆT</span>
+          <h1>Chi tiết hồ sơ phê duyệt</h1>
         </header>
         <BlockedState
           title="Không có quyền truy cập"
-          description="Chỉ ADMIN được xem submitted Package detail."
+          description="Chỉ Admin được xem chi tiết hồ sơ đã gửi."
         />
       </main>
     );
@@ -172,12 +175,12 @@ export function AuctionApprovalPackageGovernanceDetailPage() {
     return (
       <main className="approval-package-page">
         <header className="approval-package-heading">
-          <span>ADMIN GOVERNANCE</span>
-          <h1>Approval Package Detail</h1>
+          <span>QUẢN TRỊ PHÊ DUYỆT</span>
+          <h1>Chi tiết hồ sơ phê duyệt</h1>
         </header>
         <BlockedState
-          title="Không tìm thấy submitted dynamic Package"
-          description="Draft, malformed and fixture packages are not available in this detail."
+          title="Không tìm thấy hồ sơ động đã gửi"
+          description="Bản nháp, hồ sơ không hợp lệ và dữ liệu mẫu cũ không xuất hiện tại đây."
         />
       </main>
     );
@@ -207,8 +210,8 @@ export function AuctionApprovalPackageGovernanceDetailPage() {
   return (
     <main className="approval-package-page">
       <header className="approval-package-heading">
-        <span>ADMIN GOVERNANCE · IMMUTABLE READ-ONLY EVIDENCE</span>
-        <h1>Approval Package Detail</h1>
+        <span>QUẢN TRỊ PHÊ DUYỆT · BẰNG CHỨNG CHỈ ĐỌC</span>
+        <h1>Chi tiết hồ sơ phê duyệt</h1>
         <p>{PROTOTYPE_CONTENT_POLICY.classification}</p>
       </header>
       <section className="approval-package-card approval-package-identity">
@@ -253,7 +256,7 @@ export function AuctionApprovalPackageGovernanceDetailPage() {
               className="button primary"
               to={`/governance/auction-approval-reviews/${review.reviewId}`}
             >
-              Mở Approval Review
+              Bắt đầu thẩm định
             </Link>
           </div>
         )}
@@ -266,40 +269,40 @@ export function AuctionApprovalPackageGovernanceDetailPage() {
 
       <div className="approval-package-grid">
         <section className="approval-package-card">
-          <p className="approval-package-eyebrow">SUBMISSION · READ-ONLY</p>
-          <h2>Submission Record</h2>
+          <p className="approval-package-eyebrow">HỒ SƠ ĐÃ GỬI · CHỈ ĐỌC</p>
+          <h2>Bản ghi gửi duyệt</h2>
           <dl>
-            <dt>Record</dt>
+            <dt>Mã bản ghi</dt>
             <dd>
               {submission.submissionRecordId} · v{submission.recordVersion}
             </dd>
-            <dt>Submitted Package</dt>
+            <dt>Phiên bản hồ sơ đã gửi</dt>
             <dd>v{submission.submittedPackageVersion}</dd>
-            <dt>Submitted by/at</dt>
+            <dt>Người gửi / thời điểm</dt>
             <dd>
               {submission.submittedBy} · {submission.submittedAt}
             </dd>
-            <dt>Queue state</dt>
+            <dt>Trạng thái hàng đợi</dt>
             <dd>{submission.queueState}</dd>
           </dl>
         </section>
 
         <section className="approval-package-card">
-          <p className="approval-package-eyebrow">SESSION · READ-ONLY</p>
-          <h2>Session evidence</h2>
+          <p className="approval-package-eyebrow">PHIÊN ĐẤU GIÁ · CHỈ ĐỌC</p>
+          <h2>Bằng chứng phiên đấu giá</h2>
           <dl>
-            <dt>Session</dt>
+            <dt>Phiên đấu giá</dt>
             <dd>
               {evidence.session.sessionId} · {evidence.session.sessionCode}
             </dd>
-            <dt>Version</dt>
+            <dt>Phiên bản</dt>
             <dd>v{evidence.session.sessionVersion}</dd>
-            <dt>Source / mode</dt>
+            <dt>Nguồn / chế độ</dt>
             <dd>
               {evidence.session.creationSource} /{" "}
               {evidence.session.managementMode}
             </dd>
-            <dt>Lifecycle / publication</dt>
+            <dt>Vòng đời / công bố</dt>
             <dd>
               {evidence.session.lifecycleStatus} /{" "}
               {evidence.session.publicationStatus}
@@ -309,73 +312,73 @@ export function AuctionApprovalPackageGovernanceDetailPage() {
 
         <section className="approval-package-card">
           <p className="approval-package-eyebrow">
-            CUSTOMER SOURCE · READ-ONLY
+            NGUỒN CUSTOMER · CHỈ ĐỌC
           </p>
-          <h2>Opening Request lineage</h2>
+          <h2>Nguồn gốc yêu cầu mở phiên</h2>
           <dl>
-            <dt>Request</dt>
+            <dt>Yêu cầu</dt>
             <dd>
               {evidence.openingRequest.openingRequestId} · v
               {evidence.openingRequest.openingRequestVersion}
             </dd>
             <dt>Customer</dt>
             <dd>{evidence.openingRequest.customerId}</dd>
-            <dt>Accepted state</dt>
+            <dt>Trạng thái tiếp nhận</dt>
             <dd>{evidence.openingRequest.acceptedState}</dd>
-            <dt>Original title</dt>
+            <dt>Tiêu đề ban đầu</dt>
             <dd>{evidence.openingRequest.originalTitle}</dd>
-            <dt>Original purpose</dt>
+            <dt>Mục đích ban đầu</dt>
             <dd>{evidence.openingRequest.originalPurpose}</dd>
           </dl>
         </section>
 
         <section className="approval-package-card">
           <p className="approval-package-eyebrow">
-            AUCTION CONTENT · READ-ONLY
+            NỘI DUNG ĐẤU GIÁ · CHỈ ĐỌC
           </p>
-          <h2>Content evidence</h2>
+          <h2>Bằng chứng nội dung</h2>
           <dl>
             <dt>Content</dt>
             <dd>
               {evidence.auctionContent.contentId} · v
               {evidence.auctionContent.contentVersion}
             </dd>
-            <dt>Title</dt>
+            <dt>Tiêu đề</dt>
             <dd>{evidence.auctionContent.auctionTitle}</dd>
-            <dt>Summary</dt>
+            <dt>Tóm tắt</dt>
             <dd>{evidence.auctionContent.auctionSummary}</dd>
-            <dt>Completeness</dt>
+            <dt>Mức độ hoàn thiện</dt>
             <dd>{evidence.auctionContent.completenessStatus}</dd>
           </dl>
         </section>
 
         <section className="approval-package-card">
           <p className="approval-package-eyebrow">
-            CONFIGURATION · READ-ONLY
+            CẤU HÌNH · CHỈ ĐỌC
           </p>
-          <h2>Configuration evidence</h2>
+          <h2>Bằng chứng cấu hình</h2>
           <dl>
-            <dt>Snapshot / Proposal</dt>
+            <dt>Bản chụp / đề xuất</dt>
             <dd>
               {evidence.configuration.snapshotId} · v
               {evidence.configuration.proposalVersion}
             </dd>
-            <dt>Starting Price</dt>
+            <dt>Giá khởi điểm</dt>
             <dd>
               {evidence.configuration.startingPrice.toLocaleString("vi-VN")}{" "}
               VND
             </dd>
-            <dt>Price Band / Room</dt>
+            <dt>Dải giá / phòng đấu giá</dt>
             <dd>
               {evidence.configuration.priceBand} →{" "}
               {evidence.configuration.ordinaryRoom}
             </dd>
-            <dt>Member Title</dt>
+            <dt>Hạng thành viên</dt>
             <dd>
               {evidence.configuration.memberTitle} ·{" "}
               {evidence.configuration.membershipReferenceVersion}
             </dd>
-            <dt>Listing Fee</dt>
+            <dt>Phí đăng sản phẩm</dt>
             <dd>{feeLabel(evidence.configuration.memberListingFee)}</dd>
           </dl>
           <p>{evidence.configuration.policyDisclaimer}</p>
@@ -383,46 +386,46 @@ export function AuctionApprovalPackageGovernanceDetailPage() {
 
         <section className="approval-package-card">
           <p className="approval-package-eyebrow">
-            CONTENT REVIEW · READ-ONLY
+            THẨM ĐỊNH NỘI DUNG · CHỈ ĐỌC
           </p>
-          <h2>Completion evidence</h2>
+          <h2>Bằng chứng hoàn tất</h2>
           <dl>
             <dt>Review</dt>
             <dd>
               {evidence.contentReview.reviewId} · v
               {evidence.contentReview.reviewVersion}
             </dd>
-            <dt>Completion Record</dt>
+            <dt>Bản ghi hoàn tất</dt>
             <dd>
               {evidence.contentReview.completionRecordId} · v
               {evidence.contentReview.completionRecordVersion}
             </dd>
-            <dt>Completed by/at</dt>
+            <dt>Người / thời điểm hoàn tất</dt>
             <dd>
               {evidence.contentReview.completedBy} ·{" "}
               {evidence.contentReview.completedAt}
             </dd>
-            <dt>Readiness</dt>
+            <dt>Mức độ sẵn sàng</dt>
             <dd>{evidence.contentReview.readiness}</dd>
           </dl>
         </section>
       </div>
 
       <section className="approval-package-card approval-package-boundary">
-        <h2>ADMIN review boundary</h2>
-        <p>No approval decision has been made.</p>
-        <p>The Session remains DRAFT / NOT_READY.</p>
-        <p>No Schedule or Publication has been created.</p>
+        <h2>Phạm vi thẩm định của Admin</h2>
+        <p>Chưa có quyết định phê duyệt nào được đưa ra.</p>
+        <p>Phiên vẫn ở trạng thái bản nháp/chưa sẵn sàng.</p>
+        <p>Chưa tạo lịch hoặc bản công bố.</p>
         <p>
-          This detail is read-only. Approve, Return, Reject, Schedule and
-          Publish controls do not exist for dynamic packages in this phase.
+          Màn hình này chỉ dùng để xem. Các thao tác phê duyệt, trả lại, từ
+          chối, lên lịch và công bố chưa áp dụng cho hồ sơ động ở giai đoạn này.
         </p>
       </section>
       <Dialog
         open={dialogOpen}
         onOpenChange={setDialogOpen}
-        title="Bắt đầu Approval Review"
-        description="Hành động này chỉ bắt đầu review intake."
+        title="Bắt đầu thẩm định hồ sơ"
+        description="Hành động này chỉ bắt đầu bước tiếp nhận thẩm định."
         footer={
           <>
             <Button variant="secondary" onClick={() => setDialogOpen(false)}>
@@ -433,9 +436,9 @@ export function AuctionApprovalPackageGovernanceDetailPage() {
         }
       >
         <p>Không có quyết định phê duyệt nào được tạo.</p>
-        <p>Submitted Approval Package vẫn bất biến.</p>
-        <p>Session vẫn giữ DRAFT / NOT_READY.</p>
-        <p>Không tạo Schedule hoặc Publication.</p>
+        <p>Hồ sơ đã gửi vẫn được giữ nguyên để truy vết.</p>
+        <p>Phiên vẫn ở trạng thái bản nháp/chưa sẵn sàng.</p>
+        <p>Không tạo lịch hoặc bản công bố ở bước này.</p>
       </Dialog>
     </main>
   );
@@ -462,20 +465,20 @@ export function AuctionApprovalReviewPage() {
   if (actorRole !== "ADMIN")
     return (
       <main className="approval-package-page">
-        <h1>Approval Review</h1>
+        <h1>Thẩm định hồ sơ</h1>
         <BlockedState
           title="Không có quyền truy cập"
-          description="Chỉ ADMIN được xem Approval Review."
+          description="Chỉ Admin được xem nội dung thẩm định hồ sơ."
         />
       </main>
     );
   if (!review || !packageValue || !submission)
     return (
       <main className="approval-package-page">
-        <h1>Approval Review</h1>
+        <h1>Thẩm định hồ sơ</h1>
         <BlockedState
-          title="Không tìm thấy Approval Review"
-          description="Malformed hoặc orphan Review không được hiển thị."
+          title="Không tìm thấy hồ sơ thẩm định"
+          description="Hồ sơ thẩm định không hợp lệ hoặc không còn dữ liệu nguồn sẽ không được hiển thị."
         />
       </main>
     );
@@ -498,8 +501,8 @@ export function AuctionApprovalReviewPage() {
   return (
     <main className="approval-package-page">
       <header className="approval-package-heading">
-        <span>ADMIN GOVERNANCE · REVIEW INTAKE ONLY</span>
-        <h1>Approval Review</h1>
+        <span>QUẢN TRỊ PHÊ DUYỆT · TIẾP NHẬN THẨM ĐỊNH</span>
+        <h1>Thẩm định hồ sơ</h1>
         <p>{PROTOTYPE_CONTENT_POLICY.classification}</p>
       </header>
       <section className="approval-package-card approval-package-identity">
@@ -509,25 +512,25 @@ export function AuctionApprovalReviewPage() {
             Review v{review.reviewVersion} · {review.status}
           </p>
           <p>
-            Started by {review.startedBy} · {review.startedAt}
+            Bắt đầu bởi {review.startedBy} · {review.startedAt}
           </p>
         </div>
         <Badge>{review.status}</Badge>
         {review.status === "IN_REVIEW" && (
-          <Button onClick={runRevalidation}>Kiểm tra lại evidence</Button>
+          <Button onClick={runRevalidation}>Kiểm tra lại bằng chứng</Button>
         )}
         {message && <p role="status">{message}</p>}
       </section>
       <section className="approval-package-card">
-        <h2>Governed references</h2>
+        <h2>Tham chiếu được quản trị</h2>
         <dl>
           <dt>Package</dt>
           <dd>
             {review.packageId} · v{review.packageVersionAtStart}
           </dd>
-          <dt>Submission Record</dt>
+          <dt>Bản ghi gửi duyệt</dt>
           <dd>{review.submissionRecordId}</dd>
-          <dt>Session</dt>
+          <dt>Phiên đấu giá</dt>
           <dd>
             {review.sessionId} · v{review.sessionVersionAtStart}
           </dd>
@@ -536,14 +539,14 @@ export function AuctionApprovalReviewPage() {
             {review.startEvidence.contentId} · v
             {review.startEvidence.contentVersion}
           </dd>
-          <dt>Configuration Snapshot</dt>
+          <dt>Bản chụp cấu hình</dt>
           <dd>{review.startEvidence.configurationSnapshotId}</dd>
-          <dt>Content Review Completion</dt>
+          <dt>Hoàn tất thẩm định nội dung</dt>
           <dd>{review.startEvidence.contentReviewCompletionRecordId}</dd>
         </dl>
       </section>
       <section className="approval-package-card">
-        <h2>Current evidence validity</h2>
+        <h2>Hiệu lực bằng chứng hiện tại</h2>
         <p>
           {review.currentEvidenceValidation.validForReview
             ? "CURRENT"
@@ -557,23 +560,23 @@ export function AuctionApprovalReviewPage() {
               <li key={code}>{code}</li>
             ))
           ) : (
-            <li>Không có finding.</li>
+            <li>Không có phát hiện cần xử lý.</li>
           )}
         </ul>
       </section>
       <section className="approval-package-card">
-        <h2>Submitted Package evidence · read-only</h2>
+        <h2>Bằng chứng hồ sơ đã gửi · chỉ đọc</h2>
         <p>
           {packageValue.evidence.auctionContent.auctionTitle} ·{" "}
           {packageValue.evidence.auctionContent.auctionSummary}
         </p>
         <p>
-          Package {packageValue.status} · Submission{" "}
+          Hồ sơ {packageValue.status} · Bản ghi gửi duyệt{" "}
           {submission.submissionRecordId}
         </p>
       </section>
       <section className="approval-package-card">
-        <h2>Review history</h2>
+        <h2>Lịch sử thẩm định</h2>
         <ol>
           {review.history.map((entry) => (
             <li key={entry.historyId}>
@@ -592,8 +595,8 @@ export function AuctionApprovalReviewPage() {
           Approval Review đã bắt đầu nhưng chưa có quyết định phê duyệt.
         </p>
         <p>
-          Prototype frontend-only: Package remains SUBMITTED; Session remains
-          DRAFT / NOT_READY. No decision, Schedule or Publication exists.
+          Đây là prototype frontend: hồ sơ vẫn ở trạng thái SUBMITTED; phiên
+          vẫn là DRAFT / NOT_READY. Chưa có quyết định, lịch hoặc bản công bố.
         </p>
       </section>
     </main>

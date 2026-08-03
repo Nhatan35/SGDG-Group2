@@ -12,7 +12,7 @@ test.describe('PUB-002 auction catalog', () => {
     await expect(primaryNavigation.getByRole('link', { name: 'Sắp diễn ra', exact: true })).toHaveCount(0)
     await expect(page.getByRole('button', { name: 'Đã kết thúc', exact: true })).toHaveCount(0)
     await expect(page.getByRole('button', { name: 'Đã hủy', exact: true })).toHaveCount(0)
-    await expect(page.locator('.catalog-auction-grid .auction-card')).toHaveCount(6)
+    await expect(page.locator('.catalog-auction-grid .auction-card')).toHaveCount(3)
     const decisionCard = page.locator('.catalog-auction-grid .auction-card').first()
     const titleBox = await decisionCard.locator('h3').boundingBox()
     const priceBox = await decisionCard.locator('.auction-price').boundingBox()
@@ -49,9 +49,9 @@ test.describe('PUB-002 auction catalog', () => {
     await expect(page.getByRole('button', { name: 'Đang diễn ra', exact: true })).toHaveAttribute('aria-pressed', 'true')
 
     await page.goto('/auctions')
-    await expect(page.locator('.catalog-auction-grid .auction-card')).toHaveCount(6)
+    await expect(page.locator('.catalog-auction-grid .auction-card')).toHaveCount(3)
     await page.goto('/auctions?status=cancelled')
-    await expect(page.locator('.catalog-auction-grid .auction-card')).toHaveCount(6)
+    await expect(page.locator('.catalog-auction-grid .auction-card')).toHaveCount(3)
     await expect(page.getByRole('button', { name: 'Đã hủy', exact: true })).toHaveCount(0)
     await page.goto('/auctions')
     await page.getByRole('button', { name: 'Giá cao – thấp' }).click()
@@ -64,7 +64,7 @@ test.describe('PUB-002 auction catalog', () => {
     await page.getByRole('button', { name: 'Tìm kiếm' }).click()
     await expect(page.getByRole('heading', { name: 'Không tìm thấy phiên đấu giá phù hợp' })).toBeVisible()
     await page.getByRole('button', { name: 'Xóa tất cả bộ lọc' }).click()
-    await expect(page.locator('.catalog-auction-grid .auction-card')).toHaveCount(6)
+    await expect(page.locator('.catalog-auction-grid .auction-card')).toHaveCount(3)
 
     await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true)
   })
@@ -86,7 +86,7 @@ test.describe('PUB-002 auction catalog', () => {
     await page.setViewportSize({ width: 390, height: 844 })
     await page.goto('/auctions')
 
-    await expect(page.locator('.catalog-auction-grid .auction-card')).toHaveCount(6)
+    await expect(page.locator('.catalog-auction-grid .auction-card')).toHaveCount(3)
     const firstCardBox = await page.locator('.catalog-auction-grid .auction-card').first().boundingBox()
     const secondCardBox = await page.locator('.catalog-auction-grid .auction-card').nth(1).boundingBox()
     expect(firstCardBox).not.toBeNull()

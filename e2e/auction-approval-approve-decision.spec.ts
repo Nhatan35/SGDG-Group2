@@ -73,10 +73,10 @@ async function createSubmittedPackage(page: Page) {
 
   await loginStaff(page, "admin@sgdg.demo");
   await page.goto(`/governance/auction-configurations/${configurationId}`);
-  await page.getByRole("button", { name: "Confirm Configuration" }).click();
+  await page.getByRole("button", { name: "Xác nhận cấu hình" }).click();
   await page
-    .getByRole("dialog", { name: "Confirm Configuration" })
-    .getByRole("button", { name: "Confirm Configuration" })
+    .getByRole("dialog", { name: "Xác nhận cấu hình" })
+    .getByRole("button", { name: "Xác nhận cấu hình" })
     .click();
 
   await loginStaff(page, "content@sgdg.demo");

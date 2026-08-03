@@ -1,11 +1,22 @@
 import { useState } from "react";
+import {
+  AlertTriangle,
+  ArrowLeft,
+  CheckCircle2,
+  FileCheck2,
+  History,
+  ShieldCheck,
+  UserRound,
+} from "lucide-react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { Button } from "../../components/common/Button";
 import { Card } from "../../components/common/Card";
 import { EmptyState, ErrorState, LoadingState } from "../../components/feedback/States";
 import { useEligibilityWorkflowStore } from "../../store/eligibilityWorkflowStore";
 import { NotFoundPage } from "../NotFoundPage";
+import { formatDateTime } from "../../utils/format";
 import "../../styles/eligibility-review.css";
+import "../../styles/governance-decision.css";
 
 export function EligibilityReviewQueuePage() {
   const reviews = useEligibilityWorkflowStore((state) => state.reviews);
@@ -86,44 +97,84 @@ export function EligibilityReviewDetailPage() {
     setMessage(result.ok ? "Quyết định đã được ghi nhận và projection khách hàng đã cập nhật." : `Không thể quyết định: ${result.reason}.`);
   };
   const decided = review.status === "APPROVED" || review.status === "REJECTED";
+  const statusLabel = {
+    PENDING: "Đang chờ Admin quyết định",
+    EVIDENCE_REQUESTED: "Đang chờ bổ sung bằng chứng",
+    APPROVED: "Đã xác nhận đủ điều kiện",
+    REJECTED: "Đã từ chối điều kiện tham gia",
+  }[review.status];
   return (
-    <main className="eligibility-review-page">
-      <header className="ops-heading">
-        <div><span>ELIGIBILITY GOVERNANCE</span><h1>{review.reviewId}</h1></div>
-        <Link to="/governance/eligibility-reviews">Về hàng đợi</Link>
+    <main className="eligibility-review-page governance-decision-page">
+      <Link className="decision-back-link" to="/governance/eligibility-reviews"><ArrowLeft />Về hàng đợi rà soát</Link>
+      <header className="governance-decision-hero">
+        <div>
+          <span>RÀ SOÁT ĐIỀU KIỆN THAM GIA</span>
+          <h1>{review.reviewId}</h1>
+          <p>
+            Địa chỉ trong hồ sơ eKYC cần được xác nhận thủ công trước khi
+            Customer được công nhận đủ điều kiện tham gia phiên.
+          </p>
+        </div>
+        <strong className={`decision-status ${review.status.toLowerCase()}`}>
+          {statusLabel}
+        </strong>
       </header>
-      <div className="ops-workspace">
-        <Card>
-          <h2>Nguồn tham chiếu chỉ đọc</h2>
-          <dl className="ops-definition">
-            <div><dt>Registration</dt><dd>{review.registrationId}</dd></div>
-            <div><dt>Customer</dt><dd>{review.customerId}</dd></div>
-            <div><dt>KYC</dt><dd>{review.kycReference}</dd></div>
-            <div><dt>Restriction</dt><dd>{review.restrictionReference}</dd></div>
-            <div><dt>Finance</dt><dd>{review.financeReference}</dd></div>
-            <div><dt>Rule version</dt><dd>{review.ruleVersion}</dd></div>
-            <div><dt>Version</dt><dd>v{review.version}</dd></div>
-          </dl>
-          <h3>Check cần xem xét</h3>
-          <ul>{review.failedChecks.map((item) => <li key={item}>{item}</li>)}</ul>
-          <h3>Evidence</h3>
-          <ul>{review.evidence.map((item) => <li key={item}>{item}</li>)}</ul>
-        </Card>
-        <Card>
-          <h2>Quyết định · {review.status}</h2>
+      <div className="governance-decision-grid">
+        <div className="governance-decision-main">
+          <Card className="decision-summary-card">
+            <div className="decision-section-heading">
+              <span><AlertTriangle /></span>
+              <div>
+                <small>VẤN ĐỀ CẦN XÁC NHẬN</small>
+                <h2>Bằng chứng địa chỉ eKYC cần được kiểm tra thủ công</h2>
+              </div>
+            </div>
+            <p>
+              Hệ thống tự động chưa thể kết luận hồ sơ đạt điều kiện vì bằng
+              chứng địa chỉ cần người có thẩm quyền đối chiếu.
+            </p>
+            <div className="decision-impact eligibility-impact">
+              <div className="will-change"><CheckCircle2 /><span><strong>Nếu xác nhận đủ điều kiện</strong>Hồ sơ hoàn tất bước rà soát ngoại lệ và tiếp tục luồng kiểm tra điều kiện tham gia.</span></div>
+              <div><FileCheck2 /><span><strong>Nếu yêu cầu bổ sung</strong>Hồ sơ chuyển sang chờ bằng chứng; Customer/CSKH cần cung cấp tài liệu còn thiếu.</span></div>
+              <div><ShieldCheck /><span><strong>Nếu từ chối</strong>Customer chưa đủ điều kiện tham gia ở phiên bản đăng ký hiện tại và có thể xử lý lại theo quy trình.</span></div>
+            </div>
+          </Card>
+          <Card>
+            <div className="decision-section-heading compact">
+              <span><UserRound /></span>
+              <div><small>HỒ SƠ ĐANG RÀ SOÁT</small><h2>Customer và nguồn kiểm tra</h2></div>
+            </div>
+            <dl className="decision-reference-grid">
+              <div><dt>Đăng ký tham gia</dt><dd>{review.registrationId}</dd></div>
+              <div><dt>Customer</dt><dd>{review.customerId}</dd></div>
+              <div><dt>Hồ sơ eKYC</dt><dd>{review.kycReference}</dd></div>
+              <div><dt>Hạn chế tham gia</dt><dd>{review.restrictionReference === "RST-NONE-1048" ? "Không ghi nhận hạn chế" : review.restrictionReference}</dd></div>
+              <div><dt>Tham chiếu tài chính</dt><dd>{review.financeReference}</dd></div>
+              <div><dt>Bộ quy tắc áp dụng</dt><dd>{review.ruleVersion} · hồ sơ v{review.version}</dd></div>
+            </dl>
+            <h3>Bằng chứng hiện có</h3>
+            <div className="decision-evidence-list">{review.evidence.map((item) => <span key={item}><FileCheck2 />{item.replace("KYC snapshot", "Bản chụp eKYC").replace("Deposit reference", "Tham chiếu tiền đặt trước")}</span>)}</div>
+          </Card>
+        </div>
+        <Card className="governance-decision-rail">
+          <div className="decision-section-heading compact">
+            <span><ShieldCheck /></span>
+            <div><small>QUYẾT ĐỊNH CÓ KIỂM SOÁT</small><h2>{statusLabel}</h2></div>
+          </div>
           {!decided && <>
-            <label>Lý do bắt buộc
-              <textarea value={reason} onChange={(event) => setReason(event.target.value)} />
+            <p className="decision-guidance">Kiểm tra bằng chứng hiện có và ghi rõ căn cứ trước khi chọn một phương án.</p>
+            <label>Căn cứ quyết định
+              <textarea value={reason} onChange={(event) => setReason(event.target.value)} placeholder="Ví dụ: Đã đối chiếu địa chỉ trên eKYC với tài liệu bổ sung…" />
             </label>
             <div className="eligibility-review-actions">
-              <Button onClick={() => act("APPROVE")} disabled={!reason.trim()}>Duyệt ngoại lệ</Button>
-              <Button variant="secondary" onClick={() => act("REQUEST_EVIDENCE")} disabled={!reason.trim()}>Yêu cầu bằng chứng</Button>
-              <Button variant="danger" onClick={() => act("REJECT")} disabled={!reason.trim()}>Từ chối</Button>
+              <Button onClick={() => act("APPROVE")} disabled={!reason.trim()}>Xác nhận đủ điều kiện</Button>
+              <Button variant="secondary" onClick={() => act("REQUEST_EVIDENCE")} disabled={!reason.trim()}>Yêu cầu bổ sung bằng chứng</Button>
+              <Button variant="danger" onClick={() => act("REJECT")} disabled={!reason.trim()}>Từ chối điều kiện tham gia</Button>
             </div>
           </>}
           {message && <p role="status">{message}</p>}
-          <h3>Lịch sử bất biến</h3>
-          <ol>{review.history.map((item) => <li key={`${item.at}-${item.action}`}><strong>{item.action}</strong> · {item.actor}<br/><small>{item.at}{item.reason ? ` · ${item.reason}` : ""}</small></li>)}</ol>
+          <div className="decision-history-heading"><History /><h3>Lịch sử xử lý</h3></div>
+          <ol className="decision-history">{review.history.map((item) => <li key={`${item.at}-${item.action}`}><strong>{item.action === "REVIEW_CREATED" ? "Đã tạo hồ sơ rà soát" : item.action}</strong><span>{item.actor}</span><small>{formatDateTime(item.at)}{item.reason ? ` · ${item.reason}` : ""}</small></li>)}</ol>
         </Card>
       </div>
     </main>

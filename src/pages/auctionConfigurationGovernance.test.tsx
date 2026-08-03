@@ -491,7 +491,7 @@ describe("Auction Configuration preparation and governance UI", () => {
     expect(
       screen.getByRole("heading", {
         level: 1,
-        name: "Configuration Governance Queue",
+        name: "Phê duyệt cấu hình phiên",
       }),
     ).toBeVisible();
     expect(
@@ -511,17 +511,17 @@ describe("Auction Configuration preparation and governance UI", () => {
     const user = userEvent.setup();
     const detail = renderAdminDetail(submitted.configurationId);
     await user.click(
-      screen.getByRole("button", { name: "Request Correction" }),
+      screen.getByRole("button", { name: "Yêu cầu chỉnh sửa" }),
     );
     const dialog = screen.getByRole("dialog", {
-      name: "Request Configuration Correction",
+      name: "Yêu cầu chỉnh sửa cấu hình",
     });
     const confirm = within(dialog).getByRole("button", {
-      name: "Confirm Return",
+      name: "Xác nhận trả lại",
     });
     expect(confirm).toBeDisabled();
     await user.type(
-      within(dialog).getByLabelText("Correction reason"),
+      within(dialog).getByLabelText("Lý do yêu cầu chỉnh sửa"),
       "Minimum increment requires a documented correction.",
     );
     await user.click(within(dialog).getByLabelText("ROOM"));
@@ -553,13 +553,13 @@ describe("Auction Configuration preparation and governance UI", () => {
     const user = userEvent.setup();
     const detail = renderAdminDetail(submitted.configurationId);
     await user.click(
-      screen.getByRole("button", { name: "Confirm Configuration" }),
+      screen.getByRole("button", { name: "Xác nhận cấu hình" }),
     );
     const dialog = screen.getByRole("dialog", {
-      name: "Confirm Configuration",
+      name: "Xác nhận cấu hình",
     });
     expect(
-      within(dialog).getByText(/Session remains DRAFT \/ NOT_READY/),
+      within(dialog).getByText(/Phiên vẫn ở trạng thái bản nháp\/chưa sẵn sàng/),
     ).toBeVisible();
     expect(
       within(dialog).getByText(/PRICE-BAND-ROOM-3/),
@@ -569,7 +569,7 @@ describe("Auction Configuration preparation and governance UI", () => {
     ).toBeVisible();
     await user.click(
       within(dialog).getByRole("button", {
-        name: "Confirm Configuration",
+        name: "Xác nhận cấu hình",
       }),
     );
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
@@ -616,7 +616,7 @@ describe("Auction Configuration preparation and governance UI", () => {
     const user = userEvent.setup();
     renderAdminDetail(submitted.configurationId);
     const opener = screen.getByRole("button", {
-      name: "Request Correction",
+      name: "Yêu cầu chỉnh sửa",
     });
     opener.focus();
     await user.keyboard("{Enter}");

@@ -48,13 +48,13 @@ describe("ADMIN Approval Review intake UI", () => {
       screen.getByRole("button", { name: "Bắt đầu xem xét" }),
     );
     const dialog = screen.getByRole("dialog", {
-      name: "Bắt đầu Approval Review",
+      name: "Bắt đầu thẩm định hồ sơ",
     });
-    expect(dialog).toHaveTextContent("chỉ bắt đầu review intake");
     expect(dialog).toHaveTextContent("Không có quyết định phê duyệt");
-    expect(dialog).toHaveTextContent("Approval Package vẫn bất biến");
-    expect(dialog).toHaveTextContent("DRAFT / NOT_READY");
-    expect(dialog).toHaveTextContent("Không tạo Schedule hoặc Publication");
+    expect(dialog).toHaveTextContent("Không có quyết định phê duyệt");
+    expect(dialog).toHaveTextContent("Hồ sơ đã gửi vẫn được giữ nguyên");
+    expect(dialog).toHaveTextContent("bản nháp/chưa sẵn sàng");
+    expect(dialog).toHaveTextContent("Không tạo lịch hoặc bản công bố");
   });
 
   it("starts once, shows IN_REVIEW, and exposes no decision controls", async () => {
@@ -90,9 +90,9 @@ describe("ADMIN Approval Review intake UI", () => {
     expect(
       screen.queryByRole("button", { name: "Bắt đầu xem xét" }),
     ).not.toBeInTheDocument();
-    await user.click(screen.getByRole("link", { name: "Mở Approval Review" }));
+    await user.click(screen.getByRole("link", { name: "Bắt đầu thẩm định" }));
     expect(
-      screen.getByRole("heading", { level: 1, name: "Approval Review" }),
+      screen.getByRole("heading", { level: 1, name: "Thẩm định hồ sơ" }),
     ).toBeInTheDocument();
     expect(screen.getByText(/chưa có quyết định phê duyệt/)).toBeInTheDocument();
     for (const name of ["Approve", "Return", "Reject"])

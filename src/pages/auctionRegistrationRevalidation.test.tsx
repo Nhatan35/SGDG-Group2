@@ -176,7 +176,7 @@ describe("Corrected Registration Revalidation UI", () => {
     );
     expect(
       screen.getByRole("heading", {
-        name: "Customer-safe Revalidation Result",
+        name: "Kết quả kiểm tra lại đăng ký",
       }),
     ).toBeInTheDocument();
     expect(

@@ -3,6 +3,7 @@ import { type FormEvent, useMemo, useState } from "react";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Badge } from "../../components/common/Badge";
 import { Button } from "../../components/common/Button";
+import { ResilientImage } from "../../components/common/ResilientImage";
 import {
   EmptyState,
   ErrorState,
@@ -23,6 +24,7 @@ import { useAuctionSessionStore } from "../../store/auctionSessionStore";
 import { formatDateTime, formatMoney } from "../../utils/format";
 import { NotFoundPage } from "../NotFoundPage";
 import "../../styles/opening-request-customer.css";
+import "../../styles/opening-request-enhancements.css";
 import "../../styles/opening-request-lifecycle.css";
 
 const statusTone = (status: CustomerOpeningRequest["status"]) =>
@@ -209,6 +211,9 @@ export function OpeningRequestListPage() {
 type FormValues = {
   title: string;
   assetReference: string;
+  assetCategory: string;
+  assetCondition: string;
+  assetImageUrl: string;
   purpose: string;
   proposedStartPrice: string;
   customerNotes: string;
@@ -218,6 +223,9 @@ type FormValues = {
 const fromRecord = (record?: CustomerOpeningRequest): FormValues => ({
   title: record?.title ?? "",
   assetReference: record?.assetReference ?? "",
+  assetCategory: record?.assetCategory ?? "",
+  assetCondition: record?.assetCondition ?? "",
+  assetImageUrl: record?.assetImageUrl ?? "",
   purpose: record?.purpose ?? "",
   proposedStartPrice: record?.proposedStartPrice?.toString() ?? "",
   customerNotes: record?.customerNotes ?? "",
@@ -257,6 +265,9 @@ export function OpeningRequestFormPage({
   const fields = {
     title: values.title.trim(),
     assetReference: values.assetReference.trim(),
+    assetCategory: values.assetCategory,
+    assetCondition: values.assetCondition.trim(),
+    assetImageUrl: values.assetImageUrl,
     purpose: values.purpose.trim(),
     proposedStartPrice: values.proposedStartPrice
       ? Number(values.proposedStartPrice)
@@ -503,6 +514,70 @@ export function OpeningRequestFormPage({
             <small className="field-error">{errors.assetReference}</small>
           )}
         </label>
+        <section className="opening-request-asset-details wide" aria-labelledby="asset-details-title">
+          <header>
+            <h2 id="asset-details-title">Thông tin nhận diện tài sản</h2>
+            <p>Thông tin và hình ảnh giúp SGDG đối chiếu đúng tài sản khi tiếp nhận hồ sơ.</p>
+          </header>
+          <div className="opening-request-asset-fields">
+            <label>
+              <span>Loại tài sản</span>
+              <select
+                disabled={!editable}
+                value={values.assetCategory}
+                onChange={(event) =>
+                  setValues({ ...values, assetCategory: event.target.value })
+                }
+              >
+                <option value="">Chọn loại tài sản</option>
+                <option>Đồng hồ</option>
+                <option>Trang sức</option>
+                <option>Nghệ thuật</option>
+                <option>Đồ cổ</option>
+                <option>Xe cộ</option>
+                <option>Bất động sản</option>
+                <option>Khác</option>
+              </select>
+            </label>
+            <label>
+              <span>Tình trạng tài sản</span>
+              <input
+                disabled={!editable}
+                placeholder="Ví dụ: mới, đã qua sử dụng, còn nguyên hộp"
+                value={values.assetCondition}
+                onChange={(event) =>
+                  setValues({ ...values, assetCondition: event.target.value })
+                }
+              />
+            </label>
+          </div>
+          <div className="opening-request-image-field">
+            <label>
+              <span>Hình ảnh tài sản</span>
+              <input
+                type="file"
+                accept="image/png,image/jpeg,image/webp"
+                disabled={!editable}
+                onChange={(event) => {
+                  const file = event.target.files?.[0];
+                  if (!file) return;
+                  const reader = new FileReader();
+                  reader.onload = () =>
+                    setValues({ ...values, assetImageUrl: String(reader.result ?? "") });
+                  reader.readAsDataURL(file);
+                }}
+              />
+              <small>PNG, JPG hoặc WebP. Ảnh rõ toàn bộ tài sản sẽ giúp rút ngắn bước đối chiếu.</small>
+            </label>
+            <div className="opening-request-image-preview">
+              {values.assetImageUrl ? (
+                <ResilientImage src={values.assetImageUrl} alt="Ảnh tài sản đã chọn" />
+              ) : (
+                <span>Chưa có ảnh tài sản</span>
+              )}
+            </div>
+          </div>
+        </section>
         <label className="wide">
           <span>Mục đích đấu giá</span>
           <textarea

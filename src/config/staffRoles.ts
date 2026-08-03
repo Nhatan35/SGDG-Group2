@@ -8,8 +8,8 @@ export const staffRoleMeta: Record<
   ADMIN: {
     label: "Admin",
     workspace: "/admin",
-    eyebrow: "ADMINISTRATION & GOVERNANCE",
-    description: "Quản trị truy cập, phê duyệt, cấu hình, audit và báo cáo.",
+    eyebrow: "QUẢN TRỊ & ĐIỀU PHỐI",
+    description: "Quản trị truy cập, phê duyệt, cấu hình, nhật ký và báo cáo.",
   },
   CUSTOMER_SUPPORT: {
     label: "Customer Support",
@@ -19,9 +19,9 @@ export const staffRoleMeta: Record<
       "Ticket, khiếu nại, tranh chấp, tra cứu được phép và chuyển cấp.",
   },
   CONTENT_STAFF: {
-    label: "Content Staff",
+    label: "Nhân viên nội dung",
     workspace: "/ops",
-    eyebrow: "AUCTION OPERATIONS",
+    eyebrow: "NỘI DUNG & VẬN HÀNH ĐẤU GIÁ",
     description: "Tài sản, nội dung, chuẩn bị phiên, vận hành và bàn giao.",
   },
   FINANCE: {
@@ -40,9 +40,18 @@ export function workspaceForRole(role: ActorRole): string {
 }
 export const demoStaffAccounts: Record<string, StaffRole> = {
   "admin@sgdg.demo": "ADMIN",
+  "admin.checker@sgdg.demo": "ADMIN",
   "support@sgdg.demo": "CUSTOMER_SUPPORT",
   "content@sgdg.demo": "CONTENT_STAFF",
   "finance@sgdg.demo": "FINANCE",
+};
+
+export const demoStaffNames: Record<string, string> = {
+  "admin@sgdg.demo": "Nguyễn Hoàng Nam",
+  "admin.checker@sgdg.demo": "Trần Ngọc Anh",
+  "support@sgdg.demo": "Chuyên viên CSKH",
+  "content@sgdg.demo": "Lê Thu Hà",
+  "finance@sgdg.demo": "Chuyên viên Finance",
 };
 
 export function canVisitStaffPath(role: StaffRole, path: string): boolean {
@@ -58,7 +67,6 @@ export function canVisitStaffPath(role: StaffRole, path: string): boolean {
     return (
       path === "/ops" ||
       path.startsWith("/ops/") ||
-      path.startsWith("/admin/assets") ||
       path.startsWith("/cms")
     );
   return (

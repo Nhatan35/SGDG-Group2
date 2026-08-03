@@ -116,7 +116,7 @@ test("SGDG-managed Configuration derives the ordinary Room but blocks submission
   await page.goto(`/governance/auction-configurations/${configurationId}`);
   await expect(page.getByText(blocker).first()).toBeVisible();
   await expect(
-    page.getByRole("button", { name: "Confirm Configuration" }),
+    page.getByRole("button", { name: "Xác nhận cấu hình" }),
   ).toHaveCount(0);
   await expect(page.getByText(/snapshot-v/)).toHaveCount(0);
 

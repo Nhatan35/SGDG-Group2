@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-test("customer deposits per auction and an unpaid live auction opens the deposit gate", async ({
+test("customer deposits during registration and can enter a live auction without a second deposit gate", async ({
   page,
 }) => {
   await page.goto("/auth/login");
@@ -69,23 +69,11 @@ test("customer deposits per auction and an unpaid live auction opens the deposit
   });
 
   await page.goto("/auctions/rolex-126610lv/live");
-  await expect(page.getByText("Chưa đặt cọc cho phiên này")).toBeVisible();
   await page.getByRole("button", { name: "Đặt giá thủ công" }).click();
   await expect(
     page.getByRole("heading", {
-      name: "Xác nhận đặt cọc để tham gia đấu giá",
+      name: "Nhập mức giá của bạn",
     }),
-  ).toBeVisible();
-  await expect(page.getByText("38.000.000 ₫", { exact: true })).toBeVisible();
-  await page.getByRole("button", { name: "Đồng ý đặt cọc" }).click();
-  await expect(
-    page.getByRole("heading", {
-      name: "Bạn đã đủ điều kiện tham gia đấu giá",
-    }),
-  ).toBeVisible();
-  await page.getByRole("button", { name: "Vào đấu giá" }).click();
-  await expect(
-    page.getByRole("heading", { name: "Nhập mức giá của bạn" }),
   ).toBeVisible();
 
   const liveDeposit = await page.evaluate(() => {
@@ -93,12 +81,12 @@ test("customer deposits per auction and an unpaid live auction opens the deposit
     if (!raw) return null;
     const parsed = JSON.parse(raw);
     return {
-      amount: parsed.state.auctionDeposits["rolex-126610lv"],
+      hasDeposit: Boolean(parsed.state.auctionDeposits["rolex-126610lv"]),
       walletBalance: parsed.state.walletBalance,
     };
   });
   expect(liveDeposit).toEqual({
-    amount: 38_000_000,
-    walletBalance: 19_000_000,
+    hasDeposit: false,
+    walletBalance: 57_000_000,
   });
 });

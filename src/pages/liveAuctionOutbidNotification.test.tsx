@@ -108,7 +108,10 @@ describe("live auction outbid notification", () => {
     expect(leaderboard).not.toBeNull();
     expect(within(leaderboard!).queryByText("Bạn")).not.toBeInTheDocument();
     expect(within(leaderboard!).getByText("SBD 027")).toBeInTheDocument();
-    expect(screen.getByText("Chưa đặt cọc cho phiên này")).toBeInTheDocument();
+    expect(screen.queryByText("Chưa đặt cọc cho phiên này")).not.toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Đặt giá thủ công" }),
+    ).toBeEnabled();
   });
 
   it("automatically closes the success popup after one minute", () => {
