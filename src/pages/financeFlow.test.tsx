@@ -80,6 +80,31 @@ describe("customer payout to Finance UI flow", () => {
     ).toBeInTheDocument();
   }, 15_000);
 
+  it("tops up the wallet directly from the balance card", async () => {
+    const user = userEvent.setup();
+    renderInRouter(<WalletPage />);
+
+    await user.click(
+      screen.getByRole("button", { name: /^Nạp tiền$/ }),
+    );
+    expect(
+      screen.getByRole("dialog", { name: "Bổ sung số dư khả dụng" }),
+    ).toBeInTheDocument();
+
+    await user.type(screen.getByLabelText("Số tiền muốn nạp"), "15000000");
+    await user.click(
+      screen.getByRole("button", { name: "Xác nhận nạp tiền" }),
+    );
+
+    expect(useDemoStore.getState().walletBalance).toBe(140_000_000);
+    expect(screen.getByRole("status")).toHaveTextContent(
+      "Nạp 15.000.000 ₫ vào ví thành công",
+    );
+    expect(
+      screen.queryByRole("dialog", { name: "Bổ sung số dư khả dụng" }),
+    ).not.toBeInTheDocument();
+  });
+
   it("switches report views and produces visible export feedback", async () => {
     const user = userEvent.setup();
     renderInRouter(<FinanceReportsPage />);
