@@ -121,7 +121,11 @@ export function LiveAuctionShowcase({ auctions }: { auctions: Auction[] }) {
                 <Clock3 aria-hidden="true" />
                 <span>Kết thúc sau</span>
               </div>
-              <AuctionStatus auction={selectedAuction} showBadge={false} />
+              <AuctionStatus
+                auction={selectedAuction}
+                showBadge={false}
+                segmented
+              />
             </div>
 
             <div className="home-live-price">

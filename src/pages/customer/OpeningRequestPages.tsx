@@ -61,7 +61,11 @@ const historyLabel: Record<OpeningRequestHistoryAction, string> = {
   ROUTE_TO_GOVERNED_REVIEW: "Chuyển xem xét quản trị",
 };
 
-export function OpeningRequestListPage() {
+export function OpeningRequestListPage({
+  basePath = "/account/opening-requests",
+}: {
+  basePath?: string;
+}) {
   const records = useOpeningRequestStore((state) => state.records);
   const [params, setParams] = useSearchParams();
   const query = params.get("q") ?? "";
@@ -107,7 +111,7 @@ export function OpeningRequestListPage() {
           <h1>Yêu cầu đấu giá của tôi</h1>
           <p>Theo dõi, hoàn thiện và gửi yêu cầu mở phiên đấu giá.</p>
         </div>
-        <Link className="button primary" to="/account/opening-requests/new">
+        <Link className="button primary" to={`${basePath}/new`}>
           <Plus aria-hidden="true" /> Tạo yêu cầu mở phiên
         </Link>
       </header>
@@ -173,7 +177,7 @@ export function OpeningRequestListPage() {
                   </dl>
                   <Link
                     className="button secondary"
-                    to={`/account/opening-requests/${item.requestId}`}
+                    to={`${basePath}/${item.requestId}`}
                   >
                     {actionLabel(item.status)}
                   </Link>
@@ -198,7 +202,7 @@ export function OpeningRequestListPage() {
           description="Tạo yêu cầu đầu tiên để SGDG tiếp nhận và xem xét tài sản."
           icon={<ClipboardList />}
           primaryAction={
-            <Link className="button primary" to="/account/opening-requests/new">
+            <Link className="button primary" to={`${basePath}/new`}>
               Tạo yêu cầu mở phiên
             </Link>
           }
@@ -234,8 +238,10 @@ const fromRecord = (record?: CustomerOpeningRequest): FormValues => ({
 
 export function OpeningRequestFormPage({
   create = false,
+  basePath = "/account/opening-requests",
 }: {
   create?: boolean;
+  basePath?: string;
 }) {
   const { requestId } = useParams();
   const navigate = useNavigate();
@@ -313,7 +319,7 @@ export function OpeningRequestFormPage({
     setErrors({});
     setMessage("Đã lưu bản nháp.");
     if (create)
-      navigate(`/account/opening-requests/${result.data.requestId}`, {
+      navigate(`${basePath}/${result.data.requestId}`, {
         replace: true,
       });
   };
@@ -355,7 +361,7 @@ export function OpeningRequestFormPage({
       return;
     }
     setErrors({});
-    navigate(`/account/opening-requests/${result.data.requestId}`, {
+    navigate(`${basePath}/${result.data.requestId}`, {
       replace: true,
     });
   };
@@ -375,7 +381,7 @@ export function OpeningRequestFormPage({
     <main className="opening-request-page">
       <header className="opening-request-heading compact">
         <div>
-          <Link to="/account/opening-requests">← Yêu cầu của tôi</Link>
+          <Link to={basePath}>← Yêu cầu của tôi</Link>
           <h1>
             {create
               ? "Tạo yêu cầu mở phiên"

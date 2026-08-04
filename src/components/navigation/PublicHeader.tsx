@@ -20,10 +20,11 @@ import { useDemoStore } from "../../store/demoStore";
 import { formatMoney } from "../../utils/format";
 
 const links = [
-  { to: "/", label: "Trang chủ" },
-  { to: "/auctions", label: "Phiên đấu giá" },
-  { to: "/news", label: "Tin tức" },
-  { to: "/help", label: "Hướng dẫn" },
+  { to: "/", label: "Trang chủ", end: true },
+  { to: "/auctions", label: "Phiên đấu giá", end: true },
+  { to: "/open-auction", label: "Mở đấu giá", end: false },
+  { to: "/news", label: "Tin tức", end: true },
+  { to: "/help", label: "Hướng dẫn", end: true },
 ];
 
 export function PublicHeader() {
@@ -76,7 +77,7 @@ export function PublicHeader() {
             <NavLink
               key={x.to}
               to={x.to}
-              end
+              end={x.end}
               onClick={() => setOpen(false)}
             >
               {x.label}

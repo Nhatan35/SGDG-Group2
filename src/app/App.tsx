@@ -169,6 +169,10 @@ import {
   OpeningRequestFormPage,
   OpeningRequestListPage,
 } from "../pages/customer/OpeningRequestPages";
+import {
+  OpenAuctionEligibilityGuard,
+  OpenAuctionPage,
+} from "../pages/customer/OpenAuctionPage";
 import { AuctionCustomerRegistrationPage } from "../pages/customer/AuctionCustomerRegistrationPage";
 import { AuctionRegistrationCorrectionPage } from "../pages/customer/AuctionRegistrationCorrectionPage";
 import {
@@ -365,6 +369,47 @@ export function App() {
             element={<PublicLivestreamPage />}
           />
           <Route
+            path="/open-auction"
+            element={
+              <CustomerGuard>
+                <OpenAuctionPage />
+              </CustomerGuard>
+            }
+          />
+          <Route
+            path="/open-auction/requests"
+            element={
+              <CustomerGuard>
+                <OpenAuctionEligibilityGuard>
+                  <OpeningRequestListPage basePath="/open-auction/requests" />
+                </OpenAuctionEligibilityGuard>
+              </CustomerGuard>
+            }
+          />
+          <Route
+            path="/open-auction/requests/new"
+            element={
+              <CustomerGuard>
+                <OpenAuctionEligibilityGuard>
+                  <OpeningRequestFormPage
+                    create
+                    basePath="/open-auction/requests"
+                  />
+                </OpenAuctionEligibilityGuard>
+              </CustomerGuard>
+            }
+          />
+          <Route
+            path="/open-auction/requests/:requestId"
+            element={
+              <CustomerGuard>
+                <OpenAuctionEligibilityGuard>
+                  <OpeningRequestFormPage basePath="/open-auction/requests" />
+                </OpenAuctionEligibilityGuard>
+              </CustomerGuard>
+            }
+          />
+          <Route
             element={
               <CustomerGuard>
                 <AccountLayout />
@@ -388,15 +433,27 @@ export function App() {
             <Route path="/account/bids" element={<MyBidsPage />} />
             <Route
               path="/account/opening-requests"
-              element={<OpeningRequestListPage />}
+              element={
+                <OpenAuctionEligibilityGuard>
+                  <OpeningRequestListPage />
+                </OpenAuctionEligibilityGuard>
+              }
             />
             <Route
               path="/account/opening-requests/new"
-              element={<OpeningRequestFormPage create />}
+              element={
+                <OpenAuctionEligibilityGuard>
+                  <OpeningRequestFormPage create />
+                </OpenAuctionEligibilityGuard>
+              }
             />
             <Route
               path="/account/opening-requests/:requestId"
-              element={<OpeningRequestFormPage />}
+              element={
+                <OpenAuctionEligibilityGuard>
+                  <OpeningRequestFormPage />
+                </OpenAuctionEligibilityGuard>
+              }
             />
             <Route path="/account/support" element={<CustomerSupportHome />} />
             <Route
