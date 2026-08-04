@@ -1,0 +1,26 @@
+{
+  "/assets/catalog-generated/antique-07.jpg": {
+    "src": "/images/auction-room/generated-display/antique-07.png",
+    "mode": "cutout"
+  },
+  "/assets/catalog-generated/fashion-07.jpg": {
+    "src": "/images/auction-room/generated-display/fashion-07.png",
+    "mode": "cutout"
+  },
+  "/assets/catalog-generated/collectible-07.jpg": {
+    "src": "/images/auction-room/generated-display/collectible-07.png",
+    "mode": "cutout"
+  },
+  "/assets/catalog-generated/phone-13.jpg": {
+    "src": "/images/auction-room/generated-display/phone-13.png",
+    "mode": "cutout"
+  },
+  "/assets/catalog-generated/vehicle-13.jpg": {
+    "src": "/images/auction-room/generated-display/vehicle-13.png",
+    "mode": "cutout"
+  },
+  "/assets/catalog-generated/art-13.jpg": {
+    "src": "/images/auction-room/generated-display/art-13.webp",
+    "mode": "framed-art"
+  }
+}

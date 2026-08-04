@@ -33,7 +33,6 @@ import {
   canEnterAuction,
   useEligibilityWorkflowStore,
 } from "../../store/eligibilityWorkflowStore";
-import { useDemoStore } from "../../store/demoStore";
 import { formatMoney } from "../../utils/format";
 import { useDemoClock } from "../../hooks/useDemoClock";
 import "../../styles/live-auction-room.css";
@@ -41,7 +40,6 @@ import "../../styles/live-deposit-gate.css";
 import "../../styles/live-auction-mocks.css";
 import "../../styles/live-auction-room-redesign.css";
 import "../../styles/live-outbid-notification.css";
-import "../../styles/live-auction-luxury-bidding.css";
 
 type Step = "entry" | "confirmation" | "validating" | "result";
 type Outcome =
@@ -63,20 +61,19 @@ type DepositStep = "confirm" | "need-topup" | "gateway" | "success";
 
 const rule = "QD-2026.07";
 const currentUserBidderNumber = "SBD 018";
-const defaultLeaderboard = [
-  { bidderNumber: "SBD 027", amount: 450_000_000, bids: 16 },
-  { bidderNumber: "SBD 031", amount: 445_000_000, bids: 12 },
-  { bidderNumber: "SBD 044", amount: 440_000_000, bids: 9 },
-  { bidderNumber: "SBD 052", amount: 435_000_000, bids: 7 },
-  { bidderNumber: "SBD 068", amount: 430_000_000, bids: 5 },
-] satisfies LeaderboardEntry[];
-const patekLeaderboard = [
-  { bidderNumber: "SBD 027", amount: 3_250_000_000, bids: 16 },
-  { bidderNumber: "SBD 031", amount: 3_225_000_000, bids: 12 },
-  { bidderNumber: "SBD 044", amount: 3_200_000_000, bids: 9 },
-  { bidderNumber: "SBD 052", amount: 3_175_000_000, bids: 7 },
-  { bidderNumber: "SBD 068", amount: 3_150_000_000, bids: 5 },
-] satisfies LeaderboardEntry[];
+function createLeaderboard(
+  currentPrice: number,
+  minimumIncrement: number,
+): LeaderboardEntry[] {
+  const bidderNumbers = ["SBD 027", "SBD 031", "SBD 044", "SBD 052", "SBD 068"];
+  const bidCounts = [16, 12, 9, 7, 5];
+
+  return bidderNumbers.map((bidderNumber, index) => ({
+    bidderNumber,
+    amount: Math.max(0, currentPrice - minimumIncrement * index),
+    bids: bidCounts[index],
+  }));
+}
 
 function AuctionMetrics() {
   const metrics = [
@@ -131,12 +128,12 @@ function LeaderboardPanel({
           <Crown aria-hidden="true" />
           Bảng xếp hạng đấu giá
         </h2>
-        <div className="leaderboard-header-meta">
-          <span className="leaderboard-bidder-number">
-            Số báo danh của bạn: <b>018</b>
-          </span>
-        </div>
+        <span className="leaderboard-live-state">Tự động cập nhật</span>
       </header>
+      <nav className="leaderboard-controls" aria-label="Cách xếp hạng">
+        <button className="is-active">Theo giá đấu</button>
+        <button>Theo hoạt động</button>
+      </nav>
       <ol>
         {leaderboard.map((entry, index) => (
           <li
@@ -173,8 +170,8 @@ function LeaderboardPanel({
         ))}
       </ol>
       <p className="leaderboard-note">
-        <Users aria-hidden="true" /> Danh tính được bảo mật bằng số báo danh.
-        Mỗi bước giá đều được ghi nhận minh bạch.
+        <Users aria-hidden="true" /> Cạnh tranh rất sát sao! Mỗi bước giá đều
+        quan trọng.
       </p>
     </section>
   );
@@ -369,8 +366,8 @@ function ManualBidModal({
             <strong>{formatMoney(amount)}</strong>
           </>
         )}
-        {step === "result" && (
-          outcome === "accepted" ? (
+        {step === "result" &&
+          (outcome === "accepted" ? (
             <div className="bid-success-luxury" role="status" aria-live="polite">
               <div className="bid-paddle-rays" aria-hidden="true" />
               <div className="bid-paddle-board">
@@ -385,9 +382,7 @@ function ManualBidModal({
                     Bạn vừa ra giá thành công
                   </span>
                 </div>
-                <p>
-                  Đã ghi nhận thành công · Bạn đang dẫn đầu
-                </p>
+                <p>Đã ghi nhận thành công · Bạn đang dẫn đầu</p>
               </div>
               <div className="bid-paddle-handle" aria-hidden="true">
                 <i />
@@ -403,8 +398,7 @@ function ManualBidModal({
                 <Button onClick={onClose}>Đóng</Button>
               </div>
             </>
-          )
-        )}
+          ))}
     </Dialog>
   );
 }
@@ -644,40 +638,66 @@ export function LiveAuctionRoomPage() {
   const registration = useEligibilityWorkflowStore((store) =>
     store.registrations.find((item) => item.auctionId === auctionId),
   );
-  const { walletBalance, auctionDeposits, topUpWallet, payAuctionDeposit } =
-    useDemoStore();
-  const depositAmount = auction ? Math.ceil(auction.startPrice * 0.1) : 0;
-  const depositedAmount = auctionId ? (auctionDeposits[auctionId] ?? 0) : 0;
-  const hasPaidDeposit = depositedAmount > 0;
-  const isPatek = auction?.id === "patek-nautilus";
-  const initialLeaderboard = isPatek ? patekLeaderboard : defaultLeaderboard;
-  const initialActivities = isPatek
-    ? [
-        "10:05:12 · SBD 027 vừa đặt 3.250.000.000 ₫",
-        "10:04:50 · SBD 031 vừa đặt 3.225.000.000 ₫",
-        "10:03:31 · SBD 027 vừa lên vị trí #1",
-        "10:02:05 · SBD 044 vừa đặt 3.200.000.000 ₫",
-        "10:01:42 · SBD 052 vừa đặt 3.175.000.000 ₫",
-        "10:00:12 · Phiên đấu giá được mở",
-      ]
-    : [
-        "10:05:12 · SBD 027 vừa đặt 450.000.000 ₫",
-        "10:04:50 · SBD 031 vừa đặt 445.000.000 ₫",
-        "10:03:31 · SBD 027 vừa lên vị trí #1",
-        "10:01:42 · SBD 044 vừa đặt 440.000.000 ₫",
-        "10:00:12 · Phiên đấu giá được mở",
-      ];
-  const [price, setPrice] = useState(() => auction?.currentPrice ?? 0);
+  const initialPrice = auction?.currentPrice ?? 0;
+  const initialIncrement = auction?.minimumIncrement ?? 0;
+  const initialLeaderboard = createLeaderboard(
+    initialPrice,
+    initialIncrement,
+  );
+  const initialActivities = [
+    `10:05:12 · Bạn vừa đặt ${formatMoney(initialPrice)}`,
+    `10:04:50 · Mi***A vừa đặt ${formatMoney(Math.max(0, initialPrice - initialIncrement))}`,
+    "10:03:31 · Bạn vừa lên vị trí #1",
+    `10:02:05 · An***B vừa đặt ${formatMoney(Math.max(0, initialPrice - initialIncrement * 2))}`,
+    "10:00:12 · Phiên đấu giá được mở",
+  ];
+  const [price, setPrice] = useState(initialPrice);
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>(() =>
     initialLeaderboard.map((entry) => ({ ...entry })),
   );
   const [activityItems, setActivityItems] =
     useState<string[]>(initialActivities);
-  const [bidHistory, setBidHistory] = useState<UserBidRecord[]>([]);
-  const [accepted, setAccepted] = useState(false);
-  const [depositAction, setDepositAction] = useState<DepositAction | null>(
-    null,
+  const [bidHistory, setBidHistory] = useState<UserBidRecord[]>(() =>
+    auction?.id === "patek-nautilus"
+      ? [
+          {
+            id: "patek-user-bid-004",
+            amount: 3_250_000_000,
+            source: "manual",
+            result: "accepted",
+            createdAt: "2026-07-18T10:05:12+07:00",
+            officialPriceAfterBid: 3_250_000_000,
+          },
+          {
+            id: "patek-user-bid-003",
+            amount: 3_200_000_000,
+            source: "auto",
+            result: "accepted",
+            createdAt: "2026-07-18T10:02:38+07:00",
+            officialPriceAfterBid: 3_200_000_000,
+          },
+          {
+            id: "patek-user-bid-002",
+            amount: 3_150_000_000,
+            source: "manual",
+            result: "accepted",
+            createdAt: "2026-07-18T09:58:44+07:00",
+            officialPriceAfterBid: 3_150_000_000,
+          },
+          {
+            id: "patek-user-bid-001",
+            amount: 3_125_000_000,
+            source: "manual",
+            result: "rejected",
+            createdAt: "2026-07-18T09:55:16+07:00",
+            rejectionCode: "stale-price",
+            rejectionReason:
+              "Giá chính thức đã thay đổi trước khi bạn xác nhận.",
+          },
+        ]
+      : [],
   );
+  const [accepted, setAccepted] = useState(false);
   const [isOutbid, setIsOutbid] = useState(false);
   const [outbidNotice, setOutbidNotice] = useState<OutbidNotice | null>(null);
   const [manualBidPrefill, setManualBidPrefill] = useState<number | null>(null);
@@ -749,36 +769,12 @@ export function LiveAuctionRoomPage() {
       next.set("panel", nextPanel);
       return next;
     });
-  const showManualBid = () => {
+  const openManualBid = () => {
     setManualBidPrefill(null);
     setManualBidRequestId((current) => current + 1);
     openPanel("manual-bid");
   };
-  const openManualBid = () => {
-    if (!hasPaidDeposit) {
-      setDepositAction("manual-bid");
-      return;
-    }
-    showManualBid();
-  };
-  const showAutoBid = () => openPanel("autobid");
-  const openAutoBid = () => {
-    if (!hasPaidDeposit) {
-      setDepositAction("autobid");
-      return;
-    }
-    showAutoBid();
-  };
-  const confirmDeposit = (topUpAmount: number) => {
-    if (topUpAmount > 0) topUpWallet(topUpAmount);
-    payAuctionDeposit(auction.id, depositAmount);
-  };
-  const continueAfterDeposit = () => {
-    const requestedAction = depositAction;
-    setDepositAction(null);
-    if (requestedAction === "manual-bid") showManualBid();
-    if (requestedAction === "autobid") showAutoBid();
-  };
+  const openAutoBid = () => openPanel("autobid");
   const closePanel = () =>
     setParams((current) => {
       const next = new URLSearchParams(current);
@@ -846,10 +842,7 @@ export function LiveAuctionRoomPage() {
               isCurrentUser: true,
             },
           ];
-
-      return updatedEntries.sort(
-        (first, second) => second.amount - first.amount,
-      );
+      return updatedEntries.sort((first, second) => second.amount - first.amount);
     });
     setActivityItems((items) =>
       [
@@ -1133,21 +1126,11 @@ export function LiveAuctionRoomPage() {
                 </button>
               </div>
             )}
-            <div
-              className={`deposit-inline-status ${hasPaidDeposit ? "paid" : ""}`}
-            >
-              {hasPaidDeposit ? <ShieldCheck /> : <Wallet />}
+            <div className="deposit-inline-status paid">
+              <ShieldCheck />
               <div>
-                <strong>
-                  {hasPaidDeposit
-                    ? "Đặt cọc đã được xác nhận"
-                    : "Chưa đặt cọc cho phiên này"}
-                </strong>
-                <span>
-                  {hasPaidDeposit
-                    ? `Đã ghi nhận ${formatMoney(depositedAmount)}. Quyền đặt giá đã được mở.`
-                    : `Cần đặt cọc ${formatMoney(depositAmount)} trước khi đặt giá.`}
-                </span>
+                <strong>Đặt cọc đã được xác nhận khi đăng ký</strong>
+                <span>Quyền đặt giá của bạn đã được mở cho phiên này.</span>
               </div>
             </div>
             <Button
@@ -1200,20 +1183,7 @@ export function LiveAuctionRoomPage() {
           <LeaderboardPanel leaderboard={leaderboard} isOutbid={isOutbid} />
         </aside>
       </div>
-      {depositAction && (
-        <DepositGateModal
-          key={`${auction.id}:${depositAction}`}
-          action={depositAction}
-          auctionName={auction.assetName}
-          startPrice={auction.startPrice}
-          depositAmount={depositAmount}
-          walletBalance={walletBalance}
-          onCancel={() => setDepositAction(null)}
-          onContinue={continueAfterDeposit}
-          onConfirmDeposit={confirmDeposit}
-        />
-      )}
-      {hasPaidDeposit && panel === "manual-bid" && (
+      {panel === "manual-bid" && (
         <ManualBidModal
           key={manualBidRequestId}
           price={price}
@@ -1241,7 +1211,7 @@ export function LiveAuctionRoomPage() {
           }
         />
       )}
-      {hasPaidDeposit && panel === "autobid" && (
+      {panel === "autobid" && (
         <AutoBidDrawer
           currentPrice={price}
           minimumNextBid={minimum}

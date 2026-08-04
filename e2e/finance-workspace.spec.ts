@@ -128,7 +128,7 @@ test("Finance override request uses a reviewed three-step flow", async ({
   await page.getByRole("button", { name: "Gửi cho ADMIN duyệt" }).click();
 
   await expect(page).toHaveURL(/\/finance\/override-requests\/FOV-2026-/);
-  await expect(page.getByText("Chờ ADMIN duyệt")).toBeVisible();
+  await expect(page.getByText("Chờ ADMIN duyệt", { exact: true }).first()).toBeVisible();
 });
 
 test("new Finance workspaces stay usable on a mobile viewport", async ({

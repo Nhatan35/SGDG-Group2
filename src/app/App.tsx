@@ -107,9 +107,9 @@ import {
   AdminAuctionsPage,
   AdminLoginPage,
   AdminPaymentsPage,
-  AdminUsersPage,
   LiveOpsPage,
 } from "../pages/admin/AdminPages";
+import { CustomerGovernancePage } from "../pages/admin/CustomerGovernancePage";
 import {
   AdminGuard,
   CustomerGuard,
@@ -152,6 +152,7 @@ import {
   DisputeQueue,
   DisputeWorkspace,
   KnowledgeGapQueue,
+  RetentionHoldGovernancePage,
   SupportDashboard,
   TicketQueue,
   TicketWorkspace,
@@ -794,6 +795,14 @@ export function App() {
               </InternalRoleGuard>
             }
           />
+          <Route
+            path="/governance/retention-holds"
+            element={
+              <InternalRoleGuard roles={["ADMIN"]}>
+                <RetentionHoldGovernancePage />
+              </InternalRoleGuard>
+            }
+          />
           <Route path="/support" element={<SupportDashboard />} />
           <Route
             path="/support/conversations"
@@ -840,6 +849,14 @@ export function App() {
           />
           <Route path="/finance/settlements" element={<SettlementsPage />} />
           <Route path="/finance/reports" element={<FinanceReportsPage />} />
+          <Route
+            path="/ops/assets"
+            element={
+              <InternalRoleGuard roles={["CONTENT_STAFF"]}>
+                <AdminAssetsPage />
+              </InternalRoleGuard>
+            }
+          />
           <Route path="/admin/settings" element={<Navigate to="/admin/configurations" replace />} />
           <Route path="/admin" element={<AdministrationDashboardPage />} />
           <Route path="/admin/workforce" element={<WorkforcePage />} />
@@ -853,7 +870,7 @@ export function App() {
           <Route path="/admin/notifications" element={<NotificationGovernancePage />} />
           <Route path="/admin/search-governance" element={<SearchGovernancePage />} />
           <Route path="/admin/report-snapshots" element={<ReportSnapshotsPage />} />
-          <Route path="/admin/users" element={<AdminUsersPage />} />
+          <Route path="/admin/users" element={<CustomerGovernancePage />} />
           <Route path="/admin/assets" element={<AdminAssetsPage />} />
           <Route path="/admin/auctions" element={<AdminAuctionsPage />} />
           <Route path="/admin/live-ops/:auctionId" element={<LiveOpsPage />} />

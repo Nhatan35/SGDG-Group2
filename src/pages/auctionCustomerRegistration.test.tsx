@@ -40,10 +40,10 @@ describe("Customer Registration page", () => {
     const prepared = prepareOpenRegistrationWindow();
     renderRegistration(prepared.session.sessionId);
     expect(
-      screen.getByRole("heading", { level: 1, name: "Auction Registration" }),
+      screen.getByRole("heading", { level: 1, name: "Đăng ký tham gia đấu giá" }),
     ).toBeInTheDocument();
     await user.click(
-      screen.getByRole("button", { name: "Tạo Registration Draft" }),
+      screen.getByRole("button", { name: "Tạo bản nháp đăng ký" }),
     );
     expect(screen.getByText("DRAFT / v1")).toBeInTheDocument();
     expect(
@@ -65,14 +65,14 @@ describe("Customer Registration page", () => {
     const prepared = prepareOpenRegistrationWindow();
     renderRegistration(prepared.session.sessionId);
     await user.click(
-      screen.getByRole("button", { name: "Tạo Registration Draft" }),
+      screen.getByRole("button", { name: "Tạo bản nháp đăng ký" }),
     );
-    const submit = screen.getByRole("button", { name: "Gửi Registration" });
+    const submit = screen.getByRole("button", { name: "Gửi đăng ký" });
     expect(submit).toBeDisabled();
-    await user.click(screen.getByRole("checkbox", { name: /accept/i }));
+    await user.click(screen.getByRole("checkbox", { name: /đồng ý/i }));
     expect(submit).toBeDisabled();
-    await user.click(screen.getByRole("button", { name: "Lưu Draft" }));
-    expect(screen.getByRole("button", { name: "Gửi Registration" }))
+    await user.click(screen.getByRole("button", { name: "Lưu bản nháp" }));
+    expect(screen.getByRole("button", { name: "Gửi đăng ký" }))
       .toBeEnabled();
   });
 
@@ -81,17 +81,17 @@ describe("Customer Registration page", () => {
     const prepared = prepareOpenRegistrationWindow();
     renderRegistration(prepared.session.sessionId);
     await user.click(
-      screen.getByRole("button", { name: "Tạo Registration Draft" }),
+      screen.getByRole("button", { name: "Tạo bản nháp đăng ký" }),
     );
-    await user.click(screen.getByRole("checkbox", { name: /accept/i }));
-    await user.click(screen.getByRole("button", { name: "Lưu Draft" }));
+    await user.click(screen.getByRole("checkbox", { name: /đồng ý/i }));
+    await user.click(screen.getByRole("button", { name: "Lưu bản nháp" }));
     await user.click(
-      screen.getByRole("button", { name: "Gửi Registration" }),
+      screen.getByRole("button", { name: "Gửi đăng ký" }),
     );
     expect(screen.getByText("SUBMITTED / v3")).toBeInTheDocument();
-    expect(screen.getByRole("checkbox", { name: /accept/i })).toBeDisabled();
+    expect(screen.getByRole("checkbox", { name: /đồng ý/i })).toBeDisabled();
     expect(
-      screen.queryByRole("button", { name: "Gửi Registration" }),
+      screen.queryByRole("button", { name: "Gửi đăng ký" }),
     ).not.toBeInTheDocument();
     expect(screen.getByText(/2026-08-01T01:30:00/)).toBeInTheDocument();
   });
@@ -100,16 +100,16 @@ describe("Customer Registration page", () => {
     const prepared = prepareOpenRegistrationWindow();
     renderRegistration(prepared.session.sessionId);
     expect(
-      screen.getByText("Submitting Registration does not confirm eligibility."),
+      screen.getByText("Gửi đăng ký không đồng nghĩa khách hàng đã đủ điều kiện tham gia."),
     ).toBeInTheDocument();
     expect(
       screen.getByText(
-        "Membership, Deposit, and Eligibility checks have not started.",
+        "Chưa bắt đầu kiểm tra hạng thành viên, tiền cọc và điều kiện tham gia.",
       ),
     ).toBeInTheDocument();
     expect(
       screen.getByText(
-        "The Auction is not publicly published by this action.",
+        "Thao tác này không tự động công khai phiên đấu giá.",
       ),
     ).toBeInTheDocument();
   });
@@ -120,9 +120,9 @@ describe("Customer Registration page", () => {
       const prepared = prepareOpenRegistrationWindow();
       useDemoStore.setState({ actorRole });
       renderRegistration(prepared.session.sessionId);
-      expect(screen.getByText("Unauthorized")).toBeInTheDocument();
+      expect(screen.getByText("Không có quyền truy cập")).toBeInTheDocument();
       expect(
-        screen.queryByRole("button", { name: "Tạo Registration Draft" }),
+        screen.queryByRole("button", { name: "Tạo bản nháp đăng ký" }),
       ).not.toBeInTheDocument();
     },
   );
@@ -144,7 +144,7 @@ describe("Customer Registration page", () => {
     renderRegistration(prepared.session.sessionId);
     expect(screen.queryByText("CUS-OTHER-001")).not.toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: "Tạo Registration Draft" }),
+      screen.getByRole("button", { name: "Tạo bản nháp đăng ký" }),
     ).toBeInTheDocument();
   });
 });

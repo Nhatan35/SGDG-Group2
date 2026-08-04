@@ -107,10 +107,10 @@ export function AuctionRegistrationCorrectionPage() {
   if (actorRole !== "CUSTOMER")
     return (
       <main className="schedule-confirmation-page">
-        <h1>Registration Correction Draft</h1>
+        <h1>Bản nháp chỉnh sửa đăng ký</h1>
         <BlockedState
-          title="Unauthorized"
-          description="Only the owning CUSTOMER can access Registration correction."
+          title="Không có quyền truy cập"
+          description="Chỉ khách hàng sở hữu hồ sơ mới được chỉnh sửa đăng ký này."
         />
       </main>
     );
@@ -118,10 +118,10 @@ export function AuctionRegistrationCorrectionPage() {
   if (!registration || !validation)
     return (
       <main className="schedule-confirmation-page">
-        <h1>Registration Correction Draft</h1>
+        <h1>Bản nháp chỉnh sửa đăng ký</h1>
         <BlockedState
-          title="Correction unavailable"
-          description="A submitted owned Registration and Validation Record are required."
+          title="Chưa thể chỉnh sửa đăng ký"
+          description="Cần có hồ sơ đăng ký đã gửi và kết quả kiểm tra tương ứng."
         />
       </main>
     );
@@ -163,7 +163,7 @@ export function AuctionRegistrationCorrectionPage() {
     });
     if (!result.ok) return setError(correctionError(result));
     setRulesAccepted(result.correctionDraft.rulesAccepted);
-    setMessage("Correction Draft created.");
+    setMessage("Đã tạo bản nháp chỉnh sửa.");
   };
 
   const save = () => {
@@ -181,8 +181,8 @@ export function AuctionRegistrationCorrectionPage() {
     if (!result.ok) return setError(correctionError(result));
     setMessage(
       result.changed
-        ? "Correction Draft saved."
-        : "Correction Draft is unchanged.",
+        ? "Đã lưu bản nháp chỉnh sửa."
+        : "Bản nháp chỉnh sửa không có thay đổi.",
     );
   };
 
@@ -205,16 +205,16 @@ export function AuctionRegistrationCorrectionPage() {
     setConfirmationOpen(false);
     setMessage(
       result.created
-        ? "Corrected Registration resubmitted."
-        : "Corrected Resubmission already recorded.",
+        ? "Đã gửi lại đăng ký sau chỉnh sửa."
+        : "Lần gửi lại này đã được ghi nhận trước đó.",
     );
   };
 
   return (
     <main className="schedule-confirmation-page">
       <header className="approval-package-heading">
-        <span>AUTHENTICATED CUSTOMER · CORRECTION AND RESUBMISSION</span>
-        <h1>Registration Correction Draft</h1>
+        <span>KHÁCH HÀNG · CHỈNH SỬA VÀ GỬI LẠI ĐĂNG KÝ</span>
+        <h1>Bản nháp chỉnh sửa đăng ký</h1>
         <p>{PROTOTYPE_REGISTRATION_CORRECTION_MODEL}</p>
       </header>
 
@@ -223,34 +223,34 @@ export function AuctionRegistrationCorrectionPage() {
         aria-labelledby="correction-source"
       >
         <div className="schedule-confirmation-title">
-          <h2 id="correction-source">Immutable Source Evidence</h2>
-          <Badge tone="warning">CORRECTION REQUIRED</Badge>
+          <h2 id="correction-source">Thông tin gốc chỉ đọc</h2>
+          <Badge tone="warning">CẦN CHỈNH SỬA</Badge>
         </div>
         <dl className="schedule-confirmation-evidence">
-          <dt>Original Registration ID / version</dt>
+          <dt>Mã / phiên bản đăng ký gốc</dt>
           <dd>
             {registration.registrationId} / v
             {registration.registrationVersion}
           </dd>
-          <dt>Original Registration status</dt>
+          <dt>Trạng thái đăng ký gốc</dt>
           <dd>{registration.status}</dd>
-          <dt>Validation result</dt>
+          <dt>Kết quả kiểm tra</dt>
           <dd>
             {validation.outcome} / {validation.correctability} /{" "}
             {validation.nextStep}
           </dd>
-          <dt>Validation ID</dt>
+          <dt>Mã kết quả kiểm tra</dt>
           <dd>{validation.validationId}</dd>
-          <dt>Customer identity</dt>
+          <dt>Mã khách hàng</dt>
           <dd>{CURRENT_CUSTOMER_ID}</dd>
-          <dt>Correction Draft status / version</dt>
+          <dt>Trạng thái / phiên bản bản nháp chỉnh sửa</dt>
           <dd>
             {correctionDraft
               ? `${correctionDraft.status} / v${correctionDraft.correctionVersion}`
               : "NOT CREATED"}
           </dd>
         </dl>
-        <h3>Correctable findings</h3>
+        <h3>Nội dung có thể chỉnh sửa</h3>
         <ul>
           {validation.findings.map((item) => (
             <li key={item.code}>
@@ -262,7 +262,7 @@ export function AuctionRegistrationCorrectionPage() {
 
       {!correctionDraft && !correctionEligibility.eligible && (
         <section className="approval-package-card">
-          <h2>Correction blocked</h2>
+          <h2>Chưa thể chỉnh sửa</h2>
           <p role="alert">
             {correctionEligibility.code}: {correctionEligibility.message}
           </p>
@@ -271,14 +271,14 @@ export function AuctionRegistrationCorrectionPage() {
 
       {!correctionDraft && correctionEligibility.eligible && (
         <section className="approval-package-card">
-          <h2>Create Correction Draft</h2>
-          <Button onClick={create}>Create Correction Draft</Button>
+          <h2>Tạo bản nháp chỉnh sửa</h2>
+          <Button onClick={create}>Tạo bản nháp chỉnh sửa</Button>
         </section>
       )}
 
       {correctionDraft && (
         <section className="approval-package-card">
-          <h2>Supported correction data</h2>
+          <h2>Nội dung được phép chỉnh sửa</h2>
           <label>
             <input
               type="checkbox"
@@ -286,11 +286,11 @@ export function AuctionRegistrationCorrectionPage() {
               disabled={Boolean(resubmission)}
               onChange={(event) => setRulesAccepted(event.target.checked)}
             />{" "}
-            I accept the Auction rules
+            Tôi đã đọc và đồng ý với quy tắc đấu giá
           </label>
           {!resubmission && (
             <div className="approval-package-actions">
-              <Button onClick={save}>Save Correction Draft</Button>
+              <Button onClick={save}>Lưu bản nháp chỉnh sửa</Button>
             </div>
           )}
         </section>
@@ -300,11 +300,11 @@ export function AuctionRegistrationCorrectionPage() {
         !resubmission &&
         resubmissionEligibility?.eligible && (
           <section className="approval-package-card">
-            <h2>Corrected Resubmission</h2>
-            <p>Correction Draft: {correctionDraft.status}</p>
-            <p>Resubmission: NOT STARTED</p>
+            <h2>Gửi lại đăng ký đã chỉnh sửa</h2>
+            <p>Bản nháp chỉnh sửa: {correctionDraft.status}</p>
+            <p>Gửi lại: CHƯA BẮT ĐẦU</p>
             <Button onClick={() => setConfirmationOpen(true)}>
-              Resubmit Corrected Registration
+              Gửi lại đăng ký
             </Button>
           </section>
         )}
@@ -322,23 +322,23 @@ export function AuctionRegistrationCorrectionPage() {
 
       {resubmission && (
         <section className="approval-package-card">
-          <h2>Resubmission outcome</h2>
+          <h2>Kết quả gửi lại đăng ký</h2>
           <dl className="schedule-confirmation-evidence">
-            <dt>Original Registration</dt>
+            <dt>Đăng ký gốc</dt>
             <dd>{registration.status}</dd>
-            <dt>Previous Validation</dt>
+            <dt>Kết quả kiểm tra trước đó</dt>
             <dd>{validation.nextStep}</dd>
-            <dt>Correction Draft</dt>
+            <dt>Bản nháp chỉnh sửa</dt>
             <dd>{correctionDraft?.status ?? "NOT CREATED"}</dd>
-            <dt>Corrected Resubmission</dt>
+            <dt>Đăng ký gửi lại</dt>
             <dd>{resubmission.status}</dd>
-            <dt>Next Step</dt>
+            <dt>Bước tiếp theo</dt>
             <dd>{resubmission.nextStep}</dd>
-            <dt>Membership</dt>
+            <dt>Hạng thành viên</dt>
             <dd>NOT CHECKED</dd>
-            <dt>Deposit</dt>
+            <dt>Tiền cọc</dt>
             <dd>NOT CHECKED</dd>
-            <dt>Eligibility</dt>
+            <dt>Điều kiện tham gia</dt>
             <dd>NOT EVALUATED</dd>
           </dl>
         </section>
@@ -346,19 +346,19 @@ export function AuctionRegistrationCorrectionPage() {
 
       {revalidation && (
         <section className="approval-package-card">
-          <h2>Customer-safe Revalidation Result</h2>
+          <h2>Kết quả kiểm tra lại đăng ký</h2>
           <dl className="schedule-confirmation-evidence">
-            <dt>Revalidation</dt>
+            <dt>Kết quả kiểm tra lại</dt>
             <dd>{revalidation.outcome}</dd>
-            <dt>Next Step</dt>
+            <dt>Bước tiếp theo</dt>
             <dd>{revalidation.nextStep}</dd>
-            <dt>Safe result</dt>
+            <dt>Trạng thái hiển thị</dt>
             <dd>
               {revalidation.nextStep === "READY_FOR_MEMBERSHIP_CHECK"
-                ? "Ready for Membership Check"
+                ? "Sẵn sàng kiểm tra hạng thành viên"
                 : revalidation.nextStep === "CORRECTION_REQUIRED_AGAIN"
-                  ? "Correction Required Again"
-                  : "Stopped"}
+                  ? "Cần chỉnh sửa lại"
+                  : "Đã dừng xử lý"}
             </dd>
           </dl>
         </section>
@@ -366,19 +366,19 @@ export function AuctionRegistrationCorrectionPage() {
 
       {membershipCheck && (
         <section className="approval-package-card">
-          <h2>Customer-safe Membership Result</h2>
+          <h2>Kết quả kiểm tra hạng thành viên</h2>
           <dl className="schedule-confirmation-evidence">
-            <dt>Membership outcome</dt>
+            <dt>Kết quả</dt>
             <dd>{membershipCheck.outcome}</dd>
-            <dt>Next Step</dt>
+            <dt>Bước tiếp theo</dt>
             <dd>{membershipCheck.nextStep}</dd>
-            <dt>Safe result</dt>
+            <dt>Trạng thái hiển thị</dt>
             <dd>
               {membershipCheck.nextStep === "READY_FOR_DEPOSIT_CHECK"
-                ? "Ready for Deposit Check"
+                ? "Sẵn sàng kiểm tra tiền cọc"
                 : membershipCheck.nextStep === "MEMBERSHIP_INELIGIBLE"
-                  ? "Membership Ineligible"
-                  : "Membership Review Required"}
+                  ? "Hạng thành viên chưa đủ điều kiện"
+                  : "Cần xem xét hạng thành viên"}
             </dd>
           </dl>
         </section>
@@ -386,20 +386,20 @@ export function AuctionRegistrationCorrectionPage() {
 
       {depositCheck && (
         <section className="approval-package-card">
-          <h2>Customer-safe Deposit Result</h2>
+          <h2>Kết quả kiểm tra tiền cọc</h2>
           <dl className="schedule-confirmation-evidence">
-            <dt>Deposit outcome</dt>
+            <dt>Kết quả</dt>
             <dd>{depositCheck.outcome}</dd>
-            <dt>Next Step</dt>
+            <dt>Bước tiếp theo</dt>
             <dd>{depositCheck.nextStep}</dd>
-            <dt>Safe result</dt>
+            <dt>Trạng thái hiển thị</dt>
             <dd>
               {depositCheck.nextStep ===
               "READY_FOR_ELIGIBILITY_EVALUATION"
-                ? "Ready for Eligibility Evaluation"
+                ? "Sẵn sàng đánh giá điều kiện tham gia"
                 : depositCheck.nextStep === "DEPOSIT_NOT_SATISFIED"
-                  ? "Deposit Not Satisfied"
-                  : "Deposit Review Required"}
+                  ? "Tiền cọc chưa đáp ứng"
+                  : "Cần xem xét tiền cọc"}
             </dd>
           </dl>
         </section>
@@ -409,17 +409,17 @@ export function AuctionRegistrationCorrectionPage() {
       {error && <p role="alert">{error}</p>}
 
       <section className="approval-package-card">
-        <h2>Correction boundary</h2>
-        {!resubmission && <p>This saves a correction draft only.</p>}
-        <p>The original submitted Registration remains unchanged.</p>
-        {!resubmission && <p>Resubmission has not started.</p>}
-        <p>Membership, Deposit, and Eligibility processing has not started.</p>
+        <h2>Phạm vi chỉnh sửa</h2>
+        {!resubmission && <p>Thao tác này chỉ lưu bản nháp chỉnh sửa.</p>}
+        <p>Hồ sơ đăng ký đã gửi ban đầu vẫn được giữ nguyên.</p>
+        {!resubmission && <p>Quá trình gửi lại chưa bắt đầu.</p>}
+        <p>Chưa bắt đầu xử lý hạng thành viên, tiền cọc và điều kiện tham gia.</p>
       </section>
 
       <Dialog
         open={confirmationOpen}
         onOpenChange={setConfirmationOpen}
-        title="Confirm Corrected Registration Resubmission"
+        title="Xác nhận gửi lại đăng ký đã chỉnh sửa"
         description={PROTOTYPE_REGISTRATION_RESUBMISSION_POLICY}
         footer={
           <>
@@ -427,39 +427,39 @@ export function AuctionRegistrationCorrectionPage() {
               variant="secondary"
               onClick={() => setConfirmationOpen(false)}
             >
-              Cancel
+              Hủy
             </Button>
             <Button onClick={resubmit}>
-              Confirm Resubmission
+              Xác nhận gửi lại
             </Button>
           </>
         }
       >
         <dl className="schedule-confirmation-evidence">
-          <dt>Original Registration ID / version</dt>
+          <dt>Mã / phiên bản đăng ký gốc</dt>
           <dd>
             {registration.registrationId} / v
             {registration.registrationVersion}
           </dd>
-          <dt>Previous Validation ID</dt>
+          <dt>Mã kết quả kiểm tra trước đó</dt>
           <dd>{validation.validationId}</dd>
-          <dt>Correction Draft ID / version</dt>
+          <dt>Mã / phiên bản bản nháp chỉnh sửa</dt>
           <dd>
             {correctionDraft?.correctionDraftId ?? "NOT CREATED"} / v
             {correctionDraft?.correctionVersion ?? 0}
           </dd>
-          <dt>Corrected rules acceptance</dt>
+          <dt>Xác nhận quy tắc sau chỉnh sửa</dt>
           <dd>
             {correctionDraft?.rulesAccepted ? "ACCEPTED" : "NOT ACCEPTED"}
           </dd>
-          <dt>Customer identity</dt>
+          <dt>Mã khách hàng</dt>
           <dd>{CURRENT_CUSTOMER_ID}</dd>
         </dl>
-        <p>This creates a corrected Resubmission Record.</p>
+        <p>Thao tác này tạo bản ghi gửi lại đăng ký đã chỉnh sửa.</p>
         <p>
-          The original Registration and previous Validation remain unchanged.
+          Đăng ký gốc và kết quả kiểm tra trước đó vẫn được giữ nguyên.
         </p>
-        <p>Membership, Deposit, and Eligibility checks do not start.</p>
+        <p>Thao tác này chưa khởi chạy kiểm tra hạng thành viên, tiền cọc và điều kiện tham gia.</p>
       </Dialog>
     </main>
   );

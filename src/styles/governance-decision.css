@@ -1,0 +1,289 @@
+.governance-decision-page {
+  width: min(100%, 1480px);
+  margin-inline: auto;
+}
+.decision-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 12px;
+  color: var(--sgdg-orange-700);
+  font-size: 12px;
+  font-weight: 800;
+}
+.decision-back-link svg {
+  width: 16px;
+}
+.governance-decision-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 20px;
+  border: 1px solid #efcdb4;
+  border-left: 5px solid var(--sgdg-orange-600);
+  border-radius: 15px;
+  padding: 22px 26px;
+  background:
+    radial-gradient(circle at 92% 20%, #f9dfcf 0, transparent 25%),
+    var(--sgdg-white);
+  box-shadow: var(--shadow-sm);
+}
+.governance-decision-hero > div {
+  max-width: 900px;
+}
+.governance-decision-hero span {
+  color: var(--sgdg-orange-700);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .11em;
+}
+.governance-decision-hero h1 {
+  margin: 5px 0;
+  font-size: 31px;
+}
+.governance-decision-hero p {
+  margin: 0;
+  color: var(--sgdg-text-secondary);
+}
+.decision-status {
+  flex: 0 0 auto;
+  border-radius: 999px;
+  padding: 8px 12px;
+  font-size: 11px;
+}
+.decision-status.pending,
+.decision-status.evidence_requested {
+  color: #8a570d;
+  background: var(--sgdg-sand);
+}
+.decision-status.approved {
+  color: var(--sgdg-success);
+  background: var(--sgdg-sage-100);
+}
+.decision-status.rejected {
+  color: var(--sgdg-danger);
+  background: #fbe7e4;
+}
+.governance-decision-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(360px, .75fr);
+  gap: 18px;
+  align-items: start;
+}
+.governance-decision-main {
+  display: grid;
+  gap: 16px;
+}
+.governance-decision-main > article,
+.governance-decision-rail {
+  padding: 22px;
+}
+.decision-section-heading {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.decision-section-heading > span {
+  display: grid;
+  flex: 0 0 42px;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border-radius: 11px;
+  color: var(--sgdg-orange-700);
+  background: var(--sgdg-orange-100);
+}
+.decision-section-heading > span svg {
+  width: 20px;
+}
+.decision-section-heading small {
+  color: var(--sgdg-orange-700);
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: .09em;
+}
+.decision-section-heading h2 {
+  margin: 2px 0 0;
+  font-size: 21px;
+  line-height: 1.3;
+}
+.decision-section-heading.compact h2 {
+  font-size: 19px;
+}
+.decision-summary-card > p {
+  color: var(--sgdg-text-secondary);
+}
+.decision-impact {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 18px;
+}
+.decision-impact > div {
+  display: flex;
+  gap: 10px;
+  min-height: 88px;
+  border: 1px solid var(--sgdg-border);
+  border-radius: 11px;
+  padding: 13px;
+  background: #faf8f5;
+}
+.decision-impact > div.will-change {
+  border-color: #efbd93;
+  background: var(--sgdg-orange-50);
+}
+.decision-impact svg {
+  flex: 0 0 auto;
+  width: 18px;
+  color: var(--sgdg-orange-700);
+}
+.decision-impact span,
+.decision-impact strong {
+  display: block;
+}
+.decision-impact span {
+  color: var(--sgdg-text-secondary);
+  font-size: 11px;
+}
+.decision-impact strong {
+  margin-bottom: 4px;
+  color: var(--sgdg-charcoal);
+  font-size: 12px;
+}
+.eligibility-impact {
+  grid-template-columns: repeat(3, 1fr);
+}
+.decision-reference-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 20px;
+  margin: 0 0 18px;
+}
+.decision-reference-grid > div {
+  padding: 11px 0;
+  border-top: 1px solid var(--sgdg-border);
+}
+.decision-reference-grid dt {
+  color: var(--sgdg-text-secondary);
+  font-size: 10px;
+}
+.decision-reference-grid dd {
+  margin: 3px 0 0;
+  font-size: 12px;
+  font-weight: 800;
+}
+.decision-evidence-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.decision-evidence-list span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 8px;
+  padding: 8px 10px;
+  color: var(--sgdg-text-secondary);
+  background: #faf8f5;
+  font-size: 11px;
+  font-weight: 700;
+}
+.decision-evidence-list svg {
+  width: 15px;
+  color: var(--sgdg-orange-700);
+}
+.governance-decision-rail {
+  position: sticky;
+  top: 84px;
+}
+.governance-decision-rail label {
+  display: grid;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 800;
+}
+.governance-decision-rail textarea {
+  min-height: 128px;
+  width: 100%;
+  border: 1px solid var(--sgdg-border);
+  border-radius: 9px;
+  padding: 10px;
+  resize: vertical;
+}
+.decision-guidance {
+  margin: 0 0 14px;
+  border-left: 3px solid var(--sgdg-orange-500);
+  padding: 9px 11px;
+  color: var(--sgdg-text-secondary);
+  background: var(--sgdg-orange-50);
+  font-size: 11px;
+}
+.decision-history-heading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 22px;
+  border-top: 1px solid var(--sgdg-border);
+  padding-top: 17px;
+}
+.decision-history-heading svg {
+  width: 18px;
+  color: var(--sgdg-orange-700);
+}
+.decision-history-heading h3 {
+  margin: 0;
+  font-size: 15px;
+}
+.decision-history {
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.decision-history li {
+  position: relative;
+  display: grid;
+  gap: 2px;
+  margin-left: 7px;
+  border-left: 2px solid #ead9cc;
+  padding: 7px 0 12px 16px;
+}
+.decision-history li::before {
+  position: absolute;
+  top: 11px;
+  left: -5px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--sgdg-orange-600);
+  content: "";
+}
+.decision-history strong {
+  font-size: 11px;
+}
+.decision-history span,
+.decision-history small {
+  color: var(--sgdg-text-secondary);
+  font-size: 10px;
+}
+@media (max-width: 1050px) {
+  .governance-decision-grid {
+    grid-template-columns: 1fr;
+  }
+  .governance-decision-rail {
+    position: static;
+  }
+}
+@media (max-width: 700px) {
+  .governance-decision-hero {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 18px;
+  }
+  .decision-impact,
+  .eligibility-impact,
+  .decision-reference-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -59,6 +59,7 @@ interface DemoState {
   authenticated: boolean;
   adminAuthenticated: boolean;
   actorRole: ActorRole;
+  staffEmail: string;
   userName: string;
   walletBalance: number;
   auctionDeposits: Record<string, number>;
@@ -86,7 +87,10 @@ interface DemoState {
   applyAuctionDepositToPayment: (auctionId: string) => void;
   addBankAccount: (account: Omit<LinkedBankAccount, "id">) => void;
   withdrawFromWallet: (amount: number) => void;
-  adminLogin: (role?: Exclude<ActorRole, "CUSTOMER">) => void;
+  adminLogin: (
+    role?: Exclude<ActorRole, "CUSTOMER">,
+    staffEmail?: string,
+  ) => void;
   adminLogout: () => void;
   setKyc: (state: KycState) => void;
   toggleWatch: (id: string) => void;
@@ -98,6 +102,7 @@ export const useDemoStore = create<DemoState>()(
       authenticated: false,
       adminAuthenticated: false,
       actorRole: "CUSTOMER",
+      staffEmail: "",
       userName: "Nguyễn Minh Anh",
       walletBalance: INITIAL_WALLET_BALANCE,
       auctionDeposits: {},
@@ -470,10 +475,10 @@ export const useDemoStore = create<DemoState>()(
         set((state) => ({
           walletBalance: Math.max(0, state.walletBalance - Math.max(0, amount)),
         })),
-      adminLogin: (role = "ADMIN") =>
-        set({ adminAuthenticated: true, actorRole: role }),
+      adminLogin: (role = "ADMIN", staffEmail = "admin@sgdg.demo") =>
+        set({ adminAuthenticated: true, actorRole: role, staffEmail }),
       adminLogout: () =>
-        set({ adminAuthenticated: false, actorRole: "CUSTOMER" }),
+        set({ adminAuthenticated: false, actorRole: "CUSTOMER", staffEmail: "" }),
       setKyc: (kyc) => set({ kyc }),
       toggleWatch: (id) =>
         set((state) => ({
@@ -499,6 +504,10 @@ export const useDemoStore = create<DemoState>()(
               : INITIAL_WALLET_BALANCE,
           auctionDeposits: persisted.auctionDeposits ?? {},
           auctionDepositRecords: persisted.auctionDepositRecords ?? {},
+          staffEmail:
+            typeof persisted.staffEmail === "string"
+              ? persisted.staffEmail
+              : "",
         } as DemoState;
       },
     },

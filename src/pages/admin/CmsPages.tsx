@@ -1,4 +1,4 @@
-﻿import {
+import {
   Archive,
   Check,
   ChevronRight,
@@ -31,6 +31,8 @@ import {
 } from "react-router-dom";
 import { Badge } from "../../components/common/Badge";
 import { useSupportStore } from "../../store/supportStore";
+import { useDemoStore } from "../../store/demoStore";
+import { demoStaffNames } from "../../config/staffRoles";
 import {
   type CmsContent,
   type CmsContentType,
@@ -43,6 +45,7 @@ const statusLabels: Record<CmsStatus, string> = {
   DRAFT: "Bản nháp",
   PENDING_REVIEW: "Chờ duyệt",
   CHANGES_REQUESTED: "Cần chỉnh sửa",
+  APPROVED: "Đã duyệt · chờ xuất bản",
   SCHEDULED: "Đã lên lịch",
   PUBLISHED: "Đã xuất bản",
   ARCHIVED: "Đã lưu trữ",
@@ -58,12 +61,12 @@ const typeLabels: Record<CmsContentType, string> = {
   SESSION_INTRO: "Giới thiệu phiên",
   POLICY: "Chính sách",
   FAQ: "FAQ",
-  KNOWLEDGE_BASE: "Knowledge Base",
+  KNOWLEDGE_BASE: "Kho tri thức",
 };
 function tone(status: CmsStatus) {
   return status === "PUBLISHED"
     ? "success"
-    : status === "PENDING_REVIEW"
+    : status === "PENDING_REVIEW" || status === "APPROVED"
       ? "warning"
       : status === "CHANGES_REQUESTED"
         ? "danger"
@@ -83,7 +86,7 @@ function CmsHeader({
   return (
     <>
       <nav className="cms-breadcrumb">
-        <Link to="/cms">CMS</Link>
+        <Link to="/cms">Quản lý nội dung</Link>
         <ChevronRight />
         <span>{title}</span>
       </nav>
@@ -116,7 +119,7 @@ export function CmsDashboardPage() {
   return (
     <>
       <CmsHeader
-        title="CMS Dashboard"
+        title="Tổng quan nội dung"
         intro="Tổng quan nội dung, lịch xuất bản và livestream."
         action={
           <div className="cms-header-actions">
@@ -205,11 +208,14 @@ export function ContentListPage() {
     deleteDraft = useCmsStore((s) => s.deleteDraft);
   const [query, setQuery] = useState(""),
     [status, setFilter] = useState("ALL"),
+    [category, setCategory] = useState("ALL"),
+    [advancedOpen, setAdvancedOpen] = useState(false),
     [selected, setSelected] = useState<string[]>([]),
     [toast, setToast] = useState("");
   const rows = contents.filter(
     (x) =>
       (status === "ALL" || x.status === status) &&
+      (category === "ALL" || x.category === category) &&
       `${x.title} ${x.category}`.toLowerCase().includes(query.toLowerCase()),
   );
   const act = (text: string, fn: () => void) => {
@@ -243,11 +249,43 @@ export function ContentListPage() {
             </option>
           ))}
         </select>
-        <button className="button secondary">
+        <button
+          className="button secondary"
+          aria-expanded={advancedOpen}
+          onClick={() => setAdvancedOpen((current) => !current)}
+        >
           <Filter />
           Bộ lọc nâng cao
         </button>
       </div>
+      {advancedOpen && (
+        <div className="cms-toolbar">
+          <label>
+            Danh mục
+            <select
+              value={category}
+              onChange={(event) => setCategory(event.target.value)}
+            >
+              <option value="ALL">Tất cả danh mục</option>
+              {[...new Set(contents.map((item) => item.category))].map(
+                (item) => (
+                  <option key={item}>{item}</option>
+                ),
+              )}
+            </select>
+          </label>
+          <button
+            className="button ghost"
+            onClick={() => {
+              setCategory("ALL");
+              setQuery("");
+              setFilter("ALL");
+            }}
+          >
+            Xóa bộ lọc
+          </button>
+        </div>
+      )}
       {selected.length > 0 && (
         <div className="cms-bulk">
           <strong>{selected.length} nội dung đã chọn</strong>
@@ -355,6 +393,18 @@ export function ContentListPage() {
                         <Send />
                       </button>
                     ) : null}
+                    {x.status === "APPROVED" && (
+                      <button
+                        title="Xác nhận xuất bản"
+                        onClick={() =>
+                          act("Đã xuất bản nội dung được duyệt", () =>
+                            setStatus(x.id, "PUBLISHED", "Content Staff xác nhận xuất bản"),
+                          )
+                        }
+                      >
+                        <Check />
+                      </button>
+                    )}
                     <button
                       title="Lưu trữ"
                       onClick={() => act("Đã lưu trữ", () => archive(x.id))}
@@ -384,8 +434,8 @@ export function ContentListPage() {
       <nav className="cms-pagination">
         <button disabled>Trước</button>
         <button className="active">1</button>
-        <button>2</button>
-        <button>Sau</button>
+        <button disabled title="Không còn dữ liệu trang tiếp theo">2</button>
+        <button disabled title="Không còn dữ liệu trang tiếp theo">Sau</button>
       </nav>
       {toast && <Toast text={toast} onClose={() => setToast("")} />}
     </>
@@ -412,6 +462,14 @@ function blankContent(type: CmsContentType = "NEWS"): CmsContent {
 }
 export function ContentEditorPage() {
   const [params] = useSearchParams();
+  const staffEmail = useDemoStore((s) => s.staffEmail);
+  const staffName = demoStaffNames[staffEmail] ?? "Content Staff";
+  const proposalId = params.get("proposal") || undefined;
+  const sourceGap = useSupportStore((s) =>
+    proposalId
+      ? s.knowledgeGaps.find((gap) => gap.proposalId === proposalId)
+      : undefined,
+  );
   const { contentId } = useParams(),
     navigate = useNavigate(),
     items = useCmsStore((s) => s.contents),
@@ -420,11 +478,28 @@ export function ContentEditorPage() {
   const existing = items.find((x) => x.id === contentId);
   const [form, setForm] = useState<CmsContent>(
       existing ??
-        blankContent((params.get("type") as CmsContentType) || "NEWS"),
+        {
+          ...blankContent(
+            (params.get("type") as CmsContentType) || "NEWS",
+          ),
+          author: staffName,
+          ...(sourceGap
+            ? {
+                title: sourceGap.question,
+                slug: `kien-thuc-${sourceGap.id.toLowerCase()}`,
+                category: "Hướng dẫn",
+                summary: `Giải đáp câu hỏi được ghi nhận ${sourceGap.frequency} lần từ kênh hỗ trợ khách hàng.`,
+                body: `Nguồn đề xuất: ${sourceGap.conversationId}\n\nNội dung hướng dẫn:`,
+                sourceProposalId: sourceGap.proposalId,
+              }
+            : {}),
+        },
     ),
     [toast, setToast] = useState("");
   const update = <K extends keyof CmsContent>(key: K, value: CmsContent[K]) =>
     setForm((f) => ({ ...f, [key]: value }));
+  const insertMarkup = (before: string, after = "") =>
+    update("body", `${form.body}${form.body ? "\n" : ""}${before}Nội dung${after}`);
   const persist = (submit = false) => {
     const next = {
       ...form,
@@ -442,13 +517,21 @@ export function ContentEditorPage() {
         intro="Biên tập nội dung, media, SEO và phạm vi hiển thị."
         action={
           <div className="cms-header-actions">
-            <Link
-              className="button secondary"
-              to={form.slug ? `/content/${form.slug}` : "#"}
-            >
-              <Eye />
-              Xem trước
-            </Link>
+            {form.slug ? (
+              <Link className="button secondary" to={`/content/${form.slug}`}>
+                <Eye />
+                Xem trước
+              </Link>
+            ) : (
+              <button
+                className="button secondary"
+                disabled
+                title="Cần nhập slug trước khi xem"
+              >
+                <Eye />
+                Xem trước
+              </button>
+            )}
             <button className="button primary" onClick={() => persist(false)}>
               Lưu bản nháp
             </button>
@@ -457,7 +540,7 @@ export function ContentEditorPage() {
       />
       {form.reviewComment && (
         <div className="cms-review-note">
-          <strong>Yêu cầu chỉnh sửa từ reviewer</strong>
+          <strong>Yêu cầu chỉnh sửa từ người duyệt</strong>
           <p>{form.reviewComment}</p>
         </div>
       )}
@@ -510,22 +593,22 @@ export function ContentEditorPage() {
           <section className="cms-card">
             <h2>Nội dung</h2>
             <div className="cms-rte-toolbar">
-              <button>H1</button>
-              <button>
+              <button type="button" onClick={() => insertMarkup("# ")}>H1</button>
+              <button type="button" onClick={() => insertMarkup("**", "**")}>
                 <b>B</b>
               </button>
-              <button>
+              <button type="button" onClick={() => insertMarkup("_", "_")}>
                 <i>I</i>
               </button>
-              <button>
+              <button type="button" onClick={() => insertMarkup("<u>", "</u>")}>
                 <u>U</u>
               </button>
-              <button>• List</button>
-              <button>1. List</button>
-              <button>Table</button>
-              <button>Image</button>
-              <button>Link</button>
-              <button>Code</button>
+              <button type="button" onClick={() => insertMarkup("- ")}>• Danh sách</button>
+              <button type="button" onClick={() => insertMarkup("1. ")}>1. Danh sách</button>
+              <button type="button" onClick={() => insertMarkup("| Cột 1 | Cột 2 |\n| --- | --- |\n| Giá trị 1 | Giá trị 2 |")}>Bảng</button>
+              <button type="button" onClick={() => insertMarkup("![Mô tả ảnh](/assets/placeholder.png)")}>Ảnh</button>
+              <button type="button" onClick={() => insertMarkup("[Nhãn liên kết](", ")")}>Liên kết</button>
+              <button type="button" onClick={() => insertMarkup("`", "`")}>Mã</button>
             </div>
             <textarea
               className="cms-richtext"
@@ -565,7 +648,7 @@ export function ContentEditorPage() {
               />
             </label>
             <div className="cms-seo-preview wide">
-              <small>Preview URL</small>
+              <small>Đường dẫn xem trước</small>
               <strong>sgdg.vn/content/{form.slug || "slug-noi-dung"}</strong>
               <span>{form.seoTitle || form.title || "SEO title"}</span>
               <p>
@@ -576,10 +659,10 @@ export function ContentEditorPage() {
         </div>
         <aside>
           <section className="cms-card">
-            <h2>Media</h2>
+            <h2>Tệp đa phương tiện</h2>
             <div className="cms-dropzone">
               <Upload />
-              <strong>Kéo thả hoặc chọn media</strong>
+              <strong>Kéo thả hoặc chọn tệp đa phương tiện</strong>
               <small>Ảnh, PDF hoặc video</small>
             </div>
             <label>
@@ -587,10 +670,10 @@ export function ContentEditorPage() {
               <input
                 value={form.featuredImage}
                 onChange={(e) => update("featuredImage", e.target.value)}
-                placeholder="URL từ Media Library"
+                placeholder="URL từ thư viện đa phương tiện"
               />
             </label>
-            <Link to="/cms/media">Mở Media Library</Link>
+            <Link to="/cms/media">Mở thư viện đa phương tiện</Link>
           </section>
           <section className="cms-card">
             <h2>Hiển thị</h2>
@@ -652,7 +735,7 @@ export function MediaLibraryPage() {
   return (
     <>
       <CmsHeader
-        title="Media Library"
+        title="Thư viện đa phương tiện"
         intro="Quản lý ảnh, PDF và video dùng trong nội dung."
         action={
           <label className="button primary">
@@ -671,23 +754,23 @@ export function MediaLibraryPage() {
         <Search />
         <input placeholder="Tìm tên media" />
         <select value={type} onChange={(e) => setType(e.target.value)}>
-          <option value="ALL">Tất cả media</option>
-          <option>IMAGE</option>
+          <option value="ALL">Tất cả tệp</option>
+          <option value="IMAGE">Hình ảnh</option>
           <option>PDF</option>
-          <option>VIDEO</option>
+          <option value="VIDEO">Video</option>
         </select>
         <div className="cms-view-toggle">
           <button
             className={view === "grid" ? "active" : ""}
             onClick={() => setView("grid")}
           >
-            Grid
+            Lưới
           </button>
           <button
             className={view === "table" ? "active" : ""}
             onClick={() => setView("table")}
           >
-            Table
+            Danh sách
           </button>
         </div>
       </div>
@@ -712,19 +795,19 @@ export function MediaLibraryPage() {
             <footer>
               <button onClick={() => navigator.clipboard?.writeText(x.url)}>
                 <Link2 />
-                Copy URL
+                Sao chép URL
               </button>
               <button
                 onClick={() =>
-                  setToast("Chức năng Replace sẵn sàng nhận tệp mới")
+                  setToast("Chức năng thay thế sẵn sàng nhận tệp mới")
                 }
               >
                 <Upload />
-                Replace
+                Thay thế
               </button>
               <button onClick={() => remove(x.id)}>
                 <Trash2 />
-                Delete
+                Xóa
               </button>
             </footer>
           </article>
@@ -901,21 +984,21 @@ function ScopedContentPage({
 }
 export const PolicyManagementPage = () => (
   <ScopedContentPage
-    title="Policy Management"
+    title="Quản lý chính sách"
     intro="Quản lý chính sách có version, hiệu lực và vòng đời phê duyệt."
     types={["POLICY"]}
   />
 );
 export const FaqManagementPage = () => (
   <ScopedContentPage
-    title="FAQ Management"
+    title="Câu hỏi thường gặp"
     intro="Quản lý câu hỏi thường gặp được xuất bản trên trung tâm hỗ trợ."
     types={["FAQ"]}
   />
 );
 export const KnowledgeBasePage = () => (
   <ScopedContentPage
-    title="Knowledge Base"
+    title="Kho tri thức"
     intro="Bài viết tri thức, từ khóa, tài liệu đính kèm và nội dung liên quan."
     types={["KNOWLEDGE_BASE"]}
   />
@@ -1147,7 +1230,7 @@ export function ReplayManagementPage() {
   return (
     <>
       <CmsHeader
-        title="Replay Management"
+        title="Quản lý phát lại"
         intro="Cập nhật, thay thế và xuất bản replay cho livestream đã kết thúc."
       />
       <section className="cms-card">
@@ -1186,8 +1269,19 @@ export function ReplayManagementPage() {
   );
 }
 export function ContentApprovalQueuePage() {
-  const items = useCmsStore((s) => s.contents).filter(
-    (x) => x.status === "PENDING_REVIEW",
+  const [query, setQuery] = useState("");
+  const [category, setCategory] = useState("ALL");
+  const [status, setStatusFilter] = useState<CmsStatus | "ALL">("PENDING_REVIEW");
+  const approvalItems = useCmsStore((s) => s.contents).filter(
+    (x) => x.status !== "DRAFT",
+  );
+  const items = approvalItems.filter(
+    (item) =>
+      (status === "ALL" || item.status === status) &&
+      (category === "ALL" || item.category === category) &&
+      `${item.title} ${item.author}`
+        .toLowerCase()
+        .includes(query.trim().toLowerCase()),
   );
   return (
     <>
@@ -1197,11 +1291,26 @@ export function ContentApprovalQueuePage() {
       />
       <div className="cms-toolbar">
         <Search />
-        <input placeholder="Tìm nội dung hoặc người gửi" />
-        <select>
-          <option>Tất cả danh mục</option>
-          <option>Tin tức</option>
-          <option>Chính sách</option>
+        <input placeholder="Tìm nội dung hoặc người gửi" value={query} onChange={(event) => setQuery(event.target.value)} />
+        <select value={category} onChange={(event) => setCategory(event.target.value)}>
+          <option value="ALL">Tất cả danh mục</option>
+          <option value="Tin tức">Tin tức</option>
+          <option value="Chính sách">Chính sách</option>
+        </select>
+        <select
+          aria-label="Lọc trạng thái phê duyệt"
+          value={status}
+          onChange={(event) =>
+            setStatusFilter(event.target.value as CmsStatus | "ALL")
+          }
+        >
+          <option value="PENDING_REVIEW">Chờ thẩm định</option>
+          <option value="APPROVED">Đã duyệt, chờ xuất bản</option>
+          <option value="CHANGES_REQUESTED">Yêu cầu chỉnh sửa</option>
+          <option value="PUBLISHED">Đã xuất bản</option>
+          <option value="SCHEDULED">Đã lên lịch</option>
+          <option value="ARCHIVED">Đã lưu trữ</option>
+          <option value="ALL">Tất cả lịch sử</option>
         </select>
       </div>
       <div className="cms-table-wrap">
@@ -1229,14 +1338,14 @@ export function ContentApprovalQueuePage() {
                 <td>{x.author}</td>
                 <td>{x.updatedAt}</td>
                 <td>
-                  <Badge tone="warning">Chờ duyệt</Badge>
+                  <Badge tone={tone(x.status)}>{statusLabels[x.status]}</Badge>
                 </td>
                 <td>
                   <Link
                     className="button secondary"
                     to={`/governance/content-approvals/${x.id}`}
                   >
-                    Review
+                    {x.status === "PENDING_REVIEW" ? "Thẩm định" : "Xem chi tiết"}
                   </Link>
                 </td>
               </tr>
@@ -1244,7 +1353,13 @@ export function ContentApprovalQueuePage() {
           </tbody>
         </table>
         {!items.length && (
-          <div className="cms-empty">Không có nội dung đang chờ phê duyệt.</div>
+          <div className="cms-empty">
+            <strong>Không có nội dung phù hợp bộ lọc.</strong>
+            <p>
+              Nội dung sẽ xuất hiện khi Nhân viên nội dung chọn “Gửi phê duyệt”.
+              Các hồ sơ đã xử lý được lưu tại bộ lọc “Tất cả lịch sử”.
+            </p>
+          </div>
         )}
       </div>
     </>
@@ -1255,17 +1370,28 @@ export function ContentApprovalDetailPage() {
     navigate = useNavigate(),
     item = useCmsStore((s) => s.contents.find((x) => x.id === contentId)),
     setStatus = useCmsStore((s) => s.setContentStatus),
+    resolveKnowledgeGap = useSupportStore((s) => s.resolveKnowledgeGap),
+    staffEmail = useDemoStore((s) => s.staffEmail),
     [comment, setComment] = useState(""),
     [toast, setToast] = useState("");
   if (!item) return <div className="cms-empty">Không tìm thấy nội dung.</div>;
+  const actorName = demoStaffNames[staffEmail] ?? staffEmail;
+  const selfApproval = item.author === actorName;
+  const approvalCommentRequired = item.type === "POLICY";
   const decide = (status: CmsStatus, text: string) => {
     setStatus(item.id, status, comment);
+    if (
+      status === "PUBLISHED" &&
+      item.sourceProposalId
+    ) {
+      resolveKnowledgeGap(item.sourceProposalId, item.id);
+    }
     setToast(text);
     window.setTimeout(() => navigate("/governance/content-approvals"), 650);
   };
   return (
     <>
-      <CmsHeader title="Review nội dung" intro={`${item.id} · ${item.title}`} />
+      <CmsHeader title="Thẩm định nội dung" intro={`${item.id} · ${item.title}`} />
       <div className="cms-approval-layout">
         <main>
           <section className="cms-card">
@@ -1296,7 +1422,7 @@ export function ContentApprovalDetailPage() {
             <article>{item.body}</article>
           </section>
           <section className="cms-card">
-            <h2>Media & SEO preview</h2>
+            <h2>Xem trước tệp đa phương tiện và SEO</h2>
             <p>
               <strong>{item.seoTitle}</strong>
             </p>
@@ -1318,7 +1444,7 @@ export function ContentApprovalDetailPage() {
         </main>
         <aside>
           <section className="cms-card cms-review-panel">
-            <h2>Quyết định reviewer</h2>
+            <h2>Quyết định của người duyệt</h2>
             <label>
               Nhận xét
               <textarea
@@ -1329,15 +1455,21 @@ export function ContentApprovalDetailPage() {
             </label>
             <button
               className="button primary"
+              disabled={
+                selfApproval ||
+                (approvalCommentRequired && !comment.trim())
+              }
               onClick={() =>
                 decide(
-                  item.scheduledAt ? "SCHEDULED" : "PUBLISHED",
-                  "Đã phê duyệt nội dung",
+                  item.scheduledAt ? "SCHEDULED" : "APPROVED",
+                  item.scheduledAt
+                    ? "Đã phê duyệt và giữ lịch xuất bản"
+                    : "Đã phê duyệt; chờ Content Staff xác nhận xuất bản",
                 )
               }
             >
               <Check />
-              Approve
+              Phê duyệt
             </button>
             <button
               className="button secondary"
@@ -1347,7 +1479,7 @@ export function ContentApprovalDetailPage() {
               }
             >
               <Pencil />
-              Return for revision
+              Yêu cầu chỉnh sửa
             </button>
             <button
               className="button danger"
@@ -1355,12 +1487,22 @@ export function ContentApprovalDetailPage() {
               onClick={() => decide("ARCHIVED", "Đã từ chối nội dung")}
             >
               <X />
-              Reject
+              Từ chối
             </button>
             <small>
               Admin không sửa trực tiếp nội dung trong bước review để giữ
               maker-checker.
             </small>
+            {selfApproval && (
+              <small>
+                Người tạo nội dung không được tự phê duyệt phiên bản của mình.
+              </small>
+            )}
+            {approvalCommentRequired && !comment.trim() && (
+              <small>
+                Nội dung chính sách bắt buộc có căn cứ phê duyệt.
+              </small>
+            )}
           </section>
         </aside>
       </div>
@@ -1371,6 +1513,7 @@ export function ContentApprovalDetailPage() {
 export function PublicContentPage() {
   const { slug } = useParams(),
     item = useCmsStore((s) => s.contents.find((x) => x.slug === slug));
+  const [shareNotice, setShareNotice] = useState("");
   if (!item)
     return (
       <main className="container page-shell">
@@ -1404,10 +1547,15 @@ export function PublicContentPage() {
           <div className="public-cms-body">{item.body}</div>
           <section>
             <h2>Tài liệu đính kèm</h2>
-            <a href="#">
+            <button
+              className="button ghost"
+              onClick={() =>
+                setShareNotice("Đã mở bản xem trước tài liệu mô phỏng.")
+              }
+            >
               <FileText />
               Tài liệu tham khảo.pdf
-            </a>
+            </button>
           </section>
         </main>
         <aside>
@@ -1418,9 +1566,39 @@ export function PublicContentPage() {
           </section>
           <section>
             <h2>Chia sẻ</h2>
-            <button>Facebook</button>
-            <button>LinkedIn</button>
-            <button>Copy link</button>
+            <button
+              onClick={() => {
+                window.open(
+                  `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`,
+                  "_blank",
+                  "noopener,noreferrer",
+                );
+                setShareNotice("Đã mở cửa sổ chia sẻ Facebook.");
+              }}
+            >
+              Facebook
+            </button>
+            <button
+              onClick={() => {
+                window.open(
+                  `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(window.location.href)}`,
+                  "_blank",
+                  "noopener,noreferrer",
+                );
+                setShareNotice("Đã mở cửa sổ chia sẻ LinkedIn.");
+              }}
+            >
+              LinkedIn
+            </button>
+            <button
+              onClick={() => {
+                void navigator.clipboard?.writeText(window.location.href);
+                setShareNotice("Đã sao chép liên kết.");
+              }}
+            >
+              Sao chép liên kết
+            </button>
+            {shareNotice && <small role="status">{shareNotice}</small>}
           </section>
         </aside>
       </article>
@@ -1504,8 +1682,8 @@ export function KnowledgeProposalInboxPage() {
   return (
     <>
       <CmsHeader
-        title="Knowledge Proposals"
-        intro="Đề xuất từ Customer Support; Content Staff biên tập và gửi phê duyệt trong CMS."
+        title="Đề xuất tri thức"
+        intro="Đề xuất từ Chăm sóc khách hàng; Nhân viên nội dung biên tập và gửi phê duyệt."
       />
       <section className="cms-card">
         {gaps.length ? (
@@ -1519,13 +1697,13 @@ export function KnowledgeProposalInboxPage() {
                   {x.conversationId}
                 </span>
               </div>
-              <Badge tone="warning">CHỜ CONTENT</Badge>
+              <Badge tone="warning">CHỜ NỘI DUNG</Badge>
               <Link
                 className="button secondary"
                 to={`/cms/contents/new?type=KNOWLEDGE_BASE&proposal=${x.proposalId}`}
               >
                 <Pencil />
-                Tạo Knowledge Article
+                Tạo bài viết tri thức
               </Link>
             </div>
           ))
@@ -1534,7 +1712,7 @@ export function KnowledgeProposalInboxPage() {
         )}
       </section>
       <p className="cms-review-note">
-        Knowledge Gap chỉ được đánh dấu Resolved sau khi Knowledge Article tương
+        Khoảng trống tri thức chỉ được đánh dấu đã giải quyết sau khi bài viết tương
         ứng được publish.
       </p>
     </>

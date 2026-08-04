@@ -126,7 +126,7 @@ describe("Customer Membership Check UI", () => {
     );
     expect(
       screen.getByRole("heading", {
-        name: "Customer-safe Membership Result",
+        name: "Kết quả kiểm tra hạng thành viên",
       }),
     ).toBeInTheDocument();
     expect(

@@ -56,6 +56,9 @@ export interface CustomerOpeningRequest {
   ownerId: string;
   title: string;
   assetReference: string;
+  assetCategory?: string;
+  assetCondition?: string;
+  assetImageUrl?: string;
   purpose: string;
   proposedStartPrice: number | null;
   customerNotes: string;
@@ -81,6 +84,9 @@ export type OpeningRequestEditableFields = Pick<
   CustomerOpeningRequest,
   | "title"
   | "assetReference"
+  | "assetCategory"
+  | "assetCondition"
+  | "assetImageUrl"
   | "purpose"
   | "proposedStartPrice"
   | "customerNotes"

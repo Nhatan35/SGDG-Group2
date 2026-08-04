@@ -125,7 +125,7 @@ describe("Customer Deposit Check UI", () => {
     );
     expect(
       screen.getByRole("heading", {
-        name: "Customer-safe Deposit Result",
+        name: "Kết quả kiểm tra tiền cọc",
       }),
     ).toBeInTheDocument();
     expect(

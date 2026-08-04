@@ -111,10 +111,10 @@ test("Customer-requested Configuration resolves, submits, confirms once, and rem
 
   await loginStaff(page, "admin@sgdg.demo");
   await page.goto(`/governance/auction-configurations/${configurationId}`);
-  const opener = page.getByRole("button", { name: "Confirm Configuration" });
+  const opener = page.getByRole("button", { name: "Xác nhận cấu hình" });
   await expect(opener).toBeEnabled();
   await opener.click();
-  const dialog = page.getByRole("dialog", { name: "Confirm Configuration" });
+  const dialog = page.getByRole("dialog", { name: "Xác nhận cấu hình" });
   await expect(dialog).toContainText("MEMBERSHIP-MOCK-V1");
   await expect(dialog).toContainText("VANG");
   await expect(dialog).toContainText("30.000");
@@ -124,7 +124,7 @@ test("Customer-requested Configuration resolves, submits, confirms once, and rem
     "No Approval Package, Schedule or Publication is created.",
   );
   await dialog
-    .getByRole("button", { name: "Confirm Configuration" })
+    .getByRole("button", { name: "Xác nhận cấu hình" })
     .click();
   await expect(page.getByText(/immutable snapshot/)).toBeVisible();
   await expect(page.getByText(/snapshot-v4/).first()).toBeVisible();

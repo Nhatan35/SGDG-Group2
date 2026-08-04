@@ -1,6 +1,10 @@
 import { AlertTriangle, BarChart3, Database } from "lucide-react";
-import { useSearchParams } from "react-router-dom";
+import { useState } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import { getReportsProjection } from "../../services/mock/reportsProjectionService";
+import { demoStaffNames } from "../../config/staffRoles";
+import { useAdministrationStore } from "../../store/administrationStore";
+import { useDemoStore } from "../../store/demoStore";
 import type { ReportSeriesItem, ReportsScenario } from "../../types/domain";
 import { formatDateTime } from "../../utils/format";
 import "../../styles/reports-projection.css";
@@ -13,6 +17,9 @@ const scenarios: ReportsScenario[] = [
 ];
 export function ReportsProjectionPage() {
   const [params, setParams] = useSearchParams();
+  const saveSnapshot = useAdministrationStore((state) => state.saveSnapshot);
+  const staffEmail = useDemoStore((state) => state.staffEmail);
+  const [feedback, setFeedback] = useState("");
   const scenario = scenarios.includes(params.get("scenario") as ReportsScenario)
     ? (params.get("scenario") as ReportsScenario)
     : "default";
@@ -27,7 +34,7 @@ export function ReportsProjectionPage() {
   if (params.get("view") === "loading" || scenario === "loading")
     return (
       <main className="reports-page">
-        <h1>Reports Projection</h1>
+        <h1>Báo cáo quản trị</h1>
         <div className="reports-skeleton">
           <i />
           <i />
@@ -39,7 +46,7 @@ export function ReportsProjectionPage() {
   if (params.get("view") === "error" || scenario === "error")
     return (
       <main className="reports-page">
-        <h1>Reports Projection</h1>
+        <h1>Báo cáo quản trị</h1>
         <p className="reports-error">
           Không thể tải projection. Filter hiện tại vẫn được giữ.
         </p>
@@ -55,8 +62,8 @@ export function ReportsProjectionPage() {
     <main className="reports-page">
       <header className="reports-header">
         <span>ADM-002 · REPORTS PROJECTION</span>
-        <h1>Reports Projection</h1>
-        <p>Summary mô phỏng cho Operations, Candidate, Payment và Handover.</p>
+        <h1>Báo cáo quản trị</h1>
+        <p>Tổng hợp chỉ đọc cho phiên đấu giá, điều kiện tham gia, tài chính và bàn giao.</p>
       </header>
       <p className="reports-disclosure">
         <Database />
@@ -65,13 +72,13 @@ export function ReportsProjectionPage() {
       {fixture.stale && (
         <p className="reports-stale">
           <AlertTriangle />
-          Projection có thể đã cũ. Hãy mở workspace nguồn để xem trạng thái hiện
+          Dữ liệu báo cáo có thể đã cũ. Hãy mở không gian nghiệp vụ nguồn để xem trạng thái hiện
           tại.
         </p>
       )}
       <section className="reports-filters">
         <label>
-          Period
+          Kỳ báo cáo
           <select
             value={params.get("period") || "30d"}
             onChange={(event) => set("period", event.target.value)}
@@ -82,20 +89,59 @@ export function ReportsProjectionPage() {
           </select>
         </label>
         <label>
-          Domain
+          Nghiệp vụ
           <select
             value={params.get("domain") || "all"}
             onChange={(event) => set("domain", event.target.value)}
           >
             <option value="all">Tất cả domain</option>
             <option value="auction">Auction</option>
-            <option value="candidate">Candidate</option>
-            <option value="payment">Payment</option>
-            <option value="handover">Handover</option>
+            <option value="candidate">Ứng viên</option>
+            <option value="payment">Thanh toán</option>
+            <option value="handover">Bàn giao</option>
           </select>
         </label>
         <span>{fixture.periodLabel}</span>
       </section>
+      <div className="report-filters">
+        <button
+          className="button primary"
+          disabled={scenario === "no-data"}
+          onClick={() => {
+            const period = params.get("period") || "30d";
+            const domain = params.get("domain") || "all";
+            saveSnapshot({
+              report: "Báo cáo quản trị",
+              period: fixture.periodLabel,
+              actor: demoStaffNames[staffEmail] ?? staffEmail,
+              freshness: formatDateTime(fixture.projectionAsOf),
+              completeness: fixture.stale ? "Một phần" : "100%",
+              filters: `Kỳ: ${period} · Nghiệp vụ: ${domain}`,
+              values: fixture.kpis
+                .map((item) => `${item.label}: ${item.value}`)
+                .join(" · "),
+            });
+            setFeedback("Đã lưu bản chụp với bộ lọc và giá trị hiện tại.");
+          }}
+        >
+          Lưu bản chụp hiện tại
+        </button>
+        <button
+          className="button secondary"
+          disabled={scenario === "no-data"}
+          onClick={() =>
+            setFeedback(
+              "Đã chuẩn bị bản xuất mô phỏng; thao tác được xem là sự kiện audit.",
+            )
+          }
+        >
+          Xuất báo cáo
+        </button>
+        <Link className="button secondary" to="/admin/report-snapshots">
+          Xem lịch sử bản chụp
+        </Link>
+        {feedback && <span role="status">{feedback}</span>}
+      </div>
       {scenario === "no-data" ? (
         <p className="reports-empty">
           Không có dữ liệu fixture cho filter này. Disclosure và filters vẫn giữ
@@ -109,38 +155,38 @@ export function ReportsProjectionPage() {
                 <strong>{kpi.value}</strong>
                 <h2>{kpi.label}</h2>
                 <p>{kpi.description}</p>
-                <small>Projection mock · non-authoritative</small>
+                <small>Dữ liệu mô phỏng · không phải nguồn quyết định</small>
               </article>
             ))}
           </section>
           <section className="reports-charts">
             <Chart
-              title="Auction funnel"
+              title="Luồng phiên đấu giá"
               summary="Luồng lifecycle mô phỏng từ mở phiên đến bàn giao."
               data={fixture.auctionFunnel}
             />
             <Chart
-              title="Lifecycle distribution"
+              title="Phân bố vòng đời"
               summary="Phân bố lifecycle, không gộp với publication."
               data={fixture.lifecycleDistribution}
             />
             <Chart
-              title="Publication distribution"
+              title="Phân bố trạng thái công bố"
               summary="Phân bố publication projection."
               data={fixture.publicationDistribution}
             />
             <Chart
-              title="Candidate outcomes"
+              title="Kết quả ứng viên"
               summary="Kết quả workflow candidate mô phỏng."
               data={fixture.candidateOutcomes}
             />
             <Chart
-              title="Payment references summary"
-              summary="Projection reference; không phải xác nhận thanh toán."
+              title="Tổng hợp tham chiếu thanh toán"
+              summary="Dữ liệu tham chiếu; không phải xác nhận thanh toán."
               data={fixture.paymentSummary}
             />
             <Chart
-              title="Handover stages"
+              title="Các giai đoạn bàn giao"
               summary="Provider Delivered ≠ Receipt Confirmed ≠ Completed."
               data={fixture.handoverSummary}
             />
@@ -157,7 +203,7 @@ export function ReportsProjectionPage() {
       </footer>
       {params.get("demo") === "1" && (
         <label className="reports-demo">
-          Demo scenario
+          Kịch bản mô phỏng
           <select
             value={scenario}
             onChange={(event) => set("scenario", event.target.value)}

@@ -938,13 +938,22 @@
 
 .watchlist-row {
   display: grid;
-  grid-template-columns: minmax(280px, 1fr) 150px 138px 100px 42px;
-  gap: 14px;
+  grid-template-columns: minmax(230px, 1.5fr) minmax(118px, .7fr) minmax(146px, .8fr) minmax(72px, .45fr) 42px;
+  gap: 10px;
   align-items: center;
   padding: 12px;
   border: 1px solid #ecd8c8;
   border-radius: 8px;
   background: #fffefd;
+}
+
+.watchlist-row > div {
+  min-width: 0;
+}
+
+.watchlist-row .auction-status,
+.watchlist-row .badge {
+  white-space: nowrap;
 }
 
 .watchlist-asset {
@@ -1028,7 +1037,7 @@
   }
 
   .watchlist-row {
-    grid-template-columns: minmax(280px, 1fr) 150px 120px 42px;
+    grid-template-columns: minmax(230px, 1fr) minmax(120px, .65fr) minmax(150px, .8fr) 42px;
   }
 
   .watchlist-row > div:nth-of-type(3) {

@@ -5,6 +5,7 @@ export type CmsStatus =
   | "DRAFT"
   | "PENDING_REVIEW"
   | "CHANGES_REQUESTED"
+  | "APPROVED"
   | "SCHEDULED"
   | "PUBLISHED"
   | "ARCHIVED";
@@ -38,6 +39,7 @@ export interface CmsContent {
   publishedAt?: string;
   scheduledAt?: string;
   reviewComment?: string;
+  sourceProposalId?: string;
   version: number;
 }
 export interface CmsMedia {

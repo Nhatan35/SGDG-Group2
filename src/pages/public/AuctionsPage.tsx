@@ -2,18 +2,20 @@ import {
   ArrowDownUp,
   Check,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   Clock3,
   SlidersHorizontal,
   Tag,
+  Users,
   X,
 } from "lucide-react";
-import { Fragment, useMemo } from "react";
-import { useSearchParams } from "react-router-dom";
-import {
-  AuctionCard,
-  type AuctionCardAction,
-} from "../../components/auction/AuctionCard";
-import { Button } from "../../components/common/Button";
+import { Fragment, useMemo, useRef } from "react";
+import { Link, useSearchParams } from "react-router-dom";
+import type { AuctionCardAction } from "../../components/auction/AuctionCard";
+import { AuctionStatus } from "../../components/auction/AuctionStatus";
+import { Button, ButtonLink } from "../../components/common/Button";
+import { ResilientImage } from "../../components/common/ResilientImage";
 import { selectAuctionCta } from "../../domain/auctionDisplay";
 import {
   EmptyState,
@@ -25,9 +27,12 @@ import {
   catalogAuctions,
   type Auction,
 } from "../../services/mock/auctionService";
+import { formatMoney } from "../../utils/format";
+import { resolveStagePresentation } from "./stageImagePresentation";
 import "../../styles/auction-catalog.css";
 
 const pageSize = 6;
+const SHOW_STAGE_GUIDES = false;
 const statusOptions = [
   ["upcoming", "Sắp diễn ra"],
   ["registration-open", "Đang mở đăng ký"],
@@ -81,7 +86,115 @@ function catalogPrice(auction: Auction) {
     : auction.startPrice;
 }
 
+function catalogLifecyclePriority(status: Auction["status"]) {
+  if (status === "LIVE") return 0;
+  if (status === "PAUSED") return 1;
+  if (status === "REGISTRATION_OPEN") return 2;
+  if (status === "PUBLISHED") return 3;
+  if (status === "CLOSED" || status === "COMPLETED") return 4;
+  return 5;
+}
+
+function StageAuctionCard({
+  auction,
+  position,
+}: {
+  auction: Auction;
+  position: "left" | "center" | "right";
+}) {
+  const action = actionFor(auction);
+  const stagePresentation = resolveStagePresentation(auction);
+
+  return (
+    <article
+      className={`auction-card stage-auction-card stage-auction-card-${position} ${
+        auction.status === "LIVE" ? "stage-auction-card-live" : ""
+      } stage-display-${stagePresentation.mode} stage-scale-${stagePresentation.scale}`}
+    >
+      <div className="product-anchor">
+        <Link
+          className="stage-product"
+          to={`/auctions/${auction.id}`}
+          aria-label={`Mở chi tiết ${auction.assetName}`}
+        >
+          <span className="stage-product-frame">
+            <ResilientImage
+              src={stagePresentation.src}
+              fallbackSrc={auction.image}
+              alt={auction.assetName}
+            />
+          </span>
+        </Link>
+      </div>
+      <div className="stage-info-panel product-information">
+        <div className="stage-info-meta">
+          <AuctionStatus auction={auction} catalog compact />
+          <span>{auction.category}</span>
+          <span>{auction.code}</span>
+        </div>
+        <Link className="stage-info-title" to={`/auctions/${auction.id}`}>
+          {auction.assetName}
+        </Link>
+        <div className="stage-info-price">
+          <span>
+            {auction.status === "LIVE" ? "Giá hiện tại" : "Giá khởi điểm"}
+          </span>
+          <strong>{formatMoney(catalogPrice(auction))}</strong>
+        </div>
+        <div className="stage-info-activity">
+          <AuctionStatus auction={auction} catalog segmented />
+          <span>
+            <Users aria-hidden="true" />
+            {auction.participantCount} người tham gia
+          </span>
+        </div>
+        {action ? (
+          <ButtonLink
+            className="stage-info-action"
+            variant={action.variant ?? "primary"}
+            to={action.href}
+          >
+            {action.label}
+          </ButtonLink>
+        ) : (
+          <ButtonLink
+            className="stage-info-action"
+            variant="secondary"
+            to={`/auctions/${auction.id}`}
+          >
+            Xem thông tin
+          </ButtonLink>
+        )}
+      </div>
+    </article>
+  );
+}
+
+function DiscoveryAuctionCard({ auction }: { auction: Auction }) {
+  return (
+    <Link
+      className="discovery-auction-card"
+      to={`/auctions/${auction.id}`}
+      aria-label={`Mở chi tiết ${auction.assetName}`}
+    >
+      <span className="discovery-product">
+        <ResilientImage src={auction.image} alt={auction.assetName} />
+      </span>
+      <span className="discovery-info">
+        <div>
+          <span>{auction.category}</span>
+          <span>{auction.code}</span>
+        </div>
+        <span className="discovery-title">{auction.assetName}</span>
+        <strong>{formatMoney(catalogPrice(auction))}</strong>
+        <AuctionStatus auction={auction} catalog />
+      </span>
+    </Link>
+  );
+}
+
 export function AuctionsPage() {
+  const discoveryRef = useRef<HTMLDivElement>(null);
   const [searchParams, setSearchParams] = useSearchParams();
   const query = searchParams.get("q") ?? "";
   const requestedStatus = searchParams.get("status") ?? "";
@@ -162,7 +275,13 @@ export function AuctionsPage() {
           ? catalogPrice(right) - catalogPrice(left)
           : sort === "newest"
             ? Date.parse(right.startsAt) - Date.parse(left.startsAt)
-            : Date.parse(left.startsAt) - Date.parse(right.startsAt),
+            : catalogLifecyclePriority(left.status) -
+                  catalogLifecyclePriority(right.status) ||
+                Number(resolveStagePresentation(right).mode === "cutout") -
+                  Number(resolveStagePresentation(left).mode === "cutout") ||
+                (left.status === "LIVE" || left.status === "PAUSED"
+                  ? Date.parse(left.endsAt) - Date.parse(right.endsAt)
+                  : Date.parse(left.startsAt) - Date.parse(right.startsAt)),
     );
   }, [availableAuctions, category, price, query, sort, status]);
   const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
@@ -177,6 +296,21 @@ export function AuctionsPage() {
     (page - 1) * pageSize,
     page * pageSize,
   );
+  const featuredAuctionIds = new Set(
+    visibleAuctions.slice(0, 3).map((auction) => auction.id),
+  );
+  const discoveryAuctions = filtered
+    .filter((auction) => !featuredAuctionIds.has(auction.id))
+    .slice(0, 15);
+  const scrollDiscovery = (direction: -1 | 1) => {
+    const ticker = discoveryRef.current;
+    if (!ticker) return;
+
+    ticker.scrollBy({
+      left: direction * Math.max(320, Math.round(ticker.clientWidth * 0.82)),
+      behavior: "smooth",
+    });
+  };
   const applied = [
     { key: "q", value: query, label: query && `Tìm: ${query}` },
     {
@@ -231,6 +365,7 @@ export function AuctionsPage() {
         aria-busy={projection === "loading"}
       >
         <section className="catalog-results" aria-live="polite">
+          <div className="catalog-controls-bar">
           <section
             className="catalog-filter-bar"
             aria-label="Bộ lọc phiên đấu giá"
@@ -317,6 +452,7 @@ export function AuctionsPage() {
               ))}
             </div>
           </section>
+          </div>
           <div className="catalog-toolbar">
             <div>
               <strong>{filtered.length} phiên đấu giá phù hợp</strong>
@@ -363,17 +499,53 @@ export function AuctionsPage() {
             />
           ) : visibleAuctions.length ? (
             <>
-              <div className="auction-list-grid three catalog-auction-grid">
-                {visibleAuctions.map((auction) => (
-                  <AuctionCard
-                    key={auction.id}
-                    auction={auction}
-                    action={actionFor(auction)}
-                    detailLink={auction.status !== "PUBLISHED"}
-                    showCategory
-                  />
-                ))}
-              </div>
+              <section
+                className={`catalog-stage${SHOW_STAGE_GUIDES ? " show-stage-guides" : ""}`}
+                aria-label="Khu trưng bày phiên đấu giá nổi bật"
+              >
+                <div className="catalog-stage-products catalog-auction-grid">
+                  {visibleAuctions.slice(0, 3).map((auction, index) => (
+                    <StageAuctionCard
+                      key={auction.id}
+                      auction={auction}
+                      position={
+                        index === 0 ? "left" : index === 1 ? "center" : "right"
+                      }
+                    />
+                  ))}
+                </div>
+              </section>
+              {discoveryAuctions.length > 0 && (
+                <section className="catalog-discovery">
+                  <div className="catalog-discovery-heading">
+                    <h2>Khám phá thêm</h2>
+                    <span>Kéo ngang để xem thêm phiên đấu giá</span>
+                  </div>
+                  <div className="catalog-discovery-ticker">
+                    <button
+                      type="button"
+                      className="catalog-discovery-arrow catalog-discovery-arrow-left"
+                      aria-label="Xem các phiên trước"
+                      onClick={() => scrollDiscovery(-1)}
+                    >
+                      <ChevronLeft aria-hidden="true" />
+                    </button>
+                    <div ref={discoveryRef} className="catalog-discovery-grid">
+                      {discoveryAuctions.map((auction) => (
+                        <DiscoveryAuctionCard key={auction.id} auction={auction} />
+                      ))}
+                    </div>
+                    <button
+                      type="button"
+                      className="catalog-discovery-arrow catalog-discovery-arrow-right"
+                      aria-label="Xem các phiên tiếp theo"
+                      onClick={() => scrollDiscovery(1)}
+                    >
+                      <ChevronRight aria-hidden="true" />
+                    </button>
+                  </div>
+                </section>
+              )}
               {totalPages > 1 && (
                 <nav className="catalog-pagination" aria-label="Phân trang">
                   <button

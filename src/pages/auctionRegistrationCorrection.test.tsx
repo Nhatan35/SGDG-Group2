@@ -60,7 +60,7 @@ describe("Registration Correction Draft Customer UI", () => {
     ).toBeGreaterThan(0);
     expect(
       screen.getByRole("link", {
-        name: "Open Registration Correction",
+        name: "Mở bản chỉnh sửa đăng ký",
       }),
     ).toHaveAttribute(
       "href",
@@ -79,12 +79,12 @@ describe("Registration Correction Draft Customer UI", () => {
     );
     renderCorrection(prepared.session.sessionId);
     await user.click(
-      screen.getByRole("button", { name: "Create Correction Draft" }),
+      screen.getByRole("button", { name: "Tạo bản nháp chỉnh sửa" }),
     );
     expect(screen.getByText("DRAFT / v1")).toBeInTheDocument();
-    await user.click(screen.getByRole("checkbox", { name: /accept/i }));
+    await user.click(screen.getByRole("checkbox", { name: /đồng ý/i }));
     await user.click(
-      screen.getByRole("button", { name: "Save Correction Draft" }),
+      screen.getByRole("button", { name: "Lưu bản nháp chỉnh sửa" }),
     );
     expect(screen.getByText("DRAFT / v2")).toBeInTheDocument();
     expect(
@@ -131,7 +131,7 @@ describe("Registration Correction Draft Customer UI", () => {
       "REGISTRATION_CORRECTION_FIELD_NOT_SUPPORTED",
     );
     expect(
-      screen.queryByRole("button", { name: "Create Correction Draft" }),
+      screen.queryByRole("button", { name: "Tạo bản nháp chỉnh sửa" }),
     ).not.toBeInTheDocument();
   });
 
@@ -144,18 +144,18 @@ describe("Registration Correction Draft Customer UI", () => {
       screen.queryByRole("textbox", { name: /Customer identity/i }),
     ).not.toBeInTheDocument();
     await user.click(
-      screen.getByRole("button", { name: "Create Correction Draft" }),
+      screen.getByRole("button", { name: "Tạo bản nháp chỉnh sửa" }),
     );
     expect(
-      screen.getByText("This saves a correction draft only."),
+      screen.getByText("Thao tác này chỉ lưu bản nháp chỉnh sửa."),
     ).toBeInTheDocument();
     expect(
       screen.getByText(
-        "The original submitted Registration remains unchanged.",
+        "Hồ sơ đăng ký đã gửi ban đầu vẫn được giữ nguyên.",
       ),
     ).toBeInTheDocument();
     expect(
-      screen.getByText("Resubmission has not started."),
+      screen.getByText("Quá trình gửi lại chưa bắt đầu."),
     ).toBeInTheDocument();
     for (const name of [
       /Check Membership/i,

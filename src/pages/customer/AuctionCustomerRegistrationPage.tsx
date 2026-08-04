@@ -83,10 +83,10 @@ export function AuctionCustomerRegistrationPage() {
   if (actorRole !== "CUSTOMER")
     return (
       <main className="schedule-confirmation-page">
-        <h1>Auction Registration</h1>
+        <h1>Đăng ký tham gia đấu giá</h1>
         <BlockedState
-          title="Unauthorized"
-          description="Only the authenticated CUSTOMER may access Customer Registration."
+          title="Không có quyền truy cập"
+          description="Chỉ khách hàng đã đăng nhập mới được truy cập chức năng đăng ký tham gia."
         />
       </main>
     );
@@ -94,10 +94,10 @@ export function AuctionCustomerRegistrationPage() {
   if (!session)
     return (
       <main className="schedule-confirmation-page">
-        <h1>Auction Registration</h1>
+        <h1>Đăng ký tham gia đấu giá</h1>
         <BlockedState
-          title="Session not found"
-          description="The requested dynamic Auction Session does not exist."
+          title="Không tìm thấy phiên đấu giá"
+          description="Phiên đấu giá được yêu cầu không tồn tại hoặc không còn khả dụng."
         />
       </main>
     );
@@ -129,7 +129,7 @@ export function AuctionCustomerRegistrationPage() {
       commandId: `CREATE_CUSTOMER_REGISTRATION:${sessionId}:${CURRENT_CUSTOMER_ID}`,
     });
     if (!result.ok) return setError(commandError(result));
-    setMessage("Registration Draft created.");
+    setMessage("Đã tạo bản nháp đăng ký.");
   };
 
   const save = () => {
@@ -146,7 +146,7 @@ export function AuctionCustomerRegistrationPage() {
     });
     if (!result.ok) return setError(commandError(result));
     setMessage(
-      result.changed ? "Registration Draft saved." : "Draft is unchanged.",
+      result.changed ? "Đã lưu bản nháp đăng ký." : "Bản nháp không có thay đổi.",
     );
   };
 
@@ -164,32 +164,32 @@ export function AuctionCustomerRegistrationPage() {
       commandId: `SUBMIT_CUSTOMER_REGISTRATION:${registration.registrationId}:v${registration.registrationVersion}`,
     });
     if (!result.ok) return setError(commandError(result));
-    setMessage("Registration submitted.");
+    setMessage("Đã gửi đăng ký tham gia.");
   };
 
   return (
     <main className="schedule-confirmation-page">
       <header className="approval-package-heading">
-        <span>AUTHENTICATED DIRECT CUSTOMER ROUTE</span>
-        <h1>Auction Registration</h1>
+        <span>KHU VỰC ĐĂNG KÝ DÀNH CHO KHÁCH HÀNG</span>
+        <h1>Đăng ký tham gia đấu giá</h1>
         <p>{PROTOTYPE_CUSTOMER_REGISTRATION_MODEL}</p>
       </header>
 
       <section className="approval-package-card" aria-labelledby="session-data">
-        <h2 id="session-data">Session</h2>
+        <h2 id="session-data">Thông tin phiên đấu giá</h2>
         <dl className="schedule-confirmation-evidence">
-          <dt>Session ID/code</dt>
+          <dt>Mã phiên</dt>
           <dd>{session.sessionId}</dd>
-          <dt>Auction title</dt>
-          <dd>{content?.workingContent.auctionTitle || "Not available"}</dd>
-          <dt>Registration closes</dt>
+          <dt>Tên phiên đấu giá</dt>
+          <dd>{content?.workingContent.auctionTitle || "Chưa có thông tin"}</dd>
+          <dt>Hạn đăng ký</dt>
           <dd>
             {registrationWindow?.window.registrationCloseAt ??
-              "Registration Window not open"}
+              "Chưa mở thời gian đăng ký"}
           </dd>
-          <dt>Customer identity</dt>
+          <dt>Mã khách hàng</dt>
           <dd>{CURRENT_CUSTOMER_ID}</dd>
-          <dt>Registration status/version</dt>
+          <dt>Trạng thái / phiên bản đăng ký</dt>
           <dd>
             {registration
               ? `${registration.status} / v${registration.registrationVersion}`
@@ -197,13 +197,13 @@ export function AuctionCustomerRegistrationPage() {
           </dd>
           {registration?.submittedAt && (
             <>
-              <dt>Submitted at</dt>
+              <dt>Thời điểm gửi</dt>
               <dd>{registration.submittedAt}</dd>
             </>
           )}
           {registration?.status === "SUBMITTED" && (
             <>
-              <dt>Registration validation</dt>
+              <dt>Kết quả kiểm tra đăng ký</dt>
               <dd>
                 {!validation
                   ? "VALIDATION_NOT_STARTED"
@@ -216,13 +216,13 @@ export function AuctionCustomerRegistrationPage() {
 
       {!registration && (
         <section className="approval-package-card">
-          <h2>Create Registration Draft</h2>
+          <h2>Tạo bản nháp đăng ký</h2>
           {!registrationWindow ? (
             <p role="alert">CUSTOMER_REGISTRATION_WINDOW_NOT_OPEN: Registration Window chưa được mở.</p>
           ) : eligibility && !eligibility.eligible ? (
             <p role="alert">{eligibility.code}: {eligibility.message}</p>
           ) : (
-            <Button onClick={create}>Tạo Registration Draft</Button>
+            <Button onClick={create}>Tạo bản nháp đăng ký</Button>
           )}
         </section>
       )}
@@ -230,7 +230,7 @@ export function AuctionCustomerRegistrationPage() {
       {registration && (
         <section className="approval-package-card">
           <div className="schedule-confirmation-title">
-            <h2>Rules acceptance</h2>
+            <h2>Xác nhận quy tắc đấu giá</h2>
             <Badge
               tone={registration.status === "SUBMITTED" ? "success" : "warning"}
             >
@@ -244,18 +244,18 @@ export function AuctionCustomerRegistrationPage() {
               disabled={registration.status === "SUBMITTED"}
               onChange={(event) => setRulesAccepted(event.target.checked)}
             />{" "}
-            I accept the Auction rules
+            Tôi đã đọc và đồng ý với quy tắc đấu giá
           </label>
           {registration.status === "DRAFT" && (
             <div className="approval-package-actions">
               <Button variant="secondary" onClick={save}>
-                Lưu Draft
+                Lưu bản nháp
               </Button>
               <Button
                 onClick={submitRegistration}
                 disabled={!rulesAccepted || !registration.rulesAccepted}
               >
-                Gửi Registration
+                Gửi đăng ký
               </Button>
             </div>
           )}
@@ -267,34 +267,34 @@ export function AuctionCustomerRegistrationPage() {
 
       {validation?.nextStep === "CORRECTION_REQUIRED" && (
         <section className="approval-package-card">
-          <h2>Registration correction</h2>
+          <h2>Đăng ký cần được chỉnh sửa</h2>
           <p>
-            Validation requires a Customer-owned Correction Draft. The
-            original submitted Registration remains immutable.
+            Kết quả kiểm tra yêu cầu khách hàng tạo bản nháp chỉnh sửa. Hồ sơ
+            đăng ký đã gửi ban đầu được giữ nguyên để đối chiếu.
           </p>
           <ButtonLink
             to={`/customer/auctions/${sessionId}/registration/correction`}
           >
-            Open Registration Correction
+            Mở bản chỉnh sửa đăng ký
           </ButtonLink>
         </section>
       )}
 
       {membershipCheck && (
         <section className="approval-package-card">
-          <h2>Customer-safe Membership Result</h2>
+          <h2>Kết quả kiểm tra hạng thành viên</h2>
           <dl className="schedule-confirmation-evidence">
-            <dt>Membership outcome</dt>
+            <dt>Kết quả</dt>
             <dd>{membershipCheck.outcome}</dd>
-            <dt>Next Step</dt>
+            <dt>Bước tiếp theo</dt>
             <dd>{membershipCheck.nextStep}</dd>
-            <dt>Safe result</dt>
+            <dt>Trạng thái hiển thị</dt>
             <dd>
               {membershipCheck.nextStep === "READY_FOR_DEPOSIT_CHECK"
-                ? "Ready for Deposit Check"
+                ? "Sẵn sàng kiểm tra tiền cọc"
                 : membershipCheck.nextStep === "MEMBERSHIP_INELIGIBLE"
-                  ? "Membership Ineligible"
-                  : "Membership Review Required"}
+                  ? "Hạng thành viên chưa đủ điều kiện"
+                  : "Cần xem xét hạng thành viên"}
             </dd>
           </dl>
         </section>
@@ -302,28 +302,28 @@ export function AuctionCustomerRegistrationPage() {
 
       {depositCheck && (
         <section className="approval-package-card">
-          <h2>Customer-safe Deposit Result</h2>
+          <h2>Kết quả kiểm tra tiền cọc</h2>
           <dl className="schedule-confirmation-evidence">
-            <dt>Deposit outcome</dt>
+            <dt>Kết quả</dt>
             <dd>{depositCheck.outcome}</dd>
-            <dt>Next Step</dt>
+            <dt>Bước tiếp theo</dt>
             <dd>{depositCheck.nextStep}</dd>
-            <dt>Safe result</dt>
+            <dt>Trạng thái hiển thị</dt>
             <dd>
               {depositCheck.nextStep ===
               "READY_FOR_ELIGIBILITY_EVALUATION"
-                ? "Ready for Eligibility Evaluation"
+                ? "Sẵn sàng đánh giá điều kiện tham gia"
                 : depositCheck.nextStep === "DEPOSIT_NOT_SATISFIED"
-                  ? "Deposit Not Satisfied"
-                  : "Deposit Review Required"}
+                  ? "Tiền cọc chưa đáp ứng"
+                  : "Cần xem xét tiền cọc"}
             </dd>
           </dl>
         </section>
       )}
 
       <section className="approval-package-card">
-        <h2>Submission boundary</h2>
-        <p>Submitting Registration does not confirm eligibility.</p>
+        <h2>Lưu ý khi gửi đăng ký</h2>
+        <p>Gửi đăng ký không đồng nghĩa khách hàng đã đủ điều kiện tham gia.</p>
         {registration?.status === "SUBMITTED" && (
           <p>
             Validation projection:{" "}
@@ -335,16 +335,16 @@ export function AuctionCustomerRegistrationPage() {
         )}
         {membershipCheck ? (
           <>
-            <p>Membership: {membershipCheck.outcome}.</p>
+            <p>Hạng thành viên: {membershipCheck.outcome}.</p>
             <p>
-              Deposit: {depositCheck ? depositCheck.outcome : "NOT CHECKED"}.
-              Eligibility: NOT EVALUATED.
+              Tiền cọc: {depositCheck ? depositCheck.outcome : "CHƯA KIỂM TRA"}.
+              Điều kiện tham gia: CHƯA ĐÁNH GIÁ.
             </p>
           </>
         ) : (
-          <p>Membership, Deposit, and Eligibility checks have not started.</p>
+          <p>Chưa bắt đầu kiểm tra hạng thành viên, tiền cọc và điều kiện tham gia.</p>
         )}
-        <p>The Auction is not publicly published by this action.</p>
+        <p>Thao tác này không tự động công khai phiên đấu giá.</p>
       </section>
     </main>
   );

@@ -77,10 +77,10 @@ async function confirmConfiguration(page: Page) {
   await page.getByRole("button", { name: "Gửi xác nhận" }).click();
   await loginStaff(page, "admin@sgdg.demo");
   await page.goto(`/governance/auction-configurations/${configurationId}`);
-  await page.getByRole("button", { name: "Confirm Configuration" }).click();
+  await page.getByRole("button", { name: "Xác nhận cấu hình" }).click();
   await page
-    .getByRole("dialog", { name: "Confirm Configuration" })
-    .getByRole("button", { name: "Confirm Configuration" })
+    .getByRole("dialog", { name: "Xác nhận cấu hình" })
+    .getByRole("button", { name: "Xác nhận cấu hình" })
     .click();
   await loginStaff(page, "content@sgdg.demo");
 }
@@ -134,7 +134,7 @@ async function startReview(page: Page) {
   await page.goto(`/governance/auction-approval-packages/${packageId}`);
   await page.getByRole("button", { name: "Bắt đầu xem xét" }).click();
   await page
-    .getByRole("dialog", { name: "Bắt đầu Approval Review" })
+    .getByRole("dialog", { name: "Bắt đầu thẩm định hồ sơ" })
     .getByRole("button", { name: "Bắt đầu xem xét" })
     .click();
 }
@@ -155,11 +155,11 @@ test("A: ADMIN starts one persisted Review without a decision", async ({
   await startReview(page);
   await expect(page.getByText("IN_REVIEW").first()).toBeVisible();
   await expect(
-    page.getByRole("link", { name: "Mở Approval Review" }),
+    page.getByRole("link", { name: "Bắt đầu thẩm định" }),
   ).toBeVisible();
-  await page.getByRole("link", { name: "Mở Approval Review" }).click();
+  await page.getByRole("link", { name: "Bắt đầu thẩm định" }).click();
   await expect(
-    page.getByRole("heading", { level: 1, name: "Approval Review" }),
+    page.getByRole("heading", { level: 1, name: "Thẩm định hồ sơ" }),
   ).toBeVisible();
   await expect(page.getByText(/chưa có quyết định phê duyệt/)).toBeVisible();
   for (const name of ["Approve", "Return", "Reject"])
@@ -215,7 +215,7 @@ test("C: explicit revalidation marks an existing Review STALE", async ({
     `/governance/auction-approval-reviews/${approvalReviewId}`,
   );
   await page
-    .getByRole("button", { name: "Kiểm tra lại evidence" })
+    .getByRole("button", { name: "Kiểm tra lại bằng chứng" })
     .click();
   await expect(page.getByText(/Evidence đã được kiểm tra lại: STALE/)).toBeVisible();
   await expect(

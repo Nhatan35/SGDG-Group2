@@ -446,7 +446,9 @@ describe("Approval Package workspace and read-only ADMIN queue", () => {
     renderQueue(
       `/governance/auction-approval-packages/${submitted.packageId}`,
     );
-    expect(screen.getByText("No approval decision has been made.")).toBeVisible();
+    expect(
+      screen.getByText("Chưa có quyết định phê duyệt nào được đưa ra."),
+    ).toBeVisible();
     expect(
       screen.getAllByText(prepared.content.workingContent.auctionTitle)
         .length,

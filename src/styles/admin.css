@@ -29,6 +29,14 @@
   display: grid;
   margin-top: 15px;
 }
+.admin-nav-section {
+  margin: 14px 10px 4px;
+  color: #9f968d;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
 .admin-sidebar a {
   display: flex;
   align-items: center;
@@ -587,4 +595,23 @@
     min-width: 44px;
     padding-inline: 12px;
   }
+}
+.admin-asset-thumbnail {
+  width: 76px;
+  height: 58px;
+  border: 1px solid var(--sgdg-border);
+  border-radius: 8px;
+  background: #f7f2ed;
+  object-fit: cover;
+}
+
+.admin-asset-identity {
+  display: grid;
+  gap: 4px;
+  min-width: 180px;
+}
+
+.admin-asset-identity small {
+  color: var(--sgdg-text-secondary);
+  font-size: 12px;
 }
