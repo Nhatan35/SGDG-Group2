@@ -1,7 +1,6 @@
 ﻿import {
   Bell,
   ChevronDown,
-  ClipboardList,
   CircleDollarSign,
   CreditCard,
   FileCheck2,
@@ -17,15 +16,22 @@
   Trophy,
   UserRound,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import { useDemoStore } from "../../store/demoStore";
 
 const primaryLinks = [
   ["/account/dashboard", "Tổng quan", LayoutDashboard],
-  ["/account/profile", "Hồ sơ cá nhân", UserRound],
+] as const;
+
+const profileLinks = [
+  ["/account/profile", "Thông tin cá nhân", UserRound],
   ["/account/kyc", "Xác minh KYC", FileCheck2],
   ["/account/wallet", "Tài khoản ngân hàng", Landmark],
+  ["/account/profile?section=security", "Cài đặt bảo mật", LockKeyhole],
+] as const;
+
+const accountLinks = [
   ["/account/deposits", "Tiền cọc đấu giá", CircleDollarSign],
 ] as const;
 
@@ -37,11 +43,9 @@ const auctionLinks = [
 ] as const;
 
 const secondaryLinks = [
-  ["/account/profile?section=security", "Cài đặt bảo mật", LockKeyhole],
   ["/account/membership", "Điểm thành viên", Trophy],
   ["/account/watchlist", "Danh sách theo dõi", Heart],
   ["/account/notifications", "Trung tâm thông báo", Bell],
-  ["/account/opening-requests", "Yêu cầu mở phiên", ClipboardList],
   ["/account/support", "Trung tâm hỗ trợ", Headphones],
 ] as const;
 
@@ -56,12 +60,24 @@ export function AccountLayout() {
     return location.pathname === to && !location.search;
   }
 
+  const profileGroupActive = profileLinks.some(([to]) => isActive(to));
   const auctionGroupActive = auctionLinks.some(([to]) => isActive(to));
-  const [auctionGroupOpen, setAuctionGroupOpen] = useState(auctionGroupActive);
-
-  useEffect(() => {
-    if (auctionGroupActive) setAuctionGroupOpen(true);
-  }, [auctionGroupActive]);
+  const [profileGroupOverride, setProfileGroupOverride] = useState<{
+    location: string;
+    open: boolean;
+  } | null>(null);
+  const [auctionGroupOverride, setAuctionGroupOverride] = useState<{
+    location: string;
+    open: boolean;
+  } | null>(null);
+  const profileGroupOpen =
+    profileGroupOverride?.location === current
+      ? profileGroupOverride.open
+      : profileGroupActive;
+  const auctionGroupOpen =
+    auctionGroupOverride?.location === current
+      ? auctionGroupOverride.open
+      : auctionGroupActive;
 
   return (
     <div className="account-shell container">
@@ -81,6 +97,52 @@ export function AccountLayout() {
             </Link>
           ))}
           <div
+            className={`account-nav-group ${profileGroupOpen ? "open" : ""}`}
+          >
+            <button
+              className={`account-nav-group__toggle ${profileGroupActive ? "active" : ""}`}
+              type="button"
+              aria-expanded={profileGroupOpen}
+              aria-controls="account-profile-menu"
+              onClick={() =>
+                setProfileGroupOverride({
+                  location: current,
+                  open: !profileGroupOpen,
+                })
+              }
+            >
+              <UserRound aria-hidden="true" />
+              <span>Hồ sơ cá nhân</span>
+              <ChevronDown
+                className="account-nav-group__chevron"
+                aria-hidden="true"
+              />
+            </button>
+            {profileGroupOpen && (
+              <div
+                className="account-nav-group__submenu"
+                id="account-profile-menu"
+              >
+                {profileLinks.map(([to, label, Icon]) => (
+                  <Link
+                    className={isActive(to) ? "active" : ""}
+                    key={to}
+                    to={to}
+                  >
+                    <Icon />
+                    {label}
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
+          {accountLinks.map(([to, label, Icon]) => (
+            <Link className={isActive(to) ? "active" : ""} key={to} to={to}>
+              <Icon />
+              {label}
+            </Link>
+          ))}
+          <div
             className={`account-nav-group ${auctionGroupOpen ? "open" : ""}`}
           >
             <button
@@ -88,7 +150,12 @@ export function AccountLayout() {
               type="button"
               aria-expanded={auctionGroupOpen}
               aria-controls="account-auction-menu"
-              onClick={() => setAuctionGroupOpen((value) => !value)}
+              onClick={() =>
+                setAuctionGroupOverride({
+                  location: current,
+                  open: !auctionGroupOpen,
+                })
+              }
             >
               <Gavel aria-hidden="true" />
               <span>Đấu giá của tôi</span>

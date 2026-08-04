@@ -16,6 +16,12 @@ test("short live auctions appear in an interactive livestream showcase", async (
   ).toBeVisible();
   await expect(channels).toHaveCount(4);
   await expect(channels.first()).toHaveAttribute("aria-pressed", "true");
+  await expect(
+    showcase.locator(".home-live-countdown .auction-countdown--segmented"),
+  ).toBeVisible();
+  await expect(
+    showcase.locator(".home-live-countdown .auction-countdown__part b"),
+  ).toHaveCount(3);
 
   await channels.nth(1).click();
 

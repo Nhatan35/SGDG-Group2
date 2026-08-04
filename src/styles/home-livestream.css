@@ -343,6 +343,49 @@
   white-space: nowrap;
 }
 
+.home-live-countdown .auction-countdown--segmented {
+  display: inline-flex;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  font-family: var(--sgdg-font-family-numeric);
+  text-shadow: none;
+}
+
+.home-live-countdown .auction-countdown--segmented > span,
+.home-live-countdown .auction-countdown__part {
+  display: inline-flex;
+  align-items: center;
+}
+
+.home-live-countdown .auction-countdown__part b {
+  display: grid;
+  min-width: 48px;
+  height: 48px;
+  place-items: center;
+  border: 1px solid #ff9b5d;
+  border-radius: 7px;
+  background: linear-gradient(145deg, #ef4b0c, #ff721c);
+  box-shadow:
+    inset 0 1px rgb(255 255 255 / 0.28),
+    0 5px 12px rgb(211 65 8 / 0.22);
+  color: #fff;
+  font-size: 21px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.home-live-countdown .auction-countdown__separator {
+  margin: 0 7px;
+  color: #a94717;
+  font-size: 22px;
+  font-weight: 900;
+  font-style: normal;
+  line-height: 1;
+}
+
 .home-live-price {
   display: grid;
   gap: 3px;
@@ -649,6 +692,11 @@
   .home-live-countdown {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .home-live-countdown .auction-countdown__part b {
+    min-width: 46px;
+    height: 46px;
   }
 
   .home-live-price > strong {

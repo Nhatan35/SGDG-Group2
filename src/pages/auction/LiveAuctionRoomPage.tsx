@@ -275,6 +275,11 @@ function ManualBidModal({
         if (!open) onClose();
       }}
       title={dialogTitle}
+      className={
+        step === "result" && outcome === "accepted"
+          ? "bid-success-dialog"
+          : ""
+      }
       panelClassName={`bid-modal${step === "result" && outcome === "accepted" ? " bid-success-modal" : ""}`}
       initialFocusRef={step === "entry" ? input : undefined}
       preventClose={step === "validating"}
@@ -369,24 +374,37 @@ function ManualBidModal({
         {step === "result" &&
           (outcome === "accepted" ? (
             <div className="bid-success-luxury" role="status" aria-live="polite">
-              <div className="bid-paddle-rays" aria-hidden="true" />
-              <div className="bid-paddle-board">
-                <span className="bid-success-eyebrow">GIÁ MỚI</span>
-                <strong className="bid-success-amount">
-                  {formatMoney(amount)}
-                </strong>
-                <div className="bid-success-bidder">
-                  <Gavel aria-hidden="true" />
-                  <span>
-                    <b>{currentUserBidderNumber}</b>
-                    Bạn vừa ra giá thành công
-                  </span>
-                </div>
-                <p>Đã ghi nhận thành công · Bạn đang dẫn đầu</p>
+              <span className="bid-success-mark" aria-hidden="true">
+                <CheckCircle2 />
+              </span>
+              <span className="bid-success-eyebrow">
+                GIÁ MỚI ĐÃ GHI NHẬN
+              </span>
+              <strong className="bid-success-amount">
+                {formatMoney(amount)}
+              </strong>
+              <p className="bid-success-caption">
+                Phiên đấu giá đã nhận lượt trả giá của bạn.
+              </p>
+
+              <div className="bid-success-bidder">
+                <span className="bid-success-bidder-icon" aria-hidden="true">
+                  <Gavel />
+                </span>
+                <span className="bid-success-bidder-code">
+                  <small>Mã người trả giá</small>
+                  <b>{currentUserBidderNumber}</b>
+                </span>
+                <span className="bid-success-leading">
+                  <Crown aria-hidden="true" />
+                  Đang dẫn đầu
+                </span>
               </div>
-              <div className="bid-paddle-handle" aria-hidden="true">
-                <i />
-              </div>
+
+              <p className="bid-success-note">
+                <ShieldCheck aria-hidden="true" />
+                Bạn đang giữ mức giá cao nhất tại thời điểm hiện tại.
+              </p>
             </div>
           ) : (
             <>

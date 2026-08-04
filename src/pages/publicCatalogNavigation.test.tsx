@@ -29,6 +29,9 @@ describe("public catalog navigation and filters", () => {
       navigation.querySelector('a[href="/auctions/upcoming"]'),
     ).not.toBeInTheDocument();
     expect(
+      navigation.querySelector('a[href="/open-auction"]'),
+    ).toHaveTextContent("Mở đấu giá");
+    expect(
       screen.queryByRole("button", { name: "Đã kết thúc" }),
     ).not.toBeInTheDocument();
     expect(
