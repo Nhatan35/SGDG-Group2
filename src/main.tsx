@@ -38,6 +38,7 @@ import "./styles/admin-management.css";
 import "./styles/final-winner.css";
 import "./styles/payment-status.css";
 import "./styles/handover-overview.css";
+import "./styles/handover-address-editor.css";
 import "./styles/handover-schedule.css";
 import "./styles/delivery-tracking.css";
 import "./styles/handover-evidence.css";

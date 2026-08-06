@@ -68,7 +68,7 @@ test("customer deposits during registration and can enter a live auction without
     walletBalance: 57_000_000,
   });
 
-  await page.goto("/auctions/rolex-126610lv/live");
+  await page.goto("/auctions/diamond-gia/live");
   await page.getByRole("button", { name: "Đặt giá thủ công" }).click();
   await expect(
     page.getByRole("heading", {
@@ -81,12 +81,12 @@ test("customer deposits during registration and can enter a live auction without
     if (!raw) return null;
     const parsed = JSON.parse(raw);
     return {
-      hasDeposit: Boolean(parsed.state.auctionDeposits["rolex-126610lv"]),
+      hasDeposit: Boolean(parsed.state.auctionDeposits["diamond-gia"]),
       walletBalance: parsed.state.walletBalance,
     };
   });
   expect(liveDeposit).toEqual({
-    hasDeposit: false,
+    hasDeposit: true,
     walletBalance: 57_000_000,
   });
 });
