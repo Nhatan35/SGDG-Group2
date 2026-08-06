@@ -116,7 +116,7 @@ describe("customer registration deposit step", () => {
     ).toBeEnabled();
   });
 
-  it("allows bidding directly without a room deposit gate", async () => {
+  it("requires a room deposit before opening the manual bid form", async () => {
     const user = userEvent.setup();
     renderLiveRoom();
 
@@ -126,14 +126,16 @@ describe("customer registration deposit step", () => {
 
     expect(
       screen.getByRole("heading", {
-        name: "Nhập mức giá của bạn",
-      }),
-    ).toBeInTheDocument();
-    expect(
-      screen.queryByRole("heading", {
         name: "Xác nhận đặt cọc để tham gia đấu giá",
       }),
-    ).not.toBeInTheDocument();
-    expect(useDemoStore.getState().auctionDeposits["rolex-126610lv"]).toBeUndefined();
+    ).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Đồng ý đặt cọc" }));
+    expect(useDemoStore.getState().auctionDeposits["rolex-126610lv"]).toBe(
+      38_000_000,
+    );
+    await user.click(screen.getByRole("button", { name: "Vào đấu giá" }));
+    expect(
+      screen.getByRole("heading", { name: "Nhập mức giá của bạn" }),
+    ).toBeInTheDocument();
   });
 });

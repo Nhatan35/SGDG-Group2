@@ -1,6 +1,7 @@
 import {
   Activity,
   ArrowDownToLine,
+  ArrowUpToLine,
   Bell,
   Building2,
   CircleDollarSign,
@@ -22,6 +23,7 @@ import {
   Smartphone,
   Trophy,
   Wallet,
+  X,
 } from "lucide-react";
 import { type FormEvent, type ReactNode, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
@@ -739,6 +741,7 @@ export function WalletPage() {
     walletBalance,
     bankAccounts: linkedBankAccounts,
     addBankAccount,
+    topUpWallet,
     withdrawFromWallet,
   } = useDemoStore();
   const payoutRequests = useFinanceFlowStore(
@@ -749,6 +752,11 @@ export function WalletPage() {
   );
   const bankAccounts = linkedBankAccounts ?? [];
   const [showBankForm, setShowBankForm] = useState(false);
+  const [showTopUp, setShowTopUp] = useState(false);
+  const [topUpAmount, setTopUpAmount] = useState("");
+  const [topUpMethod, setTopUpMethod] = useState<"BANK_TRANSFER" | "NAPAS">(
+    "BANK_TRANSFER",
+  );
   const [withdrawAmount, setWithdrawAmount] = useState("");
   const [selectedBankId, setSelectedBankId] = useState(
     bankAccounts[0]?.id ?? "",
@@ -759,8 +767,26 @@ export function WalletPage() {
   const selectedBank =
     bankAccounts.find((item) => item.id === activeBankId) ?? bankAccounts[0];
   const amount = Number(withdrawAmount);
+  const topUpValue = Number(topUpAmount);
   const canWithdraw =
     Boolean(selectedBank) && amount > 0 && amount <= walletBalance;
+  const canTopUp = topUpValue >= 100_000 && topUpValue <= 500_000_000;
+
+  function openTopUp() {
+    setMessage("");
+    setShowTopUp(true);
+  }
+
+  function confirmTopUp(event: FormEvent) {
+    event.preventDefault();
+    if (!canTopUp) return;
+    topUpWallet(topUpValue);
+    setShowTopUp(false);
+    setTopUpAmount("");
+    setMessage(
+      `Nạp ${formatMoney(topUpValue)} vào ví thành công. Số dư khả dụng đã được cập nhật.`,
+    );
+  }
 
   function addBank(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -829,7 +855,7 @@ export function WalletPage() {
     <AccountPage
       eyebrow="VÍ SGD"
       title="Quản lý ví & tài khoản ngân hàng"
-      intro="Theo dõi số dư, liên kết nhiều tài khoản ngân hàng và xác nhận thông tin trước khi rút tiền."
+      intro="Nạp tiền, theo dõi số dư, liên kết tài khoản ngân hàng và xác nhận thông tin trước khi rút tiền."
     >
       <div className="wallet-grid">
         <section className="wallet-balance-card">
@@ -842,9 +868,17 @@ export function WalletPage() {
             Tiền trong ví dùng để đặt cọc đấu giá, nạp thêm và rút về tài khoản
             ngân hàng đã liên kết.
           </small>
+          <div className="wallet-balance-card__actions">
+            <button type="button" onClick={openTopUp}>
+              <ArrowUpToLine aria-hidden="true" /> Nạp tiền
+            </button>
+            <a href="#wallet-withdraw">
+              <ArrowDownToLine aria-hidden="true" /> Rút tiền
+            </a>
+          </div>
         </section>
 
-        <section className="panel wallet-withdraw-panel">
+        <section className="panel wallet-withdraw-panel" id="wallet-withdraw">
           <h2>
             <ArrowDownToLine />
             Rút tiền
@@ -882,9 +916,14 @@ export function WalletPage() {
               Tiếp tục xác nhận
             </button>
           </form>
-          {message && <p className="wallet-message">{message}</p>}
         </section>
       </div>
+
+      {message && (
+        <p className="wallet-message" role="status">
+          <CheckCircle2 aria-hidden="true" /> {message}
+        </p>
+      )}
 
       <section className="panel wallet-bank-panel">
         <div className="panel-title">
@@ -1036,6 +1075,121 @@ export function WalletPage() {
                 Xác nhận rút tiền
               </button>
             </div>
+          </section>
+        </div>
+      )}
+
+      {showTopUp && (
+        <div
+          className="wallet-confirm-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="topup-title"
+        >
+          <section className="wallet-confirm-modal wallet-topup-modal">
+            <header>
+              <div>
+                <span>NẠP TIỀN VÀO VÍ</span>
+                <h2 id="topup-title">Bổ sung số dư khả dụng</h2>
+                <p>Chọn số tiền và phương thức thanh toán phù hợp.</p>
+              </div>
+              <button
+                className="wallet-modal-close"
+                type="button"
+                aria-label="Đóng cửa sổ nạp tiền"
+                onClick={() => setShowTopUp(false)}
+              >
+                <X aria-hidden="true" />
+              </button>
+            </header>
+
+            <form onSubmit={confirmTopUp}>
+              <div className="wallet-topup-amount">
+                <label htmlFor="wallet-topup-amount">Số tiền muốn nạp</label>
+                <span>
+                  <input
+                    id="wallet-topup-amount"
+                    autoFocus
+                    inputMode="numeric"
+                    value={topUpAmount}
+                    onChange={(event) =>
+                      setTopUpAmount(event.target.value.replace(/\D/g, ""))
+                    }
+                    placeholder="Tối thiểu 100.000"
+                    aria-describedby="topup-limit"
+                  />
+                  <b>VND</b>
+                </span>
+                <small id="topup-limit">
+                  Hạn mức mỗi lần: 100.000 – 500.000.000 VND
+                </small>
+              </div>
+
+              <div className="wallet-topup-presets" aria-label="Chọn nhanh số tiền">
+                {[5_000_000, 10_000_000, 20_000_000, 50_000_000].map(
+                  (preset) => (
+                    <button
+                      type="button"
+                      key={preset}
+                      aria-pressed={topUpValue === preset}
+                      onClick={() => setTopUpAmount(String(preset))}
+                    >
+                      {formatMoney(preset)}
+                    </button>
+                  ),
+                )}
+              </div>
+
+              <fieldset className="wallet-topup-methods">
+                <legend>Phương thức thanh toán</legend>
+                <label className={topUpMethod === "BANK_TRANSFER" ? "selected" : ""}>
+                  <input
+                    type="radio"
+                    name="topUpMethod"
+                    value="BANK_TRANSFER"
+                    checked={topUpMethod === "BANK_TRANSFER"}
+                    onChange={() => setTopUpMethod("BANK_TRANSFER")}
+                  />
+                  <Landmark aria-hidden="true" />
+                  <span>
+                    <strong>Chuyển khoản ngân hàng</strong>
+                    <small>Xác nhận nhanh qua VietQR</small>
+                  </span>
+                </label>
+                <label className={topUpMethod === "NAPAS" ? "selected" : ""}>
+                  <input
+                    type="radio"
+                    name="topUpMethod"
+                    value="NAPAS"
+                    checked={topUpMethod === "NAPAS"}
+                    onChange={() => setTopUpMethod("NAPAS")}
+                  />
+                  <CreditCard aria-hidden="true" />
+                  <span>
+                    <strong>Thẻ nội địa Napas</strong>
+                    <small>Thanh toán bằng thẻ ngân hàng</small>
+                  </span>
+                </label>
+              </fieldset>
+
+              <div className="wallet-topup-summary">
+                <span>Số dư sau khi nạp</span>
+                <strong>{formatMoney(walletBalance + (canTopUp ? topUpValue : 0))}</strong>
+              </div>
+
+              <div className="modal-actions">
+                <button
+                  className="button secondary"
+                  type="button"
+                  onClick={() => setShowTopUp(false)}
+                >
+                  Hủy
+                </button>
+                <button className="button primary" disabled={!canTopUp}>
+                  <ArrowUpToLine aria-hidden="true" /> Xác nhận nạp tiền
+                </button>
+              </div>
+            </form>
           </section>
         </div>
       )}

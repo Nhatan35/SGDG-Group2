@@ -33,6 +33,7 @@ import {
   canEnterAuction,
   useEligibilityWorkflowStore,
 } from "../../store/eligibilityWorkflowStore";
+import { useDemoStore } from "../../store/demoStore";
 import { formatMoney } from "../../utils/format";
 import { useDemoClock } from "../../hooks/useDemoClock";
 import "../../styles/live-auction-room.css";
@@ -128,12 +129,7 @@ function LeaderboardPanel({
           <Crown aria-hidden="true" />
           Bảng xếp hạng đấu giá
         </h2>
-        <span className="leaderboard-live-state">Tự động cập nhật</span>
       </header>
-      <nav className="leaderboard-controls" aria-label="Cách xếp hạng">
-        <button className="is-active">Theo giá đấu</button>
-        <button>Theo hoạt động</button>
-      </nav>
       <ol>
         {leaderboard.map((entry, index) => (
           <li
@@ -653,6 +649,12 @@ export function LiveAuctionRoomPage() {
   const [params, setParams] = useSearchParams();
   const now = useDemoClock();
   const auction = catalogAuctions.find((item) => item.id === auctionId);
+  const walletBalance = useDemoStore((state) => state.walletBalance);
+  const auctionDeposits = useDemoStore((state) => state.auctionDeposits);
+  const topUpWallet = useDemoStore((state) => state.topUpWallet);
+  const payAuctionDeposit = useDemoStore(
+    (state) => state.payAuctionDeposit,
+  );
   const registration = useEligibilityWorkflowStore((store) =>
     store.registrations.find((item) => item.auctionId === auctionId),
   );
@@ -720,6 +722,8 @@ export function LiveAuctionRoomPage() {
   const [outbidNotice, setOutbidNotice] = useState<OutbidNotice | null>(null);
   const [manualBidPrefill, setManualBidPrefill] = useState<number | null>(null);
   const [manualBidRequestId, setManualBidRequestId] = useState(0);
+  const [pendingDepositAction, setPendingDepositAction] =
+    useState<DepositAction | null>(null);
   const [autoBidInstruction, setAutoBidInstruction] =
     useState<AutoBidInstruction>({
       status: "OFF",
@@ -778,6 +782,8 @@ export function LiveAuctionRoomPage() {
     );
 
   const minimum = price + auction.minimumIncrement;
+  const depositAmount = Math.ceil(auction.startPrice * 0.1);
+  const hasDeposit = Boolean(auctionDeposits[auction.id]);
   const remainingMs = Math.max(0, new Date(auction.endsAt).getTime() - now);
   const panel = params.get("panel");
   const activeTab = params.get("tab") === "my-bids" ? "my-bids" : "activity";
@@ -790,9 +796,28 @@ export function LiveAuctionRoomPage() {
   const openManualBid = () => {
     setManualBidPrefill(null);
     setManualBidRequestId((current) => current + 1);
+    if (!hasDeposit) {
+      setPendingDepositAction("manual-bid");
+      return;
+    }
     openPanel("manual-bid");
   };
-  const openAutoBid = () => openPanel("autobid");
+  const openAutoBid = () => {
+    if (!hasDeposit) {
+      setPendingDepositAction("autobid");
+      return;
+    }
+    openPanel("autobid");
+  };
+  const confirmDeposit = (topUpAmount: number) => {
+    if (topUpAmount > 0) topUpWallet(topUpAmount);
+    payAuctionDeposit(auction.id, depositAmount);
+  };
+  const continueAfterDeposit = () => {
+    const action = pendingDepositAction;
+    setPendingDepositAction(null);
+    if (action) openPanel(action);
+  };
   const closePanel = () =>
     setParams((current) => {
       const next = new URLSearchParams(current);
@@ -1144,13 +1169,25 @@ export function LiveAuctionRoomPage() {
                 </button>
               </div>
             )}
-            <div className="deposit-inline-status paid">
-              <ShieldCheck />
-              <div>
-                <strong>Đặt cọc đã được xác nhận khi đăng ký</strong>
-                <span>Quyền đặt giá của bạn đã được mở cho phiên này.</span>
+            {hasDeposit ? (
+              <div className="deposit-inline-status paid">
+                <ShieldCheck />
+                <div>
+                  <strong>Đặt cọc đã được xác nhận</strong>
+                  <span>Quyền đặt giá của bạn đã được mở cho phiên này.</span>
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="deposit-inline-status pending">
+                <AlertCircle />
+                <div>
+                  <strong>Chưa đặt cọc cho phiên này</strong>
+                  <span>
+                    Bấm đấu giá hoặc Auto-bid để thực hiện đặt cọc 10%.
+                  </span>
+                </div>
+              </div>
+            )}
             <Button
               variant="live"
               leftIcon={<Gavel />}
@@ -1240,6 +1277,18 @@ export function LiveAuctionRoomPage() {
           onSave={saveAutoBid}
           onDisable={disableAutoBid}
           onClose={closePanel}
+        />
+      )}
+      {pendingDepositAction && (
+        <DepositGateModal
+          action={pendingDepositAction}
+          auctionName={auction.assetName}
+          startPrice={auction.startPrice}
+          depositAmount={depositAmount}
+          walletBalance={walletBalance}
+          onCancel={() => setPendingDepositAction(null)}
+          onContinue={continueAfterDeposit}
+          onConfirmDeposit={confirmDeposit}
         />
       )}
     </main>

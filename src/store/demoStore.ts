@@ -490,8 +490,8 @@ export const useDemoStore = create<DemoState>()(
     }),
     {
       name: "sgdg-demo-state",
-      version: 2,
-      migrate: (persistedState) => {
+      version: 3,
+      migrate: (persistedState, persistedVersion) => {
         const persisted =
           typeof persistedState === "object" && persistedState !== null
             ? (persistedState as Partial<DemoState>)
@@ -502,8 +502,12 @@ export const useDemoStore = create<DemoState>()(
             typeof persisted.walletBalance === "number"
               ? persisted.walletBalance
               : INITIAL_WALLET_BALANCE,
-          auctionDeposits: persisted.auctionDeposits ?? {},
-          auctionDepositRecords: persisted.auctionDepositRecords ?? {},
+          auctionDeposits:
+            persistedVersion < 3 ? {} : (persisted.auctionDeposits ?? {}),
+          auctionDepositRecords:
+            persistedVersion < 3
+              ? {}
+              : (persisted.auctionDepositRecords ?? {}),
           staffEmail:
             typeof persisted.staffEmail === "string"
               ? persisted.staffEmail
