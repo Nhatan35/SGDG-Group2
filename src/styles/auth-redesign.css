@@ -272,6 +272,28 @@
   margin-top: 22px;
 }
 
+.auth-feedback {
+  padding: 12px 14px;
+  border: 1px solid #edc9ae;
+  border-radius: 8px;
+  background: #fff7f0;
+  color: #6f4935;
+  font-size: 13px;
+  line-height: 1.5;
+  text-align: left !important;
+}
+
+.auth-feedback.is-success {
+  border-color: #b9d8c4;
+  background: #eef8f1;
+  color: #25643b;
+}
+
+.auth-shell .form-field input[aria-invalid="true"] {
+  border-color: var(--sgdg-danger);
+  background: #fff8f7;
+}
+
 .auth-shell-register .auth-card {
   padding-block: 28px;
 }

@@ -594,25 +594,124 @@ function VneidMark({ compact = false }: { compact?: boolean }) {
 export function RegisterPage() {
   const location = useLocation();
   const login = useDemoStore((s) => s.login);
-  const [done, setDone] = useState(false);
+  const [step, setStep] = useState<"details" | "otp" | "success">("details");
+  const [registration, setRegistration] = useState({
+    name: "",
+    email: "",
+    phone: "",
+  });
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [otpMessage, setOtpMessage] = useState("");
   const from =
     (location.state as { from?: string } | null)?.from || "/account/profile";
 
-  function completeRegister() {
-    login();
-    setDone(true);
+  function submitDetails(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const data = new FormData(event.currentTarget);
+    const name = String(data.get("name") || "").trim();
+    const email = String(data.get("email") || "").trim();
+    const phone = String(data.get("phone") || "").trim();
+    const password = String(data.get("password") || "");
+    const nextErrors: Record<string, string> = {};
+
+    if (!name) nextErrors.name = "Vui lòng nhập họ và tên.";
+    if (!/^\S+@\S+\.\S+$/.test(email)) {
+      nextErrors.email = "Vui lòng nhập đúng định dạng email.";
+    }
+    if (!/^\d{9,11}$/.test(phone.replace(/[\s.-]/g, ""))) {
+      nextErrors.phone = "Số điện thoại cần có từ 9 đến 11 chữ số.";
+    }
+    if (
+      password.length < 8 ||
+      !/[A-Z]/.test(password) ||
+      !/\d/.test(password)
+    ) {
+      nextErrors.password =
+        "Mật khẩu phải có ít nhất 8 ký tự, một chữ hoa và một chữ số.";
+    }
+    if (data.get("terms") !== "on") {
+      nextErrors.terms =
+        "Bạn cần đồng ý điều khoản sử dụng và chính sách bảo mật.";
+    }
+
+    setErrors(nextErrors);
+    if (Object.keys(nextErrors).length > 0) return;
+
+    setRegistration({ name, email, phone });
+    setOtpMessage("");
+    setStep("otp");
   }
 
-  if (done) {
+  function verifyOtp(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const data = new FormData(event.currentTarget);
+    const otp = String(data.get("otp") || "").trim();
+
+    if (otp !== "123456") {
+      setOtpMessage("Mã OTP chưa đúng. Vui lòng nhập mã demo 123456.");
+      return;
+    }
+
+    login(registration.name);
+    setOtpMessage("");
+    setStep("success");
+  }
+
+  if (step === "success") {
     return (
-      <AuthFrame icon={<CheckCircle2 />} title="Tạo tài khoản thành công">
-        <p>
+      <AuthFrame
+        icon={<CheckCircle2 />}
+        title="Tạo tài khoản thành công"
+        subtitle={`Chào mừng ${registration.name} đến với SGDG.`}
+      >
+        <p className="auth-feedback is-success" role="status" aria-live="polite">
           Mã OTP đã được xác minh. Tài khoản demo đã đăng nhập, bạn có thể tiếp
           tục phiên đang mở.
         </p>
         <Link className="button primary" to={from} replace>
           Tiếp tục
         </Link>
+      </AuthFrame>
+    );
+  }
+
+  if (step === "otp") {
+    return (
+      <AuthFrame
+        icon={<ShieldCheck />}
+        title="Xác minh mã OTP"
+        subtitle="Nhập mã gồm 6 chữ số để hoàn tất tạo tài khoản."
+        variant="register"
+      >
+        <p className="auth-feedback is-success" role="status" aria-live="polite">
+          Mã OTP đã được gửi đến {registration.email} và {registration.phone}.
+          Dùng mã demo <strong>123456</strong>.
+        </p>
+        <form onSubmit={verifyOtp} noValidate>
+          <FormField
+            name="otp"
+            label="Mã OTP"
+            inputMode="numeric"
+            autoComplete="one-time-code"
+            maxLength={6}
+            error={otpMessage}
+            autoFocus
+          />
+          <button className="button primary" type="submit">
+            Xác nhận và tạo tài khoản
+          </button>
+          <button
+            className="button secondary"
+            type="button"
+            onClick={() => {
+              setErrors({});
+              setOtpMessage("");
+              setStep("details");
+            }}
+          >
+            Quay lại sửa thông tin
+          </button>
+        </form>
       </AuthFrame>
     );
   }
@@ -624,33 +723,57 @@ export function RegisterPage() {
       subtitle="Mở ví, đặt cọc và tham gia những phiên đấu giá đáng tin cậy."
       variant="register"
     >
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          completeRegister();
-        }}
-      >
-        <FormField name="name" label="Họ và tên" required />
-        <FormField name="email" label="Email" type="email" required />
-        <FormField name="phone" label="Số điện thoại" type="tel" required />
+      <form onSubmit={submitDetails} noValidate>
+        <FormField
+          name="name"
+          label="Họ và tên"
+          defaultValue={registration.name}
+          error={errors.name}
+        />
+        <FormField
+          name="email"
+          label="Email"
+          type="email"
+          defaultValue={registration.email}
+          error={errors.email}
+        />
+        <FormField
+          name="phone"
+          label="Số điện thoại"
+          type="tel"
+          defaultValue={registration.phone}
+          error={errors.phone}
+        />
         <FormField
           name="password"
           label="Mật khẩu"
           type="password"
           hint="Tối thiểu 8 ký tự, có chữ hoa và số."
-          required
+          error={errors.password}
         />
         <label className="check-row">
-          <input type="checkbox" required /> Tôi đồng ý điều khoản sử dụng và
+          <input type="checkbox" name="terms" /> Tôi đồng ý điều khoản sử dụng và
           chính sách bảo mật.
         </label>
+        {errors.terms && (
+          <span className="field-error" role="alert">
+            {errors.terms}
+          </span>
+        )}
         <button className="button primary" type="submit">
           Gửi mã OTP
         </button>
       </form>
       <SocialLogin
         label="Hoặc đăng ký nhanh với"
-        onSelect={completeRegister}
+        onSelect={() => {
+          login();
+          setRegistration((current) => ({
+            ...current,
+            name: "Nguyễn Minh Anh",
+          }));
+          setStep("success");
+        }}
         vneidTo="/auth/vneid?mode=register"
         returnTo={from}
         vneidMode="register"
